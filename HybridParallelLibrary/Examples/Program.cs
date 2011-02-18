@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-using ForGpu.Examples;
-using ForGpu.Examples.CudaByExample;
-using ForGpu.Examples.Upcrc2010;
-using ForGpu.Examples.Upcrc2010.MatrixMultiplication;
+using Examples.CudaByExample;
+using Examples.Upcrc2010;
+using Examples.Upcrc2010.MatrixMultiplication;
+
 using HybridParallelLibrary;
 
-namespace ForGpu
+namespace Examples
 {
     public class Program
     {

@@ -5,7 +5,7 @@ using System.Text;
 
 using HybridParallelLibrary;
 
-namespace ForGpu.Examples.Upcrc2010
+namespace Examples.Upcrc2010
 {
     public class MatrixVectorMultiplication : ExampleBase // http://myssa.upcrc.illinois.edu/files/Lab_OpenMP_Assignments/ 
     {
