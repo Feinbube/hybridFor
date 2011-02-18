@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ForGpu.Examples.Upcrc2010.MatrixMultiplication
+namespace Examples.Upcrc2010.MatrixMultiplication
 {
     public abstract class MatrixMultiplicationBase : ExampleBase
     {

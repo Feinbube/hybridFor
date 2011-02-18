@@ -6,7 +6,7 @@ using System.IO;
 
 using HybridParallelLibrary;
 
-namespace ForGpu.Examples
+namespace Examples
 {
     public abstract class ExampleBase
     {

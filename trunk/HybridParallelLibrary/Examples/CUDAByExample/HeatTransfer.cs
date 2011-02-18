@@ -5,7 +5,7 @@ using System.Text;
 
 using HybridParallelLibrary;
 
-namespace ForGpu.Examples.CudaByExample
+namespace Examples.CudaByExample
 {
     public class HeatTransfer : ExampleBase // Based on CUDA By Example by Jason Sanders and Edward Kandrot
     {

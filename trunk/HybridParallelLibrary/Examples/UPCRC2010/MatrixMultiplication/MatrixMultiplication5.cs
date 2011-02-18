@@ -5,7 +5,7 @@ using System.Text;
 
 using HybridParallelLibrary;
 
-namespace ForGpu.Examples.Upcrc2010.MatrixMultiplication
+namespace Examples.Upcrc2010.MatrixMultiplication
 {
     public class MatrixMultiplication5 : MatrixMultiplicationBase
     {
