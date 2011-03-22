@@ -117,7 +117,7 @@ namespace Hybrid.Testsuite
             if(forGpuExample.Run(0.1, 0.1, 0.1, false, 5, 2, null) < 0 )
                 throw new Exception("Invalid result for " + forGpuExample.GetType());
 
-            System.Threading.Thread.Sleep(20);
+            System.Threading.Thread.Sleep(200);
         }
     }
 }

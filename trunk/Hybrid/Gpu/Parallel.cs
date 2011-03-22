@@ -9,12 +9,12 @@ namespace Hybrid.Gpu
     {
         public static void For(int fromInclusive, int toExclusive, Action<int> action)
         {
-            Ever.Parallel.ForGpu(fromInclusive, toExclusive, action);
+            Hybrid.MsilToOpenCL.Parallel.ForGpu(fromInclusive, toExclusive, action);
         }
 
         public static void For(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
         {
-            Ever.Parallel.ForGpu(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+            Hybrid.MsilToOpenCL.Parallel.ForGpu(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
         }
 
         public static void Invoke(params Action[] actions)
@@ -27,7 +27,7 @@ namespace Hybrid.Gpu
 
         public static void ReInitialize()
         {
-            Ever.Parallel.PurgeCaches();
+            Hybrid.MsilToOpenCL.Parallel.PurgeCaches();
         }
     }
 }

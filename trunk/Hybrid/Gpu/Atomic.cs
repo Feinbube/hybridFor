@@ -7,7 +7,7 @@ namespace Hybrid.Gpu
 {
     public class Atomic
     {
-        [Ever.OpenClAlias("atom_add")]
+        // this function is NEVER called because it will be replaced in Hyrid.Parallel regarding the annotation at the base class!!
         public static int Add(ref int location1, int value)
         {
             // implement me // OpenCL-Spec 6.11.11 atomic_add
