@@ -44,6 +44,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicBlock.cs" />
+    <Compile Include="Context\AccessPathEntry.cs" />
+    <Compile Include="Context\ArrayInfo.cs" />
+    <Compile Include="Context\HlGraph.cs" />
+    <Compile Include="Context\ILBB.cs" />
+    <Compile Include="Context\ILgraph.cs" />
+    <Compile Include="Context\StackState.cs" />
     <Compile Include="Instructions\CilBinaryComparisonInstruction.cs" />
     <Compile Include="Instructions\CilBinaryNumericInstruction.cs" />
     <Compile Include="Instructions\CilBranchInstruction.cs" />
@@ -53,8 +59,7 @@
     <Compile Include="Instructions\CilDupInstruction.cs" />
     <Compile Include="CilInstruction.cs" />
     <Compile Include="CilInstructionReader.cs" />
-    <Compile Include="Context.cs" />
-    <Compile Include="Context.Optimization.cs" />
+    <Compile Include="Context\Context.Optimization.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Instructions\CilLoadArgumentInstruction.cs" />
     <Compile Include="Instructions\CilLoadElementAddressInstruction.cs" />
