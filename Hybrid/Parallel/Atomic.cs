@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Hybrid.MsilToOpenCL;
+
 namespace Hybrid
 {
     public class Atomic
     {
         public static ExecutionMode Mode = ExecutionMode.TaskParallel;
 
-        [Ever.OpenClAlias("atom_add")]
+        [OpenClAlias("atom_add")]
         public static int Add(ref int location1, int value)
         {
             if (Mode == ExecutionMode.TaskParallel || Mode == ExecutionMode.TaskParallel2D || Mode == ExecutionMode.Serial)

@@ -78,12 +78,12 @@ namespace Hybrid.Benchmark
 
         private void RunBenchmark()
         {
-            Benchmark(0.1);
-            Benchmark(0.5);
-            Benchmark(1.0);
+            benchmark(0.1);
+            benchmark(0.5);
+            benchmark(1.0);
         }
 
-        private void Benchmark(double size)
+        private void benchmark(double size)
         {
             tw = evaluationLog();
 
@@ -101,7 +101,7 @@ namespace Hybrid.Benchmark
             tw.Close();
         }
 
-        private void RunFindGoodSizes()
+        private void runFindGoodSizes()
         {
             foreach (ExampleBase example in examples())
                 findGoodSize(example);

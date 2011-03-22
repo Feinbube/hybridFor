@@ -9,7 +9,8 @@ using System.IO;
 
 using OpenClKernel = System.Int32;
 
-namespace Ever {
+namespace Hybrid.MsilToOpenCL
+{
 	/// <summary>
 	/// This attribute marks methods that represent built-in OpenCL functions.
 	/// If the Alias property is not specified, the .NET name of the method is used as-is in
@@ -473,8 +474,8 @@ namespace Ever {
 						if (ElementType == typeof(byte) || ElementType == typeof(int) || ElementType == typeof(uint) || ElementType == typeof(long) || ElementType == typeof(ulong)
 							|| ElementType == typeof(float) || ElementType == typeof(double)) {
 							bool ForRead = false, ForWrite = false;
-							if ((Location.Flags & Ever.HighLevel.LocationFlags.IndirectRead) != 0) { ForRead = true; }
-							if ((Location.Flags & Ever.HighLevel.LocationFlags.IndirectWrite) != 0) { ForWrite = true; }
+							if ((Location.Flags & HighLevel.LocationFlags.IndirectRead) != 0) { ForRead = true; }
+							if ((Location.Flags & HighLevel.LocationFlags.IndirectWrite) != 0) { ForWrite = true; }
 
 							if (!ForRead && !ForWrite) {
 								ForRead = ForWrite = true;
@@ -736,7 +737,7 @@ namespace Ever {
 
 			TextWriter writer = System.Console.Out;
 
-			HLgraph = new Ever.HighLevel.HlGraph(Method, MethodName);
+			HLgraph = new HighLevel.HlGraph(Method, MethodName);
 
 			if (DumpCode > 3) {
 				WriteCode(HLgraph, writer);
@@ -758,14 +759,14 @@ namespace Ever {
 			// which get their value from OpenCL's built-in get_global_id() routine.
 			// NOTE: ConvertArgumentToLocal removes the specified argument, so both calls need to specify
 			//       an ArgumentId of zero!!!
-			List<HighLevel.LocalVariableLocation> IdLocation = new List<Ever.HighLevel.LocalVariableLocation>();
+			List<HighLevel.LocalVariableLocation> IdLocation = new List<HighLevel.LocalVariableLocation>();
 			for (int i = 0; i < GidParamCount; i++) {
 				IdLocation.Add(HLgraph.ConvertArgumentToLocal(0));
 			}
 
 			// Add fromInclusive and toExclusive as additional parameters
-			List<HighLevel.ArgumentLocation> StartIdLocation = new List<Ever.HighLevel.ArgumentLocation>();
-			List<HighLevel.ArgumentLocation> EndIdLocation = new List<Ever.HighLevel.ArgumentLocation>();
+			List<HighLevel.ArgumentLocation> StartIdLocation = new List<HighLevel.ArgumentLocation>();
+			List<HighLevel.ArgumentLocation> EndIdLocation = new List<HighLevel.ArgumentLocation>();
 			for (int i = 0; i < GidParamCount; i++) {
 				StartIdLocation.Add(HLgraph.InsertArgument(i * 2 + 0, "fromInclusive" + i, typeof(int), false));
 				EndIdLocation.Add(HLgraph.InsertArgument(i * 2 + 1, "toExclusive" + i, typeof(int), false));
@@ -786,7 +787,7 @@ namespace Ever {
 			// "if (i0 >= toExclusive0) return;"
 			HighLevel.BasicBlock ReturnBlock = null;
 			foreach (HighLevel.BasicBlock BB in HLgraph.BasicBlocks) {
-				if (BB.Instructions.Count == 1 && BB.Instructions[0].InstructionType == Ever.HighLevel.InstructionType.Return) {
+				if (BB.Instructions.Count == 1 && BB.Instructions[0].InstructionType == HighLevel.InstructionType.Return) {
 					ReturnBlock = BB;
 					break;
 				}
@@ -853,10 +854,10 @@ namespace Ever {
 
 				HighLevel.ArgumentLocation Argument = HLgraph.Arguments[i];
 				string AttributeString = string.Empty;
-				if ((Argument.Flags & Ever.HighLevel.LocationFlags.IndirectRead) != 0) {
+				if ((Argument.Flags & HighLevel.LocationFlags.IndirectRead) != 0) {
 					AttributeString += "__deref_read ";
 				}
-				if ((Argument.Flags & Ever.HighLevel.LocationFlags.IndirectWrite) != 0) {
+				if ((Argument.Flags & HighLevel.LocationFlags.IndirectWrite) != 0) {
 					AttributeString += "__deref_write ";
 				}
 
@@ -942,10 +943,10 @@ namespace Ever {
 				HighLevel.ArgumentLocation Argument = HLgraph.Arguments[i];
 
 				string AttributeString = string.Empty;
-				if ((Argument.Flags & Ever.HighLevel.LocationFlags.IndirectRead) != 0) {
+				if ((Argument.Flags & HighLevel.LocationFlags.IndirectRead) != 0) {
 					AttributeString += "/*[in";
 				}
-				if ((Argument.Flags & Ever.HighLevel.LocationFlags.IndirectWrite) != 0) {
+				if ((Argument.Flags & HighLevel.LocationFlags.IndirectWrite) != 0) {
 					if (AttributeString == string.Empty) {
 						AttributeString += "/*[out";
 					} else {
@@ -969,19 +970,19 @@ namespace Ever {
 
 			foreach (HighLevel.LocalVariableLocation LocalVariable in HLgraph.LocalVariables) {
 				string AttributeString = string.Empty;
-				if ((LocalVariable.Flags & Ever.HighLevel.LocationFlags.Read) != 0) {
+				if ((LocalVariable.Flags & HighLevel.LocationFlags.Read) != 0) {
 					if (AttributeString == string.Empty) { AttributeString += "/*["; } else { AttributeString += ","; }
 					AttributeString += "read";
 				}
-				if ((LocalVariable.Flags & Ever.HighLevel.LocationFlags.Write) != 0) {
+				if ((LocalVariable.Flags & HighLevel.LocationFlags.Write) != 0) {
 					if (AttributeString == string.Empty) { AttributeString += "/*["; } else { AttributeString += ","; }
 					AttributeString += "write";
 				}
-				if ((LocalVariable.Flags & Ever.HighLevel.LocationFlags.IndirectRead) != 0) {
+				if ((LocalVariable.Flags & HighLevel.LocationFlags.IndirectRead) != 0) {
 					if (AttributeString == string.Empty) { AttributeString += "/*["; } else { AttributeString += ","; }
 					AttributeString += "deref_read";
 				}
-				if ((LocalVariable.Flags & Ever.HighLevel.LocationFlags.IndirectWrite) != 0) {
+				if ((LocalVariable.Flags & HighLevel.LocationFlags.IndirectWrite) != 0) {
 					if (AttributeString == string.Empty) { AttributeString += "/*["; } else { AttributeString += ","; }
 					AttributeString += "deref_write";
 				}

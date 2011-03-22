@@ -44,11 +44,36 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicBlock.cs" />
+    <Compile Include="Instructions\CilBinaryComparisonInstruction.cs" />
+    <Compile Include="Instructions\CilBinaryNumericInstruction.cs" />
+    <Compile Include="Instructions\CilBranchInstruction.cs" />
+    <Compile Include="Instructions\CilCallInstruction.cs" />
+    <Compile Include="Instructions\CilComparisonAndBranchInstruction.cs" />
+    <Compile Include="Instructions\CilConvertInstruction.cs" />
+    <Compile Include="Instructions\CilDupInstruction.cs" />
     <Compile Include="CilInstruction.cs" />
     <Compile Include="CilInstructionReader.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Context.Optimization.cs" />
     <Compile Include="Instruction.cs" />
+    <Compile Include="Instructions\CilLoadArgumentInstruction.cs" />
+    <Compile Include="Instructions\CilLoadElementAddressInstruction.cs" />
+    <Compile Include="Instructions\CilLoadElementInstruction.cs" />
+    <Compile Include="Instructions\CilLoadFieldAddressInstruction.cs" />
+    <Compile Include="Instructions\CilLoadFieldInstruction.cs" />
+    <Compile Include="Instructions\CilLoadI4ConstantInstruction.cs" />
+    <Compile Include="Instructions\CilLoadLocalInstruction.cs" />
+    <Compile Include="Instructions\CilLoadObjectInstruction.cs" />
+    <Compile Include="Instructions\CilLoadR4ConstantInstruction.cs" />
+    <Compile Include="Instructions\CilLoadR8ConstantInstruction.cs" />
+    <Compile Include="Instructions\CilNopInstruction.cs" />
+    <Compile Include="Instructions\CilPopInstruction.cs" />
+    <Compile Include="Instructions\CilReturnInstruction.cs" />
+    <Compile Include="Instructions\CilStoreElementInstruction.cs" />
+    <Compile Include="Instructions\CilStoreLocalInstruction.cs" />
+    <Compile Include="Instructions\CilStoreObjectInstruction.cs" />
+    <Compile Include="Instructions\CilUnaryNumericInstruction.cs" />
+    <Compile Include="Instructions\CilConditionalBranchInstruction.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Parallel.cs" />

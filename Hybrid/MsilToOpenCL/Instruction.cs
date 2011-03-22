@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ever.HighLevel {
+namespace Hybrid.MsilToOpenCL.HighLevel
+{
 	public enum InstructionType {
 		Assignment,
 		Return,
