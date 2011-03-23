@@ -34,8 +34,8 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
         private Dictionary<int, BasicBlock> m_BasicBlockOffsetMap = new Dictionary<int, BasicBlock>();
 
-        private Dictionary<System.Reflection.MethodInfo, Parallel.HlGraphCacheEntry> m_RelatedGraphs = new Dictionary<System.Reflection.MethodInfo, Parallel.HlGraphCacheEntry>();
-        internal Dictionary<System.Reflection.MethodInfo, Parallel.HlGraphCacheEntry> RelatedGraphs { get { return m_RelatedGraphs; } }
+        private Dictionary<System.Reflection.MethodInfo, HlGraphCacheEntry> m_RelatedGraphs = new Dictionary<System.Reflection.MethodInfo, HlGraphCacheEntry>();
+        internal Dictionary<System.Reflection.MethodInfo, HlGraphCacheEntry> RelatedGraphs { get { return m_RelatedGraphs; } }
 
         private int m_MaxStack;
 
@@ -797,7 +797,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                         {
                             // Not a built-in method, so we need to check whether this method can be compiled from CIL...
 
-                            Parallel.HlGraphCacheEntry RelatedGraphEntry;
+                            HlGraphCacheEntry RelatedGraphEntry;
 
                             if (!m_RelatedGraphs.TryGetValue(CallNode.MethodInfo, out RelatedGraphEntry))
                             {
@@ -855,7 +855,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             // Check for an explicitly linked routine
             //
 
-            Parallel.HlGraphCacheEntry RelatedGraphEntry;
+            HlGraphCacheEntry RelatedGraphEntry;
             if (m_RelatedGraphs.TryGetValue(MethodInfo, out RelatedGraphEntry))
             {
                 return object.ReferenceEquals(RelatedGraphEntry, null) ? null : RelatedGraphEntry.HlGraph.MethodName;
