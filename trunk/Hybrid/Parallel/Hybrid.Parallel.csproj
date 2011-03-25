@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,11 +42,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Atomic.cs" />
+    <Compile Include="ExecutionDevice.cs" />
+    <Compile Include="Memory.cs" />
     <Compile Include="Parallel.cs" />
     <Compile Include="ExecutionMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scheduler.cs" />
   </ItemGroup>
   <ItemGroup>
+	<Reference Include="OpenCLNet">
+      <HintPath>..\OpenCLNet\OpenCLNet.dll</HintPath>
+    </Reference>
     <ProjectReference Include="..\Gpu\Hybrid.Gpu.Parallel.csproj">
       <Project>{CE81F308-6B35-4098-9735-2FBFD58CF35D}</Project>
       <Name>Hybrid.Gpu.Parallel</Name>
