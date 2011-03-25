@@ -7,6 +7,7 @@ namespace Hybrid
 {
     public class Parallel
     {
+        public static Scheduler Scheduler = new Scheduler();
         public static ExecutionMode Mode = ExecutionMode.TaskParallel;
 
         public static void For(int fromInclusive, int toExclusive, Action<int> action)
@@ -19,15 +20,26 @@ namespace Hybrid
             if (fromInclusive >= toExclusive)
                 return;
 
-            if (mode == ExecutionMode.TaskParallel || mode == ExecutionMode.TaskParallel2D)
-                System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, action);
+            switch (mode)
+            {
+                case ExecutionMode.TaskParallel:
+                case ExecutionMode.TaskParallel2D:
+                    System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, action);
+                    break;
 
-            if (mode == ExecutionMode.Gpu || mode == ExecutionMode.Gpu2D)
-                Gpu.Parallel.For(fromInclusive, toExclusive, action);
+                case ExecutionMode.Gpu:
+                case ExecutionMode.Gpu2D:
+                    Gpu.Parallel.For(fromInclusive, toExclusive, action);
+                    break;
 
-            if (mode == ExecutionMode.Serial)
-                for (int i = fromInclusive; i < toExclusive; i++)
-                    action(i);
+                case ExecutionMode.Serial:
+                    for (int i = fromInclusive; i < toExclusive; i++)
+                        action(i);
+                    break;
+
+                default:
+                    throw new NotImplementedException("Execution mode " + mode.ToString() + " is not supported.");
+            }
         }
 
         public static void For(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
@@ -38,54 +50,78 @@ namespace Hybrid
         public static void For(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action, ExecutionMode mode)
         {
             if (fromInclusiveX >= toExclusiveX || fromInclusiveY >= toExclusiveY)
-            {
                 return;
-            }
 
-            if (mode == ExecutionMode.TaskParallel)
-                System.Threading.Tasks.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
-                {
-                    for (int y = fromInclusiveY; y < toExclusiveY; y++)
-                        action(x, y);
-                });
-
-            if (mode == ExecutionMode.TaskParallel2D)
-                System.Threading.Tasks.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
-                {
-                    System.Threading.Tasks.Parallel.For(fromInclusiveY, toExclusiveY, delegate(int y)
+            switch (mode)
+            {
+                case ExecutionMode.TaskParallel:
+                    System.Threading.Tasks.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
                     {
-                        action(x, y);
+                        for (int y = fromInclusiveY; y < toExclusiveY; y++)
+                            action(x, y);
                     });
-                });
+                    break;
 
-            // TODO: Uncomment me
-            //if (mode == ExecutionMode.Gpu)
-            //    Gpu.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
-            //    {
-            //        for (int y = fromInclusiveY; y < toExclusiveY; y++)
-            //            action(x, y);
-            //    });
+                case ExecutionMode.TaskParallel2D:
+                    System.Threading.Tasks.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
+                    {
+                        System.Threading.Tasks.Parallel.For(fromInclusiveY, toExclusiveY, delegate(int y)
+                        {
+                            action(x, y);
+                        });
+                    });
+                    break;
 
-            if (mode == ExecutionMode.Gpu || mode == ExecutionMode.Gpu2D)
-                Gpu.Parallel.For(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+                case ExecutionMode.Gpu:
+                // TODO: Uncomment me
+                //if (mode == ExecutionMode.Gpu)
+                //    Gpu.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
+                //    {
+                //        for (int y = fromInclusiveY; y < toExclusiveY; y++)
+                //            action(x, y);
+                //    });
+                //    break;
+                case ExecutionMode.Gpu2D:
+                    Gpu.Parallel.For(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+                    break;
 
-            if (mode == ExecutionMode.Serial)
-                for (int x = fromInclusiveX; x < toExclusiveX; x++)
-                    for (int y = fromInclusiveY; y < toExclusiveY; y++)
-                        action(x, y);
+                case ExecutionMode.Serial:
+                    for (int x = fromInclusiveX; x < toExclusiveX; x++)
+                        for (int y = fromInclusiveY; y < toExclusiveY; y++)
+                            action(x, y);
+                    break;
+
+                case ExecutionMode.Automatic:
+                    Scheduler.ExecuteAutomatic(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+                    break;
+
+                default:
+                    throw new NotImplementedException("Execution mode " + mode.ToString() + " is not supported.");
+            }
         }
 
         public static void Invoke(params Action[] actions)
         {
-            if (Mode == ExecutionMode.TaskParallel || Mode == ExecutionMode.TaskParallel2D)
-                System.Threading.Tasks.Parallel.Invoke(actions);
+            switch (Mode)
+            {
+                case ExecutionMode.TaskParallel:
+                case ExecutionMode.TaskParallel2D:
+                    System.Threading.Tasks.Parallel.Invoke(actions);
+                    break;
 
-            if (Mode == ExecutionMode.Gpu || Mode == ExecutionMode.Gpu2D)
-                Gpu.Parallel.Invoke(actions);
+                case ExecutionMode.Gpu:
+                case ExecutionMode.Gpu2D:
+                    Gpu.Parallel.Invoke(actions);
+                    break;
 
-            if (Mode == ExecutionMode.Serial)
-                foreach (Action action in actions)
-                    action();
+                case ExecutionMode.Serial:
+                    foreach (Action action in actions)
+                        action();
+                    break;
+
+                default:
+                    throw new NotImplementedException("Execution mode " + Mode.ToString() + " is not supported.");
+            }
         }
 
         public static void ReInitialize()
