@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -42,15 +43,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Atomic.cs" />
-    <Compile Include="ExecutionDevice.cs" />
-    <Compile Include="Memory.cs" />
+    <Compile Include="ComputeDevice.cs" />
+    <Compile Include="ComputeUnit.cs" />
+    <Compile Include="MemoryInfo.cs" />
     <Compile Include="Parallel.cs" />
     <Compile Include="ExecutionMode.cs" />
+    <Compile Include="Platform.cs" />
+    <Compile Include="ProcessingElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scheduler.cs" />
   </ItemGroup>
   <ItemGroup>
-	<Reference Include="OpenCLNet">
+    <Reference Include="OpenCLNet">
       <HintPath>..\OpenCLNet\OpenCLNet.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\Gpu\Hybrid.Gpu.Parallel.csproj">
