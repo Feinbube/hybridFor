@@ -5,14 +5,14 @@ using System.Text;
 
 namespace Hybrid
 {
-    public class Memory
+    public class MemoryInfo
     {
-        public enum MemoryTypes { L2Cache, L3Cache, Register, Private, Local, Global }
+        public enum CacheTypes { None, ReadOnly, ReadWrite }
+        public CacheTypes CacheType;
 
-        public MemoryTypes MemoryType;
-
-        public ulong Size;
         public ulong CacheSize;
         public ulong CacheLineSize;
+
+        public ulong Size;
     }
 }
