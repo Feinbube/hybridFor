@@ -9,7 +9,7 @@ namespace Hybrid
 {
     public class ComputeDevice
     {
-        public enum DeviceTypes { NumaNode, Gpu, Accelerator, Unknown }
+        public enum DeviceTypes { Cpu, Gpu, Accelerator, Unknown }
         public DeviceTypes DeviceType;
 
         public string Name;
@@ -20,21 +20,9 @@ namespace Hybrid
 
         public List<ComputeUnit> ComputeUnits;
 
-        [DllImport("kernel32.dll", EntryPoint = "GetNumaAvailableMemoryNodeEx")]
-        [return: MarshalAsAttribute(UnmanagedType.Bool)]
-        public static extern bool GetNumaAvailableMemoryNodeEx(byte Node, out ulong AvailableBytes);
-
         public ComputeDevice(ManagementObject processorInfo)
         {
-
-            ulong size;
-
-            for(byte i=0; i<10; i++)
-                GetNumaAvailableMemoryNodeEx(i, out size);
-
-
-
-            DeviceType = DeviceTypes.NumaNode;
+            DeviceType = DeviceTypes.Cpu;
 
             Name = processorInfo["Name"].ToString();
             Manufacturer = processorInfo["Manufacturer"].ToString();
@@ -46,16 +34,25 @@ namespace Hybrid
             for (int i = 0; i < NumberOfCores; i++)
                 ComputeUnits.Add(new ComputeUnit(processorInfo));
 
+            GlobalMemory = new MemoryInfo()
+            {
+                Type = MemoryInfo.Types.Global,
+                Size = getGlobalMemorySizeForProcessor(processorInfo)
+            };
+        }
 
+        private ulong getGlobalMemorySizeForProcessor(ManagementObject processorInfo)
+        {
+            ulong overallCapacity = 0; // TODO: NUMA-aware
 
-            //GlobalMemory = new MemoryInfo()
-            //{
-            //    Size = device.GlobalMemSize,
+            ManagementClass physicalMemoryInfos = new ManagementClass("Win32_PhysicalMemory");
+            foreach (ManagementObject physicalMemoryInfo in physicalMemoryInfos.GetInstances())
+                overallCapacity += ulong.Parse(physicalMemoryInfo["Capacity"].ToString());
 
-            //    CacheType = mapCacheType(device.GlobalMemCacheType),
-            //    CacheSize = device.GlobalMemCacheSize,
-            //    CacheLineSize = device.GlobalMemCacheLineSize
-            //};
+            ManagementClass processorInfos = new ManagementClass("Win32_Processor");
+            int processorCount = processorInfos.GetInstances().Count;
+
+            return overallCapacity / (ulong)processorCount;
         }
 
         public ComputeDevice(OpenCLNet.Device device)
@@ -73,11 +70,8 @@ namespace Hybrid
 
             GlobalMemory = new MemoryInfo()
             {
-                Size = device.GlobalMemSize,
-
-                CacheType = mapCacheType(device.GlobalMemCacheType),
-                CacheSize = device.GlobalMemCacheSize,
-                CacheLineSize = device.GlobalMemCacheLineSize
+                Type = MemoryInfo.Types.Global,
+                Size = device.GlobalMemSize
             };
         }
 
@@ -86,7 +80,7 @@ namespace Hybrid
             ComputeDevice.DeviceTypes deviceType = ComputeDevice.DeviceTypes.Unknown;
 
             if (device.DeviceType == OpenCLNet.DeviceType.CPU)
-                deviceType = ComputeDevice.DeviceTypes.NumaNode;
+                deviceType = ComputeDevice.DeviceTypes.Cpu;
 
             if (device.DeviceType == OpenCLNet.DeviceType.GPU)
                 deviceType = ComputeDevice.DeviceTypes.Gpu;
@@ -97,18 +91,17 @@ namespace Hybrid
             return deviceType;
         }
 
-        private MemoryInfo.CacheTypes mapCacheType(OpenCLNet.DeviceMemCacheType deviceMemCacheType)
+        public double PredictPerformance(AlgorithmCharacteristics algorithmCharacteristics)
         {
-            if (deviceMemCacheType == OpenCLNet.DeviceMemCacheType.READ_ONLY_CACHE)
-                return MemoryInfo.CacheTypes.ReadOnly;
+            double result = 0.0;
 
-            if (deviceMemCacheType == OpenCLNet.DeviceMemCacheType.READ_WRITE_CACHE)
-                return MemoryInfo.CacheTypes.ReadWrite;
+            foreach (ComputeUnit computeUnit in ComputeUnits)
+                result += computeUnit.PredictPerformance(algorithmCharacteristics);
 
-            if (deviceMemCacheType == OpenCLNet.DeviceMemCacheType.NONE)
-                return MemoryInfo.CacheTypes.None;
+            // TODO: consider DeviceTypes
+            // TODO: consider Memory
 
-            throw new Exception("OpenCLNet.DeviceMemCacheType " + deviceMemCacheType + " unknown.");
+            return result;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Hybrid
         public bool DoublePrecisionFloatingPointSupported;
 
         public MemoryInfo SharedMemory;
+        public MemoryInfo GlobalMemoryCache;
 
         public List<ProcessingElement> ProcessingElements;
 
@@ -22,11 +23,17 @@ namespace Hybrid
 
             uint processingElementCount = NumberOfLogicalProcessors / NumberOfCores;
 
+            ProcessingElements = new List<ProcessingElement>();
             for (int i = 0; i < processingElementCount; i++)
                 ProcessingElements.Add(new ProcessingElement(processorInfo));
 
-            //uint L2CacheSize = uint.Parse(processorInfo["L2CacheSize"].ToString());
-            //uint L3CacheSize = uint.Parse(processorInfo["L3CacheSize"].ToString());
+            SharedMemory = null;
+
+            GlobalMemoryCache = new MemoryInfo()
+            {
+                Size = uint.Parse(processorInfo["L3CacheSize"].ToString()),
+                Type = MemoryInfo.Types.ReadWriteCache
+            };
         }
 
         public ComputeUnit(OpenCLNet.Device device)
@@ -44,17 +51,53 @@ namespace Hybrid
             if (device.LocalMemType == OpenCLNet.DeviceLocalMemType.LOCAL)
                 SharedMemory = new MemoryInfo()
                 {
-                    Size = device.LocalMemSize,
+                    Type = MemoryInfo.Types.Shared,
+                    Size = device.LocalMemSize
+                };
 
-                    CacheType = MemoryInfo.CacheTypes.None,
-                    CacheSize = 0,
-                    CacheLineSize = 0
+            if (device.GlobalMemCacheSize == 0)
+                GlobalMemoryCache = null;
+
+            if (device.GlobalMemCacheSize > 0)
+                GlobalMemoryCache = new MemoryInfo()
+                {
+                    Type = mapCacheType(device.GlobalMemCacheType),
+                    Size = device.GlobalMemCacheSize
                 };
         }
 
         private uint getProcessingElementCount(OpenCLNet.Device device)
         {
             return 8; // TODO: Get Real Values.
+        }
+
+        private MemoryInfo.Types mapCacheType(OpenCLNet.DeviceMemCacheType deviceMemCacheType)
+        {
+            if (deviceMemCacheType == OpenCLNet.DeviceMemCacheType.READ_ONLY_CACHE)
+                return MemoryInfo.Types.ReadOnlyCache;
+
+            if (deviceMemCacheType == OpenCLNet.DeviceMemCacheType.READ_WRITE_CACHE)
+                return MemoryInfo.Types.ReadWriteCache;
+
+            throw new Exception("OpenCLNet.DeviceMemCacheType " + deviceMemCacheType + " unknown.");
+        }
+
+        public double PredictPerformance(AlgorithmCharacteristics algorithmCharacteristics)
+        {
+            double result = 0.0;
+
+            foreach (ProcessingElement processingElement in ProcessingElements)
+                result += processingElement.ClockSpeed;
+
+            if (algorithmCharacteristics.UsesDoublePrecisionFloatingPoint && !DoublePrecisionFloatingPointSupported)
+                result /= 8; // TODO: check heuristics
+
+            if (algorithmCharacteristics.UsesAtomics && !AtomicsSupported)
+                result = 0;
+
+            // TODO: consider memory as well
+
+            return result;
         }
     }
 }
