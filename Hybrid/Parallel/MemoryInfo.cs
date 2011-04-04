@@ -7,11 +7,8 @@ namespace Hybrid
 {
     public class MemoryInfo
     {
-        public enum CacheTypes { None, ReadOnly, ReadWrite }
-        public CacheTypes CacheType;
-
-        public ulong CacheSize;
-        public ulong CacheLineSize;
+        public enum Types { ReadOnlyCache, ReadWriteCache, Global, Shared, Private }
+        public Types Type;
 
         public ulong Size;
     }
