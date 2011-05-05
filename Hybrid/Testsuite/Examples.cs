@@ -44,6 +44,12 @@ namespace Hybrid.Testsuite
             testExample(new HeatTransfer());
         }
 
+        [TestMethod]
+        public void HistogramTest()
+        {
+            testExample(new Histogram());
+        }
+
         [TestMethod,Ignore]
         public void JuliaSetTest()
         {

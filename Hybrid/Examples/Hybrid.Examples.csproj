@@ -70,9 +70,9 @@
     <Compile Include="UPCRC2010\QuickSort.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hybrid.Parallel.csproj">
-      <Project>{D6C5511C-F826-4D5A-B13A-8D238DC07B56}</Project>
-      <Name>Hybrid.Parallel</Name>
+    <ProjectReference Include="..\Hybrid\Hybrid.csproj">
+      <Project>{5EAE1B62-A9FD-496D-8903-6464474FD652}</Project>
+      <Name>Hybrid</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

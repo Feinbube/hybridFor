@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Hybrid
+{
+    public class Scheduler
+    {
+        public static Platform Platform = new Platform();
+
+        public static void AutomaticFor(int fromInclusive, int toExclusive, Action<int> action)
+        {
+            ExecuteEvenDistributed(fromInclusive, toExclusive, action);
+        }
+
+        private static void ExecuteEvenDistributed(int fromInclusive, int toExclusive, Action<int> action)
+        {
+            int count = toExclusive - fromInclusive;
+            int computeDeviceCount = Platform.ComputeDevices.Count;
+            int workshare = count / computeDeviceCount;
+            int moreWorkCount = count - workshare * computeDeviceCount;
+
+            for (int i = 0; i < moreWorkCount; i++)
+            {
+                int from = fromInclusive + i * (workshare + 1);
+                int to = from + (workshare + 1);
+                execute(from, to, action, Platform.ComputeDevices[i]);
+            }
+
+            fromInclusive = fromInclusive + moreWorkCount * (workshare + 1);
+
+            for (int i = 0; i < computeDeviceCount - moreWorkCount; i++)
+            {
+                int from = fromInclusive + i * workshare;
+                int to = from + workshare;
+                execute(from, to, action, Platform.ComputeDevices[i]);
+            }
+        }
+
+        private static void execute(int fromInclusive, int toExclusive, Action<int> action, ComputeDevice computeDevice)
+        {
+            for (int i = fromInclusive; i < toExclusive; i++)
+                action(i);
+        }
+
+        public static void AutomaticFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
+        {
+            for (int x = fromInclusiveX; x < toExclusiveX; x++)
+                for (int y = fromInclusiveY; y < toExclusiveY; y++)
+                    action(x, y);
+        }
+
+        public static void AutomaticInvoke(Action[] actions)
+        {
+            foreach (Action action in actions)
+                action();
+        }
+    }
+}

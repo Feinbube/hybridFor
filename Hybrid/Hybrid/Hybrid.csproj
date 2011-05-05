@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CE81F308-6B35-4098-9735-2FBFD58CF35D}</ProjectGuid>
+    <ProjectGuid>{5EAE1B62-A9FD-496D-8903-6464474FD652}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hybrid.Parallel.Gpu</RootNamespace>
-    <AssemblyName>Hybrid.Parallel.Gpu</AssemblyName>
+    <RootNamespace>Hybrid</RootNamespace>
+    <AssemblyName>Hybrid</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,8 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenCLNet">
+      <HintPath>..\OpenCLNet\OpenCLNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,8 +45,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Atomic.cs" />
+    <Compile Include="Core\AlgorithmCharacteristics.cs" />
+    <Compile Include="Core\ComputeDevice.cs" />
+    <Compile Include="Core\ComputeUnit.cs" />
+    <Compile Include="Cpu\CpuComputeDevice.cs" />
+    <Compile Include="Cpu\CpuComputeUnit.cs" />
+    <Compile Include="Cpu\CpuProcessingElement.cs" />
+    <Compile Include="Scheduling\ExecutionMode.cs" />
+    <Compile Include="Gpu\Atomic.cs" />
+    <Compile Include="Gpu\GpuComputeDevice.cs" />
+    <Compile Include="Gpu\GpuComputeUnit.cs" />
+    <Compile Include="Gpu\GpuProcessingElement.cs" />
+    <Compile Include="Gpu\Parallel.cs" />
+    <Compile Include="Core\MemoryInfo.cs" />
+    <Compile Include="Core\ProcessingElement.cs" />
     <Compile Include="Parallel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scheduling\Platform.cs" />
+    <Compile Include="Scheduling\Scheduler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MsilToOpenCL\Hybrid.MsilToOpenCL.csproj">
