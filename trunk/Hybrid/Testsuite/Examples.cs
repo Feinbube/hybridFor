@@ -100,6 +100,7 @@ namespace Hybrid.Testsuite
 
         private void testExample(ExampleBase example)
         {
+            runExample(example, ExecutionMode.Automatic);
             runExample(example, ExecutionMode.Serial);
             runExample(example, ExecutionMode.Gpu);
             runExample(example, ExecutionMode.TaskParallel);

@@ -28,10 +28,20 @@ namespace Hybrid.Benchmark
         {
             Environment.SetEnvironmentVariable("CL_LOG_ERRORS", "stdout");
 
+            printSystemInfo();
+
             new Program().RunBenchmark();
 
             Console.WriteLine("Press ENTER to quit...");
             Console.ReadLine();
+        }
+
+        static void printSystemInfo()
+        {
+            Console.WriteLine("Compute Devices found on the current platform:");
+
+            foreach (ComputeDevice computeDevice in Hybrid.Scheduler.Platform.ComputeDevices)
+                Console.WriteLine(" * " + computeDevice.Name + " [performance index: " + computeDevice.PredictPerformance(new AlgorithmCharacteristics()) + "]");
         }
 
         static TextWriter evaluationLog()
@@ -151,6 +161,10 @@ namespace Hybrid.Benchmark
 
             Console.Write("[GPU2D]      ");
             runExample(forGpuExample, ExecutionMode.Gpu2D);
+            Parallel.ReInitialize();
+
+            Console.Write("[Automatic]  ");
+            runExample(forGpuExample, ExecutionMode.Automatic);
             Parallel.ReInitialize();
 
             Console.WriteLine();

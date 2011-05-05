@@ -7,7 +7,6 @@ namespace Hybrid
 {
     public class Parallel
     {
-        public static Scheduler Scheduler = new Scheduler();
         public static ExecutionMode Mode = ExecutionMode.TaskParallel;
 
         public static void For(int fromInclusive, int toExclusive, Action<int> action)
@@ -35,6 +34,10 @@ namespace Hybrid
                 case ExecutionMode.Serial:
                     for (int i = fromInclusive; i < toExclusive; i++)
                         action(i);
+                    break;
+
+                case ExecutionMode.Automatic:
+                    Scheduler.ExecuteAutomatic(fromInclusive, toExclusive, action);
                     break;
 
                 default:
