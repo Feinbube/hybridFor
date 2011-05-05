@@ -53,5 +53,40 @@ namespace Hybrid.Cpu
 
             return overallCapacity / (ulong)processorCount;
         }
+
+        override public void ParallelFor(int fromInclusive, int toExclusive, Action<int> action)
+        {
+            CpuParallelFor(fromInclusive, toExclusive, action);
+        }
+
+        public static void CpuParallelFor(int fromInclusive, int toExclusive, Action<int> action)
+        {
+            if (fromInclusive >= toExclusive)
+                return;
+
+            System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, action);
+        }
+
+        override public void ParallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
+        {
+            CpuParallelFor(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+        }
+
+        public static void CpuParallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
+        {
+            if (fromInclusiveX >= toExclusiveX)
+                return;
+
+            if (fromInclusiveY >= toExclusiveY)
+                return;
+
+            System.Threading.Tasks.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
+            {
+                System.Threading.Tasks.Parallel.For(fromInclusiveY, toExclusiveY, delegate(int y)
+                {
+                    action(x, y);
+                });
+            });
+        }
     }
 }

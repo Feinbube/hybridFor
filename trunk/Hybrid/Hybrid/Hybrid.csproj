@@ -52,11 +52,9 @@
     <Compile Include="Cpu\CpuComputeUnit.cs" />
     <Compile Include="Cpu\CpuProcessingElement.cs" />
     <Compile Include="Scheduling\ExecutionMode.cs" />
-    <Compile Include="Gpu\Atomic.cs" />
     <Compile Include="Gpu\GpuComputeDevice.cs" />
     <Compile Include="Gpu\GpuComputeUnit.cs" />
     <Compile Include="Gpu\GpuProcessingElement.cs" />
-    <Compile Include="Gpu\Parallel.cs" />
     <Compile Include="Core\MemoryInfo.cs" />
     <Compile Include="Core\ProcessingElement.cs" />
     <Compile Include="Parallel.cs" />

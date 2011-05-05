@@ -40,19 +40,46 @@ namespace Hybrid
 
         private static void execute(int fromInclusive, int toExclusive, Action<int> action, ComputeDevice computeDevice)
         {
-            for (int i = fromInclusive; i < toExclusive; i++)
-                action(i);
+            computeDevice.ParallelFor(fromInclusive, toExclusive, action);
         }
 
         public static void AutomaticFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
         {
-            for (int x = fromInclusiveX; x < toExclusiveX; x++)
-                for (int y = fromInclusiveY; y < toExclusiveY; y++)
-                    action(x, y);
+            ExecuteEvenDistributedByColumn(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+        }
+
+        private static void ExecuteEvenDistributedByColumn(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int,int> action)
+        {
+            int count = toExclusiveX - fromInclusiveX;
+            int computeDeviceCount = Platform.ComputeDevices.Count;
+            int workshare = count / computeDeviceCount;
+            int moreWorkCount = count - workshare * computeDeviceCount;
+
+            for (int i = 0; i < moreWorkCount; i++)
+            {
+                int from = fromInclusiveX + i * (workshare + 1);
+                int to = from + (workshare + 1);
+                execute(from, to, fromInclusiveY, toExclusiveY, action, Platform.ComputeDevices[i]);
+            }
+
+            fromInclusiveX = fromInclusiveX + moreWorkCount * (workshare + 1);
+
+            for (int i = 0; i < computeDeviceCount - moreWorkCount; i++)
+            {
+                int from = fromInclusiveX + i * workshare;
+                int to = from + workshare;
+                execute(from, to, fromInclusiveY, toExclusiveY, action, Platform.ComputeDevices[i]);
+            }
+        }
+
+        private static void execute(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int,int> action, ComputeDevice computeDevice)
+        {
+            computeDevice.ParallelFor(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
         }
 
         public static void AutomaticInvoke(Action[] actions)
         {
+            // Todo Implement me
             foreach (Action action in actions)
                 action();
         }

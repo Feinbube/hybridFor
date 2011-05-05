@@ -16,7 +16,7 @@ namespace Hybrid.MsilToOpenCL
         private static Dictionary<MethodInfo, HlGraphCacheEntry> HlGraphCache = new Dictionary<MethodInfo, HlGraphCacheEntry>();
         private static int HlGraphSequenceNumber = 0;
 
-        public static void ForGpu(int fromInclusive, int toExclusive, Action<int> action)
+        public static void ForGpu(int fromInclusive, int toExclusive, Action<int> action, OpenCLNet.Device device)
         {
             HlGraphCacheEntry CacheEntry = GetHlGraph(action.Method, 1);
 
@@ -31,11 +31,11 @@ namespace Hybrid.MsilToOpenCL
                 if (CacheEntry.toExclusiveLocation.Count > 0)
                     ctx.PutArgument(CacheEntry.toExclusiveLocation[0], toExclusive);
 
-                DoInvoke(new int[] { toExclusive - fromInclusive }, action.Target, CacheEntry, ctx);
+                DoInvoke(new int[] { toExclusive - fromInclusive }, action.Target, CacheEntry, ctx, device);
             }
         }
 
-        public static void ForGpu(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
+        public static void ForGpu(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action, OpenCLNet.Device device)
         {
             HlGraphCacheEntry CacheEntry = GetHlGraph(action.Method, 2);
 
@@ -56,7 +56,7 @@ namespace Hybrid.MsilToOpenCL
                 if (CacheEntry.toExclusiveLocation.Count > 1)
                     ctx.PutArgument(CacheEntry.toExclusiveLocation[1], toExclusiveY);
 
-                DoInvoke(new int[] { toExclusiveX - fromInclusiveX, toExclusiveY - fromInclusiveY }, action.Target, CacheEntry, ctx);
+                DoInvoke(new int[] { toExclusiveX - fromInclusiveX, toExclusiveY - fromInclusiveY }, action.Target, CacheEntry, ctx, device);
             }
         }
 
@@ -70,7 +70,7 @@ namespace Hybrid.MsilToOpenCL
                     SetArguments(ctx, Entry.Key.GetValue(Target), Entry.Value);
         }
 
-        private static void DoInvoke(int[] WorkSize, object Target, HlGraphCacheEntry CacheEntry, InvokeContext ctx)
+        private static void DoInvoke(int[] WorkSize, object Target, HlGraphCacheEntry CacheEntry, InvokeContext ctx, OpenCLNet.Device device)
         {
             HighLevel.HlGraph HLgraph = CacheEntry.HlGraph;
 
@@ -110,15 +110,16 @@ namespace Hybrid.MsilToOpenCL
             }
             ctx.Complete();
 
-            callOpenCLNet(WorkSize, CacheEntry, ctx, HLgraph);
+            callOpenCLNet(WorkSize, CacheEntry, ctx, HLgraph, device);
         }
 
-        private static void callOpenCLNet(int[] WorkSize, HlGraphCacheEntry CacheEntry, InvokeContext ctx, HighLevel.HlGraph HLgraph)
+        private static void callOpenCLNet(int[] WorkSize, HlGraphCacheEntry CacheEntry, InvokeContext ctx, HighLevel.HlGraph HLgraph, OpenCLNet.Device device)
         {
             // We can invoke the kernel using the arguments from ctx now :)
-            OpenCLNet.Platform Platform = OpenCLNet.OpenCL.GetPlatform(0);
-            OpenCLNet.Device[] Devices = Platform.QueryDevices(OpenCLNet.DeviceType.ALL);
-            OpenCLNet.Device Device = Devices[0];
+            if (device == null)
+                device = getFirstGpu();
+
+            OpenCLNet.Platform Platform = device.Platform;
 
             OpenCLNet.Context context;
             OpenCLNet.Program program;
@@ -133,13 +134,13 @@ namespace Hybrid.MsilToOpenCL
                         new IntPtr((long)OpenCLNet.ContextProperties.PLATFORM), Platform.PlatformID,
                         IntPtr.Zero,
                     };
-                    context = CacheEntry.Context = Platform.CreateContext(properties, new OpenCLNet.Device[] { Device }, null, IntPtr.Zero);
+                    context = CacheEntry.Context = Platform.CreateContext(properties, new OpenCLNet.Device[] { device }, null, IntPtr.Zero);
                 }
 
                 program = CacheEntry.Program;
                 if (program == null)
                 {
-                    program = context.CreateProgramWithSource(GetOpenCLSourceHeader(Platform, Device) + CacheEntry.Source);
+                    program = context.CreateProgramWithSource(GetOpenCLSourceHeader(Platform, device) + CacheEntry.Source);
 
                     try
                     {
@@ -147,7 +148,7 @@ namespace Hybrid.MsilToOpenCL
                     }
                     catch (Exception ex)
                     {
-                        string err = program.GetBuildLog(Device);
+                        string err = program.GetBuildLog(device);
                         throw new Exception(err, ex);
                     }
 
@@ -155,7 +156,7 @@ namespace Hybrid.MsilToOpenCL
                 }
             }
 
-            using (CallContext CallContext = new CallContext(context, Device, OpenCLNet.CommandQueueProperties.PROFILING_ENABLE, program.CreateKernel(HLgraph.MethodName)))
+            using (CallContext CallContext = new CallContext(context, device, OpenCLNet.CommandQueueProperties.PROFILING_ENABLE, program.CreateKernel(HLgraph.MethodName)))
             {
                 OpenCLNet.CommandQueue commandQueue = CallContext.CommandQueue;
 
@@ -188,6 +189,15 @@ namespace Hybrid.MsilToOpenCL
                 StartEvent.GetEventProfilingInfo(OpenCLNet.ProfilingInfo.QUEUED, out StartTime);
                 EndEvent.GetEventProfilingInfo(OpenCLNet.ProfilingInfo.END, out EndTime);
             }
+        }
+
+        private static OpenCLNet.Device getFirstGpu()
+        {
+            foreach (OpenCLNet.Platform platform in OpenCLNet.OpenCL.GetPlatforms())
+                foreach (OpenCLNet.Device device in platform.QueryDevices(OpenCLNet.DeviceType.GPU))
+                    return device;
+
+            return null;
         }
 
         public static int DumpCode = 0;	// 0-2: nothing, 3 = final, 4 = initial, 5 = after optimize, 6 = after OpenCL transform

@@ -88,8 +88,8 @@ namespace Hybrid.Benchmark
 
         private void RunBenchmark()
         {
-            benchmark(0.1);
-            benchmark(0.5);
+            //benchmark(0.1);
+            //benchmark(0.5);
             benchmark(1.0);
         }
 
