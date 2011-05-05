@@ -37,7 +37,7 @@ namespace Hybrid
                     break;
 
                 case ExecutionMode.Automatic:
-                    Scheduler.ExecuteAutomatic(fromInclusive, toExclusive, action);
+                    Scheduler.AutomaticFor(fromInclusive, toExclusive, action);
                     break;
 
                 default:
@@ -95,7 +95,7 @@ namespace Hybrid
                     break;
 
                 case ExecutionMode.Automatic:
-                    Scheduler.ExecuteAutomatic(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+                    Scheduler.AutomaticFor(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
                     break;
 
                 default:
@@ -120,6 +120,10 @@ namespace Hybrid
                 case ExecutionMode.Serial:
                     foreach (Action action in actions)
                         action();
+                    break;
+
+                case ExecutionMode.Automatic:
+                    Scheduler.AutomaticInvoke(actions);
                     break;
 
                 default:

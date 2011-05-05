@@ -20,15 +20,7 @@ namespace Hybrid
 
         private void findOpenCLDevices()
         {
-            OpenCLNet.Platform[] platforms = OpenCLNet.OpenCL.GetPlatforms();
-            foreach (OpenCLNet.Platform platform in platforms)
-            {
-                OpenCLNet.Device[] devices = platform.QueryDevices(OpenCLNet.DeviceType.ALL);
-
-                foreach (OpenCLNet.Device device in devices)
-                    if(device.DeviceType != OpenCLNet.DeviceType.CPU) // We don't like the way AMD and Intel map CPUs to OpenCL
-                        ComputeDevices.Add(new ComputeDevice(device));
-            }
+            ComputeDevices.AddRange(Gpu.GpuComputeDevice.GpuComputeDevices());
         }
 
         private bool noCpuInDeviceList()
@@ -42,9 +34,7 @@ namespace Hybrid
 
         private void findProcessors()
         {
-            ManagementClass processorInfos = new ManagementClass("Win32_Processor");
-            foreach (ManagementObject processorInfo in processorInfos.GetInstances())
-                ComputeDevices.Add(new ComputeDevice(processorInfo));
+            ComputeDevices.AddRange(Cpu.CpuComputeDevice.CpuComputeDevices());
         }
 
         public double PredictPerformance(AlgorithmCharacteristics algorithmCharacteristics)

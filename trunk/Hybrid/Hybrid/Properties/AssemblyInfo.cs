@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HybridParallelLibrary.Gpu")]
+[assembly: AssemblyTitle("Hybrid")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("HybridParallelLibrary.Gpu")]
+[assembly: AssemblyProduct("Hybrid")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("26c7bb99-71d6-4d4d-89be-f65eea8ade9a")]
+[assembly: Guid("183d4edb-62a6-41eb-b305-5dc37c65062a")]
 
 // Version information for an assembly consists of the following four values:
 //
