@@ -7,6 +7,8 @@ namespace Hybrid.Gpu
 {
     public class GpuComputeDevice : ComputeDevice
     {
+        OpenCLNet.Device device;
+
         public static List<GpuComputeDevice> GpuComputeDevices()
         {
             List<GpuComputeDevice> result = new List<GpuComputeDevice>();
@@ -14,11 +16,10 @@ namespace Hybrid.Gpu
             OpenCLNet.Platform[] platforms = OpenCLNet.OpenCL.GetPlatforms();
             foreach (OpenCLNet.Platform platform in platforms)
             {
-                OpenCLNet.Device[] devices = platform.QueryDevices(OpenCLNet.DeviceType.ALL);
+                OpenCLNet.Device[] devices = platform.QueryDevices(OpenCLNet.DeviceType.GPU);
 
                 foreach (OpenCLNet.Device device in devices)
-                    if (device.DeviceType == OpenCLNet.DeviceType.GPU)
-                        result.Add(new GpuComputeDevice(device));
+                    result.Add(new GpuComputeDevice(device));
             }
 
             return result;
@@ -26,6 +27,8 @@ namespace Hybrid.Gpu
 
         public GpuComputeDevice(OpenCLNet.Device device)
         {
+            this.device = device;
+
             DeviceType = getDeviceType(device);
 
             Name = device.Name;
@@ -58,6 +61,57 @@ namespace Hybrid.Gpu
                 deviceType = ComputeDevice.DeviceTypes.Accelerator;
 
             return deviceType;
+        }
+
+        override public void ParallelFor(int fromInclusive, int toExclusive, Action<int> action)
+        {
+            if (fromInclusive >= toExclusive)
+                return;
+
+            Hybrid.MsilToOpenCL.Parallel.ForGpu(fromInclusive, toExclusive, action, device);
+        }
+
+        public static void GpuParallelFor(int fromInclusive, int toExclusive, Action<int> action)
+        {
+            if (fromInclusive >= toExclusive)
+                return;
+
+            Hybrid.MsilToOpenCL.Parallel.ForGpu(fromInclusive, toExclusive, action, null);
+        }
+
+        override public void ParallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
+        {
+            if (fromInclusiveX >= toExclusiveX)
+                return;
+
+            if (fromInclusiveY >= toExclusiveY)
+                return;
+
+            Hybrid.MsilToOpenCL.Parallel.ForGpu(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action, device);
+        }
+
+        public static void GpuParallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
+        {
+            if (fromInclusiveX >= toExclusiveX)
+                return;
+
+            if (fromInclusiveY >= toExclusiveY)
+                return;
+
+            Hybrid.MsilToOpenCL.Parallel.ForGpu(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action, null);
+        }
+
+        public static void GpuParallelInvoke(params Action[] actions)
+        {
+            // TODO: Uncomment me
+            // throw new NotImplementedException();
+
+            System.Threading.Tasks.Parallel.Invoke(actions);
+        }
+
+        public static void GpuReInitialize()
+        {
+            Hybrid.MsilToOpenCL.Parallel.PurgeCaches();
         }
     }
 }

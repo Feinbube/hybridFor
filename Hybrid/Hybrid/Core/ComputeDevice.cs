@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Hybrid
 {
-    public class ComputeDevice
+    abstract public class ComputeDevice
     {
         public enum DeviceTypes { Cpu, Gpu, Accelerator, Unknown }
         public DeviceTypes DeviceType;
@@ -34,5 +34,8 @@ namespace Hybrid
 
             return result;
         }
+
+        abstract public void ParallelFor(int fromInclusive, int toExclusive, Action<int> action);
+        abstract public void ParallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int,int> action);
     }
 }

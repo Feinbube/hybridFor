@@ -23,12 +23,12 @@ namespace Hybrid
             {
                 case ExecutionMode.TaskParallel:
                 case ExecutionMode.TaskParallel2D:
-                    System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, action);
+                    Cpu.CpuComputeDevice.CpuParallelFor(fromInclusive, toExclusive, action);
                     break;
 
                 case ExecutionMode.Gpu:
                 case ExecutionMode.Gpu2D:
-                    Gpu.Parallel.For(fromInclusive, toExclusive, action);
+                    Gpu.GpuComputeDevice.GpuParallelFor(fromInclusive, toExclusive, action);
                     break;
 
                 case ExecutionMode.Serial:
@@ -58,7 +58,7 @@ namespace Hybrid
             switch (mode)
             {
                 case ExecutionMode.TaskParallel:
-                    System.Threading.Tasks.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
+                    Cpu.CpuComputeDevice.CpuParallelFor(fromInclusiveX, toExclusiveX, delegate(int x)
                     {
                         for (int y = fromInclusiveY; y < toExclusiveY; y++)
                             action(x, y);
@@ -66,13 +66,7 @@ namespace Hybrid
                     break;
 
                 case ExecutionMode.TaskParallel2D:
-                    System.Threading.Tasks.Parallel.For(fromInclusiveX, toExclusiveX, delegate(int x)
-                    {
-                        System.Threading.Tasks.Parallel.For(fromInclusiveY, toExclusiveY, delegate(int y)
-                        {
-                            action(x, y);
-                        });
-                    });
+                    Cpu.CpuComputeDevice.CpuParallelFor(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
                     break;
 
                 case ExecutionMode.Gpu:
@@ -85,7 +79,7 @@ namespace Hybrid
                 //    });
                 //    break;
                 case ExecutionMode.Gpu2D:
-                    Gpu.Parallel.For(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+                    Gpu.GpuComputeDevice.GpuParallelFor(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
                     break;
 
                 case ExecutionMode.Serial:
@@ -114,7 +108,7 @@ namespace Hybrid
 
                 case ExecutionMode.Gpu:
                 case ExecutionMode.Gpu2D:
-                    Gpu.Parallel.Invoke(actions);
+                    Gpu.GpuComputeDevice.GpuParallelInvoke(actions);
                     break;
 
                 case ExecutionMode.Serial:
@@ -134,7 +128,7 @@ namespace Hybrid
         public static void ReInitialize()
         {
             if (Mode == ExecutionMode.Gpu || Mode == ExecutionMode.Gpu2D)
-                Gpu.Parallel.ReInitialize();
+                Gpu.GpuComputeDevice.GpuReInitialize();
         }
     }
 }
