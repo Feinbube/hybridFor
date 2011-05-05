@@ -18,6 +18,8 @@ namespace Hybrid
             uint CurrentClockSpeed = uint.Parse(processorInfo["CurrentClockSpeed"].ToString());
             uint MaxClockSpeed = uint.Parse(processorInfo["MaxClockSpeed"].ToString());
 
+            ClockSpeed = MaxClockSpeed;
+
             PrivateMemory = null; // TODO: get real values
 
             Cache = new MemoryInfo()

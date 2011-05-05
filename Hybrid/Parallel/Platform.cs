@@ -8,13 +8,13 @@ namespace Hybrid
 {
     public class Platform
     {
-        List<ComputeDevice> computeDevices = new List<ComputeDevice>();
+        public List<ComputeDevice> ComputeDevices = new List<ComputeDevice>();
 
         public Platform()
         {
             findOpenCLDevices();
 
-            if (noCpuInDeviceList()) // TODO: check if AMDs implementation creates aquivalent ComputeDevices
+            if (noCpuInDeviceList())
                 findProcessors();
         }
 
@@ -26,14 +26,14 @@ namespace Hybrid
                 OpenCLNet.Device[] devices = platform.QueryDevices(OpenCLNet.DeviceType.ALL);
 
                 foreach (OpenCLNet.Device device in devices)
-                    if(device.DeviceType != OpenCLNet.DeviceType.CPU) // We don't like the way AMD maps CPUs to OpenCL
-                        computeDevices.Add(new ComputeDevice(device));
+                    if(device.DeviceType != OpenCLNet.DeviceType.CPU) // We don't like the way AMD and Intel map CPUs to OpenCL
+                        ComputeDevices.Add(new ComputeDevice(device));
             }
         }
 
         private bool noCpuInDeviceList()
         {
-            foreach (ComputeDevice computeDevice in computeDevices)
+            foreach (ComputeDevice computeDevice in ComputeDevices)
                 if (computeDevice.DeviceType == ComputeDevice.DeviceTypes.Cpu)
                     return false;
 
@@ -44,7 +44,17 @@ namespace Hybrid
         {
             ManagementClass processorInfos = new ManagementClass("Win32_Processor");
             foreach (ManagementObject processorInfo in processorInfos.GetInstances())
-                computeDevices.Add(new ComputeDevice(processorInfo));
+                ComputeDevices.Add(new ComputeDevice(processorInfo));
+        }
+
+        public double PredictPerformance(AlgorithmCharacteristics algorithmCharacteristics)
+        {
+            double result = 0.0;
+
+            foreach (ComputeDevice computeDevice in ComputeDevices)
+                result += computeDevice.PredictPerformance(algorithmCharacteristics);
+
+            return result;
         }
     }
 }
