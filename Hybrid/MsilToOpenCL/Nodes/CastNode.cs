@@ -20,7 +20,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
         public override string ToString()
         {
-            return "((" + Parallel.GetOpenClType(m_Type) + ")(" + (SubNodes.Count == 0 ? "???" : SubNodes[0].ToString()) + "))";
+            return "((" + OpenCLInterop.GetOpenClType(m_Type) + ")(" + (SubNodes.Count == 0 ? "???" : SubNodes[0].ToString()) + "))";
         }
     }
 }
