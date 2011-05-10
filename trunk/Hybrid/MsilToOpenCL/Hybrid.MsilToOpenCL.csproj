@@ -122,6 +122,7 @@
     <Compile Include="OpenClAliasAttribute.cs" />
     <Compile Include="OpenClFunctions.cs" />
     <Compile Include="OpenClIn.cs" />
+    <Compile Include="OpenCLInterop.cs" />
     <Compile Include="OpenClOut.cs" />
     <Compile Include="Parallel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
