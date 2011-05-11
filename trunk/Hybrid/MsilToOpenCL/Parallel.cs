@@ -13,50 +13,50 @@ namespace Hybrid.MsilToOpenCL
 {
     public class Parallel
     {
-        private static Dictionary<MethodInfo, HlGraphCacheEntry> HlGraphCache = new Dictionary<MethodInfo, HlGraphCacheEntry>();
+        private static HlGraphCache hlGraphCache = new HlGraphCache();
         private static int HlGraphSequenceNumber = 0;
 
         public static void ForGpu(int fromInclusive, int toExclusive, Action<int> action, OpenCLNet.Device device)
         {
-            HlGraphCacheEntry CacheEntry = GetHlGraph(action.Method, 1);
+            HlGraphEntry hlGraphEntry = GetHlGraph(action.Method, 1, device);
 
-            System.Diagnostics.Debug.Assert(CacheEntry.fromInclusiveLocation != null && CacheEntry.fromInclusiveLocation.Count == 1);
-            System.Diagnostics.Debug.Assert(CacheEntry.toExclusiveLocation != null && CacheEntry.toExclusiveLocation.Count == 1);
+            System.Diagnostics.Debug.Assert(hlGraphEntry.fromInclusiveLocation != null && hlGraphEntry.fromInclusiveLocation.Count == 1);
+            System.Diagnostics.Debug.Assert(hlGraphEntry.toExclusiveLocation != null && hlGraphEntry.toExclusiveLocation.Count == 1);
 
-            using (InvokeContext ctx = new InvokeContext(CacheEntry.HlGraph))
+            using (InvokeContext ctx = new InvokeContext(hlGraphEntry.HlGraph))
             {
-                if (CacheEntry.fromInclusiveLocation.Count > 0)
-                    ctx.PutArgument(CacheEntry.fromInclusiveLocation[0], fromInclusive);
+                if (hlGraphEntry.fromInclusiveLocation.Count > 0)
+                    ctx.PutArgument(hlGraphEntry.fromInclusiveLocation[0], fromInclusive);
 
-                if (CacheEntry.toExclusiveLocation.Count > 0)
-                    ctx.PutArgument(CacheEntry.toExclusiveLocation[0], toExclusive);
+                if (hlGraphEntry.toExclusiveLocation.Count > 0)
+                    ctx.PutArgument(hlGraphEntry.toExclusiveLocation[0], toExclusive);
 
-                DoInvoke(new int[] { toExclusive - fromInclusive }, action.Target, CacheEntry, ctx, device);
+                DoInvoke(new int[] { toExclusive - fromInclusive }, action.Target, hlGraphEntry, ctx, device);
             }
         }
 
         public static void ForGpu(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action, OpenCLNet.Device device)
         {
-            HlGraphCacheEntry CacheEntry = GetHlGraph(action.Method, 2);
+            HlGraphEntry hlGraphEntry = GetHlGraph(action.Method, 2, device);
 
-            System.Diagnostics.Debug.Assert(CacheEntry.fromInclusiveLocation != null && CacheEntry.fromInclusiveLocation.Count == 2);
-            System.Diagnostics.Debug.Assert(CacheEntry.toExclusiveLocation != null && CacheEntry.toExclusiveLocation.Count == 2);
+            System.Diagnostics.Debug.Assert(hlGraphEntry.fromInclusiveLocation != null && hlGraphEntry.fromInclusiveLocation.Count == 2);
+            System.Diagnostics.Debug.Assert(hlGraphEntry.toExclusiveLocation != null && hlGraphEntry.toExclusiveLocation.Count == 2);
 
-            using (InvokeContext ctx = new InvokeContext(CacheEntry.HlGraph))
+            using (InvokeContext ctx = new InvokeContext(hlGraphEntry.HlGraph))
             {
-                if (CacheEntry.fromInclusiveLocation.Count > 0)
-                    ctx.PutArgument(CacheEntry.fromInclusiveLocation[0], fromInclusiveX);
+                if (hlGraphEntry.fromInclusiveLocation.Count > 0)
+                    ctx.PutArgument(hlGraphEntry.fromInclusiveLocation[0], fromInclusiveX);
 
-                if (CacheEntry.toExclusiveLocation.Count > 0)
-                    ctx.PutArgument(CacheEntry.toExclusiveLocation[0], toExclusiveX);
+                if (hlGraphEntry.toExclusiveLocation.Count > 0)
+                    ctx.PutArgument(hlGraphEntry.toExclusiveLocation[0], toExclusiveX);
 
-                if (CacheEntry.fromInclusiveLocation.Count > 1)
-                    ctx.PutArgument(CacheEntry.fromInclusiveLocation[1], fromInclusiveY);
+                if (hlGraphEntry.fromInclusiveLocation.Count > 1)
+                    ctx.PutArgument(hlGraphEntry.fromInclusiveLocation[1], fromInclusiveY);
 
-                if (CacheEntry.toExclusiveLocation.Count > 1)
-                    ctx.PutArgument(CacheEntry.toExclusiveLocation[1], toExclusiveY);
+                if (hlGraphEntry.toExclusiveLocation.Count > 1)
+                    ctx.PutArgument(hlGraphEntry.toExclusiveLocation[1], toExclusiveY);
 
-                DoInvoke(new int[] { toExclusiveX - fromInclusiveX, toExclusiveY - fromInclusiveY }, action.Target, CacheEntry, ctx, device);
+                DoInvoke(new int[] { toExclusiveX - fromInclusiveX, toExclusiveY - fromInclusiveY }, action.Target, hlGraphEntry, ctx, device);
             }
         }
 
@@ -70,7 +70,7 @@ namespace Hybrid.MsilToOpenCL
                     SetArguments(ctx, Entry.Key.GetValue(Target), Entry.Value);
         }
 
-        private static void DoInvoke(int[] WorkSize, object Target, HlGraphCacheEntry CacheEntry, InvokeContext ctx, OpenCLNet.Device device)
+        private static void DoInvoke(int[] WorkSize, object Target, HlGraphEntry CacheEntry, InvokeContext ctx, OpenCLNet.Device device)
         {
             HighLevel.HlGraph HLgraph = CacheEntry.HlGraph;
 
@@ -117,51 +117,34 @@ namespace Hybrid.MsilToOpenCL
 
         public static void PurgeCaches()
         {
-            lock (HlGraphCache)
-            {
-                foreach (KeyValuePair<MethodInfo, HlGraphCacheEntry> Entry in HlGraphCache)
-                {
-                    if (Entry.Value != null)
-                    {
-                        Entry.Value.Dispose();
-                    }
-                }
-                HlGraphCache.Clear();
-            }
+            hlGraphCache.purge();
         }
 
-        private static HlGraphCacheEntry GetHlGraph(MethodInfo Method, int GidParamCount)
+        private static HlGraphEntry GetHlGraph(MethodInfo Method, int GidParamCount, OpenCLNet.Device device)
         {
-            HlGraphCacheEntry CacheEntry;
+            HlGraphEntry CacheEntry;
             HighLevel.HlGraph HLgraph;
             string MethodName;
-
-            lock (HlGraphCache)
-            {
-                if (HlGraphCache.TryGetValue(Method, out CacheEntry))
-                {
-                    return CacheEntry;
-                }
-                MethodName = string.Format("Cil2OpenCL_Root_Seq{0}", HlGraphSequenceNumber++);
-            }
-
             TextWriter writer = System.Console.Out;
 
+            if (device == null)
+                device = OpenCLInterop.GetFirstGpu();
+
+            if(hlGraphCache.TryGetValue(device.DeviceID, Method, out CacheEntry))
+                return CacheEntry;
+
+            MethodName = string.Format("Cil2OpenCL_Root_Seq{0}", HlGraphSequenceNumber++);
             HLgraph = new HighLevel.HlGraph(Method, MethodName);
 
             if (DumpCode > 3)
-            {
                 WriteCode(HLgraph, writer);
-            }
 
             // Optimize it (just some copy propagation and dead assignment elimination to get rid of
             // CIL stack accesses)
             HLgraph.Optimize();
 
             if (DumpCode > 4)
-            {
                 WriteCode(HLgraph, writer);
-            }
 
             // Convert all expression trees into something OpenCL can understand
             HLgraph.ConvertForOpenCl();
@@ -237,28 +220,29 @@ namespace Hybrid.MsilToOpenCL
             HLgraph.AnalyzeLocationUsage();
 
             // Finally, add the graph to the cache
-            CacheEntry = new HlGraphCacheEntry(HLgraph, StartIdLocation, EndIdLocation);
+            CacheEntry = new HlGraphEntry(HLgraph, StartIdLocation, EndIdLocation);
 
             // Get OpenCL source code
-            string OpenClSource;
+            CacheEntry.Source = getOpenCLSource(HLgraph);
+            CacheEntry.Device = device;
+
+            hlGraphCache.SetValue(device.DeviceID, Method, CacheEntry);
+
+            return CacheEntry;
+        }
+
+        private static string getOpenCLSource(HighLevel.HlGraph HLgraph)
+        {
             using (StringWriter Srcwriter = new StringWriter())
             {
                 OpenCLInterop.WriteOpenCL(HLgraph, Srcwriter);
-                OpenClSource = Srcwriter.ToString();
+                string OpenClSource = Srcwriter.ToString();
 
                 if (DumpCode > 2)
-                {
                     System.Console.WriteLine(OpenClSource);
-                }
-            }
-            CacheEntry.Source = OpenClSource;
 
-            lock (HlGraphCache)
-            {
-                HlGraphCache[Method] = CacheEntry;
+                return OpenClSource;
             }
-
-            return CacheEntry;
         }
 
         private static void WriteCode(HighLevel.HlGraph HLgraph, TextWriter writer)
