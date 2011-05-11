@@ -48,7 +48,7 @@
     <Compile Include="Context\ArrayInfo.cs" />
     <Compile Include="Context\CallContext.cs" />
     <Compile Include="Context\HlGraph.cs" />
-    <Compile Include="Context\HlGraphCacheEntry.cs" />
+    <Compile Include="Context\HlGraphEntry.cs" />
     <Compile Include="Context\ILBB.cs" />
     <Compile Include="Context\ILgraph.cs" />
     <Compile Include="Context\InvokeArgument.cs" />
@@ -57,6 +57,7 @@
     <Compile Include="Enumerations\LocationFlags.cs" />
     <Compile Include="Enumerations\LocationType.cs" />
     <Compile Include="Enumerations\NodeType.cs" />
+    <Compile Include="HlGraphCache.cs" />
     <Compile Include="Instructions\CilBinaryComparisonInstruction.cs" />
     <Compile Include="Instructions\CilBinaryNumericInstruction.cs" />
     <Compile Include="Instructions\CilBranchInstruction.cs" />

@@ -9,11 +9,11 @@ namespace Hybrid.MsilToOpenCL
 {
     internal class OpenCLInterop
     {
-        internal static void CallOpenCLNet(int[] WorkSize, HlGraphCacheEntry CacheEntry, InvokeContext ctx, HighLevel.HlGraph HLgraph, OpenCLNet.Device device)
+        internal static void CallOpenCLNet(int[] WorkSize, HlGraphEntry CacheEntry, InvokeContext ctx, HighLevel.HlGraph HLgraph, OpenCLNet.Device device)
         {
             // We can invoke the kernel using the arguments from ctx now :)
             if (device == null)
-                device = getFirstGpu();
+                device = GetFirstGpu();
 
             OpenCLNet.Platform Platform = device.Platform;
 
@@ -87,7 +87,7 @@ namespace Hybrid.MsilToOpenCL
             }
         }
 
-        private static OpenCLNet.Device getFirstGpu()
+        internal static OpenCLNet.Device GetFirstGpu()
         {
             foreach (OpenCLNet.Platform platform in OpenCLNet.OpenCL.GetPlatforms())
                 foreach (OpenCLNet.Device device in platform.QueryDevices(OpenCLNet.DeviceType.GPU))
