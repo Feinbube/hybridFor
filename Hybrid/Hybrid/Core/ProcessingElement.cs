@@ -9,8 +9,5 @@ namespace Hybrid
     public class ProcessingElement
     {
         public uint ClockSpeed;
-
-        public MemoryInfo PrivateMemory;
-        public MemoryInfo Cache;
     }
 }

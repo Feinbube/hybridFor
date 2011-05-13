@@ -17,10 +17,9 @@ namespace Hybrid
         public string DeviceId;
 
         public MemoryInfo GlobalMemory;
+        public List<MemoryInfo> Caches;
 
         public List<ComputeUnit> ComputeUnits;
-
-        
 
         public double PredictPerformance(AlgorithmCharacteristics algorithmCharacteristics)
         {

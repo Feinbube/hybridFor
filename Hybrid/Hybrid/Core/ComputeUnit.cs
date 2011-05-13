@@ -11,8 +11,10 @@ namespace Hybrid
         public bool AtomicsSupported;
         public bool DoublePrecisionFloatingPointSupported;
 
+        public int RegisterCount;
+
         public MemoryInfo SharedMemory;
-        public MemoryInfo GlobalMemoryCache;
+        public List<MemoryInfo> Caches;
 
         public List<ProcessingElement> ProcessingElements;
 
