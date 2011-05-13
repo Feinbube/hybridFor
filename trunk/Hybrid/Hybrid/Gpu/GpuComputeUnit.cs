@@ -17,25 +17,50 @@ namespace Hybrid.Gpu
             for (int i = 0; i < getProcessingElementCount(device); i++)
                 ProcessingElements.Add(new GpuProcessingElement(device));
 
-            if (device.LocalMemType == OpenCLNet.DeviceLocalMemType.GLOBAL)
-                SharedMemory = null;
+            SharedMemory = getSharedMemory(device);
+            Caches = getCaches(device);
 
-            if (device.LocalMemType == OpenCLNet.DeviceLocalMemType.LOCAL)
-                SharedMemory = new MemoryInfo()
-                {
-                    Type = MemoryInfo.Types.Shared,
-                    Size = device.LocalMemSize
-                };
+        }
 
-            if (device.GlobalMemCacheSize == 0)
-                GlobalMemoryCache = null;
+        private List<MemoryInfo> getCaches(OpenCLNet.Device device)
+        {
+            List<MemoryInfo> result = new List<MemoryInfo>();
 
             if (device.GlobalMemCacheSize > 0)
-                GlobalMemoryCache = new MemoryInfo()
+                result.Add(
+                    new MemoryInfo()
+                    {
+                        Type = mapCacheType(device.GlobalMemCacheType),
+                        Size = device.GlobalMemCacheSize
+                    }
+                );
+
+            result.Add(
+                new MemoryInfo()
                 {
-                    Type = mapCacheType(device.GlobalMemCacheType),
-                    Size = device.GlobalMemCacheSize
-                };
+                    Type = MemoryInfo.Types.ReadOnlyCache,
+                    Size = device.MaxConstantBufferSize
+                }
+            );
+
+            return result;
+        }
+
+        private MemoryInfo getSharedMemory(OpenCLNet.Device device)
+        {
+            switch (device.LocalMemType)
+            {
+                case OpenCLNet.DeviceLocalMemType.GLOBAL:
+                    return null;
+                case OpenCLNet.DeviceLocalMemType.LOCAL:
+                    return new MemoryInfo()
+                    {
+                        Type = MemoryInfo.Types.Shared,
+                        Size = device.LocalMemSize
+                    };
+                default:
+                    throw new Exception("LocalMemType " + device.LocalMemType.ToString() + " is unknown.");
+            }
         }
 
         private uint getProcessingElementCount(OpenCLNet.Device device)

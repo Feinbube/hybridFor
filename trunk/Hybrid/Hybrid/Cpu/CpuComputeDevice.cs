@@ -27,16 +27,24 @@ namespace Hybrid.Cpu
             Manufacturer = processorInfo["Manufacturer"].ToString();
             DeviceId = processorInfo["DeviceID"].ToString();
 
-            uint NumberOfCores = uint.Parse(processorInfo["NumberOfCores"].ToString());
+            uint numberOfCores = uint.Parse(processorInfo["NumberOfCores"].ToString());
 
             ComputeUnits = new List<ComputeUnit>();
-            for (int i = 0; i < NumberOfCores; i++)
+            for (int i = 0; i < numberOfCores; i++)
                 ComputeUnits.Add(new CpuComputeUnit(processorInfo));
 
             GlobalMemory = new MemoryInfo()
             {
                 Type = MemoryInfo.Types.Global,
                 Size = getGlobalMemorySizeForProcessor(processorInfo)
+            };
+
+            Caches = new List<MemoryInfo>{ // where does L2Cache really reside: on-core or on-die?
+                new MemoryInfo()
+                {
+                    Type = MemoryInfo.Types.ReadWriteCache,
+                    Size = uint.Parse(processorInfo["L3CacheSize"].ToString())
+                }
             };
         }
 

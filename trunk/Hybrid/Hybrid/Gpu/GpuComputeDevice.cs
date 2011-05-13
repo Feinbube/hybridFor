@@ -45,6 +45,8 @@ namespace Hybrid.Gpu
                 Type = MemoryInfo.Types.Global,
                 Size = device.GlobalMemSize
             };
+
+            // TODO L2Cache
         }
 
         private ComputeDevice.DeviceTypes getDeviceType(OpenCLNet.Device device)

@@ -146,6 +146,10 @@ namespace Hybrid.Benchmark
 
         private void runExample(ExampleBase forGpuExample)
         {
+            Console.Write("[Automatic]  ");
+            runExample(forGpuExample, ExecutionMode.Automatic);
+            Parallel.ReInitialize();
+
             Console.Write("[Serial]     ");
             runExample(forGpuExample, ExecutionMode.Serial);
 
@@ -161,10 +165,6 @@ namespace Hybrid.Benchmark
 
             Console.Write("[GPU2D]      ");
             runExample(forGpuExample, ExecutionMode.Gpu2D);
-            Parallel.ReInitialize();
-
-            Console.Write("[Automatic]  ");
-            runExample(forGpuExample, ExecutionMode.Automatic);
             Parallel.ReInitialize();
 
             Console.WriteLine();
