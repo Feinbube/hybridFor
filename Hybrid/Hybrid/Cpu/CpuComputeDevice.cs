@@ -35,14 +35,14 @@ namespace Hybrid.Cpu
 
             GlobalMemory = new MemoryInfo()
             {
-                Type = MemoryInfo.Types.Global,
+                MemoryType = MemoryInfo.Type.Global,
                 Size = getGlobalMemorySizeForProcessor(processorInfo)
             };
 
             Caches = new List<MemoryInfo>{ // where does L2Cache really reside: on-core or on-die?
                 new MemoryInfo()
                 {
-                    Type = MemoryInfo.Types.ReadWriteCache,
+                    MemoryType = MemoryInfo.Type.Cache,
                     Size = uint.Parse(processorInfo["L3CacheSize"].ToString())
                 }
             };

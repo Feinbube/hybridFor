@@ -24,7 +24,8 @@ namespace Hybrid.Cpu
             Caches = new List<MemoryInfo>{ // what about L1Cache?
                 new MemoryInfo() // where does L2Cache really reside: on-core or on-die?
                 {
-                    Type = MemoryInfo.Types.ReadWriteCache,
+                    MemoryType = MemoryInfo.Type.Cache,
+                    MemoryAccess = MemoryInfo.Access.ReadWrite,
                     Size = uint.Parse(processorInfo["L2CacheSize"].ToString())
                 }
             };
