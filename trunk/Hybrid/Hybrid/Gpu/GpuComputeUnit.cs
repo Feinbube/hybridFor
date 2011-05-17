@@ -30,15 +30,17 @@ namespace Hybrid.Gpu
                 result.Add(
                     new MemoryInfo()
                     {
-                        Type = mapCacheType(device.GlobalMemCacheType),
+                        MemoryAccess = mapCacheAccess(device.GlobalMemCacheType),
+                        MemoryType = MemoryInfo.Type.Cache,
                         Size = device.GlobalMemCacheSize
                     }
                 );
 
             result.Add(
-                new MemoryInfo()
+                new MemoryInfo() // Constant Memory
                 {
-                    Type = MemoryInfo.Types.ReadOnlyCache,
+                    MemoryType = MemoryInfo.Type.Cache,
+                    MemoryAccess = MemoryInfo.Access.ReadOnly,
                     Size = device.MaxConstantBufferSize
                 }
             );
@@ -55,7 +57,7 @@ namespace Hybrid.Gpu
                 case OpenCLNet.DeviceLocalMemType.LOCAL:
                     return new MemoryInfo()
                     {
-                        Type = MemoryInfo.Types.Shared,
+                        MemoryType = MemoryInfo.Type.Shared,
                         Size = device.LocalMemSize
                     };
                 default:
@@ -68,13 +70,13 @@ namespace Hybrid.Gpu
             return 8; // TODO: Get Real Values.
         }
 
-        private MemoryInfo.Types mapCacheType(OpenCLNet.DeviceMemCacheType deviceMemCacheType)
+        private MemoryInfo.Access mapCacheAccess(OpenCLNet.DeviceMemCacheType deviceMemCacheType)
         {
             if (deviceMemCacheType == OpenCLNet.DeviceMemCacheType.READ_ONLY_CACHE)
-                return MemoryInfo.Types.ReadOnlyCache;
+                return MemoryInfo.Access.ReadOnly;
 
             if (deviceMemCacheType == OpenCLNet.DeviceMemCacheType.READ_WRITE_CACHE)
-                return MemoryInfo.Types.ReadWriteCache;
+                return MemoryInfo.Access.ReadWrite;
 
             throw new Exception("OpenCLNet.DeviceMemCacheType " + deviceMemCacheType + " unknown.");
         }

@@ -7,16 +7,15 @@ namespace Hybrid
 {
     public class MemoryInfo
     {
-        /*
-        device.GlobalMemCacheLineSize;
-            device.GlobalMemCacheSize;
-            device.GlobalMemCacheType == OpenCLNet.DeviceMemCacheType.READ_ONLY_CACHE
-                */
+        public enum Access { ReadOnly, WriteOnly, ReadWrite }
+        public enum Type { Global, Shared, Private, Cache }
+        public enum PreferredAccessPattern { Linear, Areal } // to reflect constant memory and texture memory
 
-        public enum Types { ReadOnlyCache, ReadWriteCache, Global, Shared, Private }
-        public Types Type;
+        public Type MemoryType = Type.Global;
+        public Access MemoryAccess = Access.ReadWrite;
+        public PreferredAccessPattern MemoryPreferredAccessPattern = PreferredAccessPattern.Linear;
 
         public ulong Size;
-
+        public ulong LineSize = 0;
     }
 }

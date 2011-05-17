@@ -42,7 +42,7 @@ namespace Hybrid.Gpu
 
             GlobalMemory = new MemoryInfo()
             {
-                Type = MemoryInfo.Types.Global,
+                MemoryType = MemoryInfo.Type.Global,
                 Size = device.GlobalMemSize
             };
 
