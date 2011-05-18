@@ -98,6 +98,13 @@ namespace Hybrid.Examples
             return String.Format("{0:0.00}", value).Substring(0, 4);
         }
 
+        protected void swap(ref byte[,] a, ref byte[,] b)
+        {
+            byte[,] tmp = a;
+            a = b;
+            b = tmp;
+        }
+
         protected void printField(double[,] field, int sizeX, int sizeY)
         {
             for (int i = -1; i <= sizeX; i++)
@@ -109,6 +116,16 @@ namespace Hybrid.Examples
                     else
                         Console.Write(doubleToString(field[i, j]) + " ");
                 }
+                Console.WriteLine();
+            }
+        }
+
+        protected void printField(byte[,] fields, int sizeX, int sizeY, Action<int,int> printAction)
+        {
+            for (int y = 0; y < sizeY; y++)
+            {
+                for (int x = 0; x < sizeX; x++)
+                    printAction.Invoke(x, y);
                 Console.WriteLine();
             }
         }

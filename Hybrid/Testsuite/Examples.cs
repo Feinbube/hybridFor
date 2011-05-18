@@ -99,6 +99,18 @@ namespace Hybrid.Testsuite
         }
 
         [TestMethod]
+        public void GameOfLifeTest()
+        {
+            testExample(new GameOfLife());
+        }
+
+        [TestMethod]
+        public void WatorTest()
+        {
+            testExample(new Wator());
+        }
+
+        [TestMethod]
         public void QuickSortTest()
         {
             testExample(new QuickSort());
