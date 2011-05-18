@@ -8,6 +8,8 @@ using Hybrid.Examples;
 using Hybrid.Examples.CudaByExample;
 using Hybrid.Examples.Upcrc2010;
 using Hybrid.Examples.Upcrc2010.MatrixMultiplication;
+using System.Threading;
+using System.Globalization;
 
 namespace Hybrid.Benchmark
 {
@@ -46,6 +48,8 @@ namespace Hybrid.Benchmark
 
         static TextWriter evaluationLog()
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+
             string fileName = "ForGPU_Evaluation_"
                 + DateTime.Now.ToShortDateString() + "_"
                 + DateTime.Now.ToShortTimeString().Replace(":", ".") + "."
@@ -62,6 +66,8 @@ namespace Hybrid.Benchmark
         static List<ExampleBase> examples()
         {
             return new List<ExampleBase>(new ExampleBase[]{
+            new GameOfLife(),
+            new Wator(),
             new MatrixMultiplication0(),
             new MatrixMultiplication1(),
             new MatrixMultiplication2(),
