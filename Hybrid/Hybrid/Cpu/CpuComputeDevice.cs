@@ -62,7 +62,7 @@ namespace Hybrid.Cpu
             return overallCapacity / (ulong)processorCount;
         }
 
-        override public void ParallelFor(int fromInclusive, int toExclusive, Action<int> action)
+        override protected void parallelFor(int fromInclusive, int toExclusive, Action<int> action)
         {
             CpuParallelFor(fromInclusive, toExclusive, action);
         }
@@ -75,7 +75,7 @@ namespace Hybrid.Cpu
             System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, action);
         }
 
-        override public void ParallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
+        override protected void parallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
         {
             CpuParallelFor(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
         }
