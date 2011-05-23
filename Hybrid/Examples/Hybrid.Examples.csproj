@@ -56,6 +56,7 @@
     <Compile Include="CUDAByExample\SummingVectors.cs" />
     <Compile Include="ExampleBase.cs" />
     <Compile Include="FurtherExamples\GameOfLife.cs" />
+    <Compile Include="FurtherExamples\Merge.cs" />
     <Compile Include="FurtherExamples\Wator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UPCRC2010\Convolution.cs" />
