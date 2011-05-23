@@ -39,6 +39,7 @@ namespace Hybrid.Examples
             printField(input2, sizeX);
         }
 
+        // TODO find a parallel implementation
         protected override void algorithm()
         {
             int i, j, k;
@@ -47,13 +48,9 @@ namespace Hybrid.Examples
             while (i < sizeX && j < sizeX)
             {
                 if (input1[i] < input2[j])
-                {
                     output[k++] = input1[i++];
-                }
                 else if (input1[i] > input2[j])
-                {
                     output[k++] = input2[j++];
-                }
                 else // (input1[i] == input2[j])
                 {
                     output[k++] = input1[i++];
@@ -64,6 +61,7 @@ namespace Hybrid.Examples
             // add missing elements to output
             while (i < sizeX)
                 output[k++] = input1[i++];
+
             while(j < sizeX)
                 output[k++] = input2[j++];
         }
@@ -75,27 +73,17 @@ namespace Hybrid.Examples
 
         protected override bool isValid()
         {
-            bool valid = true;
-
+            // output needs to contain all values of input{1,2}
             for (int x=0; x<sizeX; x++)
-            { // output needs to contain all values of input{1,2}
                 if (!output.Contains(input1[x]) || !output.Contains(input2[x]))
-                {
-                    valid = false;
-                    break;
-                }
-            }
+                    return false;
 
+            // output needs to be sorted 
             for (int x = 0; x < 2 * sizeX - 1; x++)
-            { // output needs to be sorted 
                 if (output[x] >= output[x + 1])
-                {
-                    valid = false;
-                    break;
-                }
-            }
+                    return false;
 
-            return valid;
+            return true;
         }
     }
 }
