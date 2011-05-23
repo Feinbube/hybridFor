@@ -51,6 +51,10 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 {
                     return RightType;
                 }
+                else if (RightType == typeof(byte) || RightType == typeof(sbyte) || RightType == typeof(short) || RightType == typeof(ushort))
+                {
+                    return LeftType;
+                }
             }
             else if (LeftType == typeof(uint))
             {

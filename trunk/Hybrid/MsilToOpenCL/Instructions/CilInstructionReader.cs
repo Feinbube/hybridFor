@@ -86,6 +86,10 @@ namespace Hybrid.MsilToOpenCL
                     NextOffset += 8;
                     break;
 
+                case OperandType.InlineSwitch:
+                    NextOffset += 4 + CilInstruction.ReadInt32(IL, NextOffset) * 4;
+                    break;
+
                 default:
                     throw new InvalidOperationException(string.Format("Sorry, IL inst {0} @ offset {1:X} uses unknown operand type {2}.", Opcode, Offset, Opcode.OperandType));
             }
