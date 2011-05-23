@@ -68,6 +68,7 @@
     <Compile Include="Instructions\CilInstruction.cs" />
     <Compile Include="Instructions\CilInstructionReader.cs" />
     <Compile Include="Context\HlGraph.Optimization.cs" />
+    <Compile Include="Instructions\CilSwitchInstruction.cs" />
     <Compile Include="Instructions\Instruction.cs" />
     <Compile Include="Instructions\CilLoadArgumentInstruction.cs" />
     <Compile Include="Instructions\CilLoadElementAddressInstruction.cs" />

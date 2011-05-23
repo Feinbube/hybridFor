@@ -176,7 +176,7 @@ namespace Hybrid.MsilToOpenCL
             return (ushort)((ushort)IL[Offset + 0] | ((ushort)IL[Offset + 1] << 8));
         }
 
-        protected static int ReadInt32(byte[] IL, int Offset)
+        public static int ReadInt32(byte[] IL, int Offset)
         {
             return (int)((uint)IL[Offset + 0] | ((uint)IL[Offset + 1] << 8) | ((uint)IL[Offset + 2] << 16) | ((uint)IL[Offset + 3] << 24));
         }
@@ -330,6 +330,8 @@ namespace Hybrid.MsilToOpenCL
             Map.Add(OpCodes.Stobj, CilStoreObjectInstruction.Create);
 
             Map.Add(OpCodes.Sub, CilBinaryNumericInstruction.Create);
+
+            Map.Add(OpCodes.Switch, CilSwitchInstruction.Create);
 
             return Map;
         }
