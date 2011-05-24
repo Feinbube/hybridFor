@@ -487,6 +487,33 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 }
             }
 
+            foreach (ArgumentLocation Argument in this.Arguments)
+            {
+                if (((Argument.Flags & LocationFlags.Write) != 0) && ((Argument.Flags & LocationFlags.ForcePointer) == 0))
+                {
+                    Type NewType = Type.GetType(Argument.DataType.FullName + "&", true);
+                    Argument.DataType = NewType;
+                    Argument.Flags |= LocationFlags.ForcePointer;
+
+                    foreach (BasicBlock BasicBlock in BasicBlocks)
+                    {
+                        foreach (Instruction Instruction in BasicBlock.Instructions)
+                        {
+                            Node Node = Instruction.Argument;
+                            if (ConvertLocationToPointer(ref Node, Argument))
+                            {
+                                Instruction.Argument = Node;
+                            }
+                            Node = Instruction.Result;
+                            if (ConvertLocationToPointer(ref Node, Argument))
+                            {
+                                Instruction.Result = Node;
+                            }
+                        }
+                    }
+                }
+            }
+
             return;
         }
 
@@ -640,6 +667,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 {
                     if (PathEntry.ArgumentLocation == null)
                     {
+//                        PathEntry.ArgumentLocation = CreateArgument("this_" + FieldInfo.Name, FieldInfo.FieldType, false);
                         PathEntry.ArgumentLocation = CreateArgument("this_" + FieldInfo.Name, FieldInfo.FieldType, false);
                     }
                 }
@@ -812,6 +840,47 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             return Changed;
         }
 
+        private bool ConvertLocationToPointer(ref Node Node, Location Location)
+        {
+            bool Changed = false;
+
+            if (!object.ReferenceEquals(Node, null))
+            {
+                if (Node.NodeType == NodeType.Location)
+                {
+                    LocationNode LocationNode = (LocationNode)Node;
+                    if (LocationNode.Location == Location)
+                    {
+                        Node = new DerefNode(LocationNode);
+                        Changed = true;
+                    }
+                }
+                else if (Node.NodeType == NodeType.AddressOf)
+                {
+                    System.Diagnostics.Debug.Assert(Node.SubNodes.Count == 1);
+                    if ((Node.SubNodes[0].NodeType == NodeType.Location) && ((LocationNode)Node.SubNodes[0]).Location == Location)
+                    {
+                        Node = Node.SubNodes[0];
+                        Changed = true;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < Node.SubNodes.Count; i++)
+                    {
+                        Node SubNode = Node.SubNodes[i];
+                        if (ConvertLocationToPointer(ref SubNode, Location))
+                        {
+                            Node.SubNodes[i] = SubNode;
+                            Changed = true;
+                        }
+                    }
+                }
+            }
+
+            return Changed;
+        }
+
         public string GetOpenClFunctionName(System.Reflection.MethodInfo MethodInfo)
         {
             //
@@ -850,6 +919,8 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 // This function has not been mapped yet...
                 return null;
             }
+
+            // TODO for Random.Next() as well
 
             //
             // Check for an explicitly linked routine

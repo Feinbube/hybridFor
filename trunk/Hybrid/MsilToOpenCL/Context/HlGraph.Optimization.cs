@@ -81,6 +81,11 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     {
                         TraverseTree(((DerefNode)Node).SubNodes[0], false, false);
                     }
+                    else if (Node.NodeType == NodeType.InstanceField)
+                    {
+                        // Do nothing here. ConvertForOpenCl will convert this to an argument location,
+                        // so regular analysis treats it as such at a later pass
+                    }
                     else
                     {
                         System.Diagnostics.Debugger.Break();
