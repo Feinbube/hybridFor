@@ -61,7 +61,8 @@ namespace Hybrid.MsilToOpenCL.Instructions
                 Argument = new HighLevel.InstanceFieldNode(Context.ReadStackLocationNode(Context.StackPointer), FieldInfo);
             }
 
-            if (!FieldInfo.FieldType.IsValueType)
+            bool isStruct = FieldInfo.FieldType.IsValueType && !FieldInfo.FieldType.IsPrimitive && !FieldInfo.FieldType.IsEnum;
+            if (!isStruct)
             {
                 Argument = new HighLevel.AddressOfNode(Argument);
             }

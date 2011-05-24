@@ -36,7 +36,8 @@ namespace Hybrid.MsilToOpenCL
                 program = CacheEntry.Program;
                 if (program == null)
                 {
-                    program = context.CreateProgramWithSource(GetOpenCLSourceHeader(Platform, device) + CacheEntry.Source);
+                    string source = GetOpenCLSourceHeader(Platform, device) + CacheEntry.Source;
+                    program = context.CreateProgramWithSource(source);
 
                     try
                     {
@@ -96,29 +97,29 @@ namespace Hybrid.MsilToOpenCL
             return null;
         }
 
-        private static string GetOpenCLSourceHeader(OpenCLNet.Platform Platform, OpenCLNet.Device Device)
+        private static string GetOpenCLSourceHeader(OpenCLNet.Platform platform, OpenCLNet.Device device)
         {
-            System.Text.StringBuilder String = new System.Text.StringBuilder();
+            StringBuilder result = new System.Text.StringBuilder();
 
-            String.AppendLine("// BEGIN GENERATED OpenCL");
+            result.AppendLine("// BEGIN GENERATED OpenCL");
 
-            if (Device.HasExtension("cl_amd_fp64"))
-            {
-                String.AppendLine("#pragma OPENCL EXTENSION cl_amd_fp64 : enable");
-            }
-            else if (Device.HasExtension("cl_khr_fp64"))
-            {
-                String.AppendLine("#pragma OPENCL EXTENSION cl_khr_fp64 : enable");
-            }
+            setExtensionIfAvailable(result, device, "cl_amd_fp64");
+            setExtensionIfAvailable(result, device, "cl_khr_fp64");
 
-            if (Device.HasExtension("cl_khr_global_int32_base_atomics"))
-            {
-                String.AppendLine("#pragma OPENCL EXTENSION cl_khr_global_int32_base_atomics: enable");
-            }
+            setExtensionIfAvailable(result, device, "cl_khr_global_int32_base_atomics");
+            setExtensionIfAvailable(result, device, "cl_khr_global_int32_extended_atomics");
+            setExtensionIfAvailable(result, device, "cl_khr_local_int32_base_atomics");
+            setExtensionIfAvailable(result, device, "cl_khr_local_int32_extended_atomics");
 
-            String.AppendLine();
+            result.AppendLine();
 
-            return String.ToString();
+            return result.ToString();
+        }
+
+        private static void setExtensionIfAvailable(StringBuilder result, OpenCLNet.Device device, string extension)
+        {
+            if (device.HasExtension(extension))
+                result.AppendLine("#pragma OPENCL EXTENSION " + extension + " : enable");
         }
 
         internal static void WriteOpenCL(Type StructType, TextWriter writer)
@@ -170,7 +171,7 @@ namespace Hybrid.MsilToOpenCL
 
                 if (AttributeString != string.Empty) { AttributeString += "]*/ "; }
 
-                if (Argument.DataType.IsArray || Argument.DataType.IsPointer)
+                if (Argument.DataType.IsArray || Argument.DataType.IsPointer || Argument.DataType.IsByRef)
                 {
                     AttributeString += "__global ";
                 }
@@ -311,6 +312,10 @@ namespace Hybrid.MsilToOpenCL
             else if (DataType == typeof(double))
             {
                 return "double";
+            }
+            else if (DataType.IsByRef)
+            {
+                return InnerGetOpenClType(DataType.GetElementType()) + "*";
             }
             else if (DataType.IsArray)
             {
