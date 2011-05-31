@@ -21,6 +21,9 @@ namespace Hybrid
             int workshare = count / computeDeviceCount;
             int moreWorkCount = count - workshare * computeDeviceCount;
 
+            AlgorithmCharacteristics algorithmCharacteristics = new AlgorithmCharacteristics(action);
+            // TODO: do something clever with algochars
+
             for (int i = 0; i < moreWorkCount; i++)
             {
                 int from = fromInclusive + i * (workshare + 1);
