@@ -55,9 +55,11 @@
     <Compile Include="CUDAByExample\Ripple.cs" />
     <Compile Include="CUDAByExample\SummingVectors.cs" />
     <Compile Include="ExampleBase.cs" />
+    <Compile Include="FurtherExamples\Crypt3.cs" />
     <Compile Include="FurtherExamples\ParGrep.cs" />
     <Compile Include="FurtherExamples\GameOfLife.cs" />
     <Compile Include="FurtherExamples\Merge.cs" />
+    <Compile Include="FurtherExamples\SudokuValidator.cs" />
     <Compile Include="FurtherExamples\Switch.cs" />
     <Compile Include="FurtherExamples\Wator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
