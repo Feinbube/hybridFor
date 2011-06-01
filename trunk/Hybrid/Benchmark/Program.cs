@@ -66,29 +66,30 @@ namespace Hybrid.Benchmark
         static List<ExampleBase> examples()
         {
             return new List<ExampleBase>(new ExampleBase[]{
-            new GameOfLife(),
-            new Wator(),
-            new MatrixMultiplication0(),
-            new MatrixMultiplication1(),
-            new MatrixMultiplication2(),
-            new MatrixMultiplication3(),
-            new MatrixMultiplication4(),
-            new MatrixMultiplication5(),
+                new Crypt3(),
+                new GameOfLife(),
+                new Wator(),
+                new MatrixMultiplication0(),
+                new MatrixMultiplication1(),
+                new MatrixMultiplication2(),
+                new MatrixMultiplication3(),
+                new MatrixMultiplication4(),
+                new MatrixMultiplication5(),
 
-            new Convolution(),
-            //new MatrixVectorMultiplication(),
-            new MinimumSpanningTree(),
-            new PrefixScan(),
-            new QuickSort(),
+                new Convolution(),
+                //new MatrixVectorMultiplication(),
+                new MinimumSpanningTree(),
+                new PrefixScan(),
+                new QuickSort(),
 
-            new Average(),
-            new DotProduct(),
-            new HeatTransfer(),
-            new Histogram(),
-            new JuliaSet(),
-            //new RayTracing(),
-            new Ripple(),
-            new SummingVectors()
+                new Average(),
+                new DotProduct(),
+                new HeatTransfer(),
+                new Histogram(),
+                new JuliaSet(),
+                //new RayTracing(),
+                new Ripple(),
+                new SummingVectors()
             });
         }
 
