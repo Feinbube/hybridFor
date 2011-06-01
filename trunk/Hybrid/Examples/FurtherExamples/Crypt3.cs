@@ -511,7 +511,7 @@ namespace Hybrid.Examples
 
             public bool CrackAttempted()
             {
-                return CrackedPassword != "";
+                return !string.IsNullOrEmpty(CrackedPassword);
             }
 
             public bool IsCracked()
@@ -520,15 +520,13 @@ namespace Hybrid.Examples
             }
         }
 
-        Random random = new Random();
-
         List<string> dictionary;
         List<PasswordEntry> passwordEntries;
 
         protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
         {
-            sizeX *= 5;
-            sizeY *= 100;
+            this.sizeX = (int)(sizeX * 50);
+            this.sizeY = (int)(sizeY * 1000);
         }
 
         private string randomString(int length)
@@ -548,7 +546,8 @@ namespace Hybrid.Examples
             passwordEntry.Salt = randomString(2);
 
             passwordEntry.OriginalPassword = dictionary[random.Next(dictionary.Count)];
-            if (random.Next(2) == 1)
+
+            if (random.Next(2) == 1 && passwordEntry.OriginalPassword.Length < 8)
                 passwordEntry.OriginalPassword += random.Next(10);
 
             passwordEntry.PasswordHash = crypt(passwordEntry.OriginalPassword, passwordEntry.Salt);
@@ -602,7 +601,7 @@ namespace Hybrid.Examples
                         possiblePasswordHash = crypt(newDictionaryEntry, passwordEntry.Salt);
                         if (possiblePasswordHash == passwordEntry.PasswordHash)
                         {
-                            passwordEntry.CrackedPassword = dictionaryEntry;
+                            passwordEntry.CrackedPassword = dictionaryEntry + i.ToString();
                             break;
                         }
                     }
