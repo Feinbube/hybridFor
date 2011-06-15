@@ -17,7 +17,7 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
 
         protected override void algorithm() // http://myssa.upcrc.illinois.edu/files/Lab_OpenMP_Assignments/
         {
-            Parallel.For(0, sizeX, 0, sizeY, delegate(int i, int j)
+            Parallel.For(ExecuteOn, 0, sizeX, 0, sizeY, delegate(int i, int j)
             {
                     c[i, j] = 0;
                     for (int k = 0; k < sizeZ; k++)

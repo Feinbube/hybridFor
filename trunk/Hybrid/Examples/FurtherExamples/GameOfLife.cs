@@ -47,7 +47,7 @@ namespace Hybrid.Examples
         protected override void algorithm()
         {
             for (int z=0; z<sizeZ; z++) {
-                Parallel.For(1, sizeX-1, 1, sizeY-1, delegate(int x, int y)
+                Parallel.For(ExecuteOn, 1, sizeX - 1, 1, sizeY - 1, delegate(int x, int y)
                 {
                     int livingNeighbors = 0;
 

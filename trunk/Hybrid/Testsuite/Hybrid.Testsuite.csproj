@@ -45,8 +45,11 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EverywhereExampleTests.cs" />
+    <Compile Include="MultiGpuExampleTests.cs" />
+    <Compile Include="GpuExampleTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Examples.cs" />
+    <Compile Include="CpuExampleTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hybrid\Hybrid.csproj">

@@ -36,7 +36,7 @@ namespace Hybrid.Examples
 
         protected override void algorithm()
         {
-            Parallel.For(0, sizeX, delegate(int x)
+            Parallel.For(ExecuteOn, 0, sizeX, delegate(int x)
             {
                 switch (input[x])
                 {

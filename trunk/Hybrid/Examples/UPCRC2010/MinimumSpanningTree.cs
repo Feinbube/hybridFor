@@ -63,7 +63,7 @@ namespace Hybrid.Examples.Upcrc2010
             float[] minDist = new float[sizeX];
 
             // initialize the minDist array with nodes's distance to first node in tree, node 0
-            Parallel.For(1, sizeX, delegate(int i)
+            Parallel.For(ExecuteOn, 1, sizeX, delegate(int i)
             {
                 nearNode[i] = 0;
                 minDist[i] = W[i, 0];

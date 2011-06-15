@@ -13,22 +13,22 @@ using Hybrid.Examples.Upcrc2010;
 namespace Hybrid.Testsuite
 {
     [TestClass]
-    public class Examples
+    public class EverywhereExampleTests
     {
         [TestMethod]
-        public void StaticFunctionCall()
+        public void Everywhere_StaticFunctionCall()
         {
             testExample(new StaticFunctionCall());
         }
 
         [TestMethod]
-        public void LocalFunctionCall()
+        public void Everywhere_LocalFunctionCall()
         {
             testExample(new LocalFunctionCall());
         }
 
         [TestMethod]
-        public void MatrixMultiplicationTest()
+        public void Everywhere_MatrixMultiplicationTest()
         {
             testExample(new MatrixMultiplication0());
             testExample(new MatrixMultiplication1());
@@ -39,116 +39,103 @@ namespace Hybrid.Testsuite
         }
 
         [TestMethod]
-        public void AverageTest()
+        public void Everywhere_AverageTest()
         {
             testExample(new Average());
         }
 
         [TestMethod]
-        public void DotProductTest()
+        public void Everywhere_DotProductTest()
         {
             testExample(new DotProduct());
         }
 
         [TestMethod]
-        public void HeatTransferTest()
+        public void Everywhere_HeatTransferTest()
         {
             testExample(new HeatTransfer());
         }
 
         [TestMethod]
-        public void HistogramTest()
+        public void Everywhere_HistogramTest()
         {
             testExample(new Histogram());
         }
 
         [TestMethod,Ignore]
-        public void JuliaSetTest()
+        public void Everywhere_JuliaSetTest()
         {
             testExample(new JuliaSet());
         }
 
         [TestMethod,Ignore]
-        public void RayTracingTest()
+        public void Everywhere_RayTracingTest()
         {
             testExample(new RayTracing());
         }
 
         [TestMethod]
-        public void RippleTest()
+        public void Everywhere_RippleTest()
         {
             testExample(new Ripple());
         }
 
         [TestMethod]
-        public void SummingVectorsTest()
+        public void Everywhere_SummingVectorsTest()
         {
             testExample(new SummingVectors());
         }
 
         [TestMethod]
-        public void ConvolutionTest()
+        public void Everywhere_ConvolutionTest()
         {
             testExample(new Convolution());
         }
 
         [TestMethod]
-        public void MatrixVectorMultiplicationTest()
+        public void Everywhere_MatrixVectorMultiplicationTest()
         {
             testExample(new MatrixVectorMultiplication());
         }
 
         [TestMethod]
-        public void MinimumSpanningTreeTest()
+        public void Everywhere_MinimumSpanningTreeTest()
         {
             testExample(new MinimumSpanningTree());
         }
 
         [TestMethod]
-        public void PrefixScanTest()
+        public void Everywhere_PrefixScanTest()
         {
             testExample(new PrefixScan());
         }
 
         [TestMethod]
-        public void GameOfLifeTest()
+        public void Everywhere_GameOfLifeTest()
         {
             testExample(new GameOfLife());
         }
 
         [TestMethod]
-        public void WatorTest()
+        public void Everywhere_WatorTest()
         {
             testExample(new Wator());
         }
 
         [TestMethod]
-        public void QuickSortTest()
+        public void Everywhere_QuickSortTest()
         {
             testExample(new QuickSort());
         }
 
         private void testExample(ExampleBase example)
         {
-            runExample(example, ExecutionMode.Automatic);
-            runExample(example, ExecutionMode.Serial);
-            runExample(example, ExecutionMode.Gpu);
-            runExample(example, ExecutionMode.TaskParallel);
-            runExample(example, ExecutionMode.TaskParallel2D);
-            runExample(example, ExecutionMode.Gpu2D);
-            
+            example.ExecuteOn = Execute.OnEverythingAvailable;
+
+            if(example.Run(0.1, 0.1, 0.1, false, 5, 2, null) < 0 )
+                throw new Exception("Invalid result for " + example.GetType());
+
             Parallel.ReInitialize();
-        }
-
-        private void runExample(ExampleBase forGpuExample, ExecutionMode mode)
-        {
-            Parallel.Mode = mode;
-            Atomic.Mode = mode;
-
-            if(forGpuExample.Run(0.1, 0.1, 0.1, false, 5, 2, null) < 0 )
-                throw new Exception("Invalid result for " + forGpuExample.GetType());
-
-            System.Threading.Thread.Sleep(100);
         }
     }
 }

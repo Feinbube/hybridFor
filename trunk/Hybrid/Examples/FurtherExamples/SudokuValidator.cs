@@ -58,7 +58,7 @@ namespace Hybrid.Examples
         {
             int invalidFieldIndicator = 0;
 
-            Parallel.For(0, n * n, delegate(int id)
+            Parallel.For(ExecuteOn, 0, n * n, delegate(int id)
             {
                 int x = id / (n * n);
                 int y = id % (n * n);
@@ -75,7 +75,7 @@ namespace Hybrid.Examples
         {
             int invalidFieldIndicator = 0;
 
-            Parallel.For(0, n * n, delegate(int id)
+            Parallel.For(ExecuteOn, 0, n * n, delegate(int id)
             {
                 int x = id / (n * n);
                 int y = id % (n * n);
@@ -92,7 +92,7 @@ namespace Hybrid.Examples
         {
             int invalidFieldIndicator = 0;
 
-            Parallel.For(0, n * n, delegate(int threadId)
+            Parallel.For(ExecuteOn, 0, n * n, delegate(int threadId)
             {
                 int n2 = n * n;
 
@@ -127,7 +127,7 @@ namespace Hybrid.Examples
         {
             int invalidFieldIndicator = 0;
 
-            Parallel.For(0, n * n, delegate(int threadId)
+            Parallel.For(ExecuteOn, 0, n * n, delegate(int threadId)
             {
                 int n2 = n * n;
 

@@ -49,7 +49,7 @@ namespace Hybrid.Examples.CudaByExample
 
             for (int i = 0; i < sizeZ; i++)
             {
-                Parallel.For(0, sizeX, 0, sizeY, delegate(int x, int y)
+                Parallel.For(ExecuteOn, 0, sizeX, 0, sizeY, delegate(int x, int y)
                 {
                     int left = Math.Max(0, x - 1);
                     int right = Math.Min(sizeX - 1, x + 1);

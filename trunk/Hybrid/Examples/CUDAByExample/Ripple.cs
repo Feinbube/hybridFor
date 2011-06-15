@@ -28,7 +28,7 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void algorithm()
         {
-            Parallel.For(0, sizeX, 0, sizeY, delegate(int x, int y)
+            Parallel.For(ExecuteOn, 0, sizeX, 0, sizeY, delegate(int x, int y)
             {
                 float fx = x - sizeX / 2.0f;
                 float fy = y - sizeY / 2.0f;

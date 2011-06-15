@@ -8,6 +8,8 @@ namespace Hybrid.Examples
 {
     public abstract class ExampleBase
     {
+        public Execute ExecuteOn = Execute.OnEverythingAvailable;
+
         protected Random random = new Random();
 
         protected int sizeX = 0;
@@ -61,7 +63,7 @@ namespace Hybrid.Examples
 
             if (tw != null)
             {
-                tw.WriteLine(this.GetType().Name + ";" + this.sizeX + ";" + this.sizeY + ";" + this.sizeZ + ";" + Parallel.Mode + "_" + Atomic.Mode + ";" + Watch.Elapsed.TotalMilliseconds + ";" + valid);
+                tw.WriteLine(this.GetType().Name + ";" + this.sizeX + ";" + this.sizeY + ";" + this.sizeZ + ";" + ExecuteOn + ";" + Watch.Elapsed.TotalMilliseconds + ";" + valid);
                 tw.Flush();
             }
 

@@ -45,7 +45,7 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
 
         void matmultleaf(int m, int n, int p, int mf, int ml, int nf, int nl, int pf, int pl, double[,] A, double[,] B, double[,] C)
         {
-            Parallel.For(mf, ml, nf, nl, delegate(int i, int j)
+            Parallel.For(ExecuteOn, mf, ml, nf, nl, delegate(int i, int j)
             {
                 for (int k = pf; k < pl; k++)
                     C[i, j] += A[i, k] * B[k, j];

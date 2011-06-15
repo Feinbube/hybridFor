@@ -43,7 +43,7 @@ namespace Hybrid.Examples.CudaByExample
 
             // TODO the book also provides a Multi-GPU version
             // How can we support that also? Explicit? Automatic?
-            Parallel.For(0, sizeX, delegate(int x)
+            Parallel.For(ExecuteOn, 0, sizeX, delegate(int x)
             {
                 temp[x] = 0.0f;
                 int tid = x;

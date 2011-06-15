@@ -7,9 +7,9 @@ namespace Hybrid.Examples
 {
     public class LocalFunctionCall: ExampleBase
     {
-        List<int> a;
-        List<int> b;
-        List<int> c;
+        int[] a;
+        int[] b;
+        int[] c;
 
         protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
         {
@@ -18,30 +18,28 @@ namespace Hybrid.Examples
 
         protected override void setup()
         {
-            init(a);
-            init(b);
-
-            c = new List<int>();
-        }
-
-        private void init(List<int> list)
-        {
-            list = new List<int>();
+            a = new int[100];
             for (int x = 0; x < sizeX; x++)
-                list.Add(random.Next(100));
+                a[x] = random.Next(100);
+
+            b = new int[100];
+            for (int x = 0; x < sizeX; x++)
+                b[x] = random.Next(100);
+
+            c = new int[100];
         }
 
         protected override void printInput()
         {
-            printField(a.ToArray(), sizeX);
-            printField(b.ToArray(), sizeX);
+            printField(a, sizeX);
+            printField(b, sizeX);
         }
 
         protected override void algorithm()
         {
-            Parallel.For(0, sizeX, delegate(int i)
+            Parallel.For(ExecuteOn, 0, sizeX, delegate(int i)
             {
-                c.Add(theFunction(a[i], b[i]));
+                c[i] = theFunction(a[i], b[i]);
             });
         }
 
@@ -52,7 +50,7 @@ namespace Hybrid.Examples
 
         protected override void printResult()
         {
-            printField(c.ToArray(), sizeX);
+            printField(c, sizeX);
         }
 
         protected override bool isValid()
