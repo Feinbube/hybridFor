@@ -38,7 +38,7 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void algorithm()
         {
-            Parallel.For(0, sizeX, delegate(int idx)
+            Parallel.For(ExecuteOn, 0, sizeX, delegate(int idx)
             {
                 int idx1 = (idx + 1) % sizeX;
                 int idx2 = (idx + 2) % sizeX;

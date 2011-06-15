@@ -70,7 +70,7 @@ namespace Hybrid.Examples
         {
             for (int round = 0; round < sizeZ; round++)
             {
-                Parallel.For(1, sizeX - 1, 1, sizeY - 1, delegate(int x, int y)
+                Parallel.For(ExecuteOn, 1, sizeX - 1, 1, sizeY - 1, delegate(int x, int y)
                 {
                     if (state1[x, y] == fish)
                     {

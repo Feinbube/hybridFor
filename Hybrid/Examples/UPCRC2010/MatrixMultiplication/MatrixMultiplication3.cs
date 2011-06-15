@@ -20,7 +20,7 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
             int ITILE2 = 32;
             int JTILE2 = 32;
 
-            Parallel.For(0, sizeX, delegate(int ii)
+            Parallel.For(ExecuteOn, 0, sizeX, delegate(int ii)
             {
                 for (int jj = 0; jj < sizeY; jj += JTILE2)
                 {

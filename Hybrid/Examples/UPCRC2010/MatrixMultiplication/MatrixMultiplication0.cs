@@ -17,7 +17,7 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
 
         protected override void algorithm() // http://www.codeproject.com/KB/cs/aforge_parallel.aspx
         {
-            Parallel.For(0, sizeX, delegate(int i)
+            Parallel.For(ExecuteOn, 0, sizeX, delegate(int i)
             {
                 for (int j = 0; j < sizeY; j++)
                 {

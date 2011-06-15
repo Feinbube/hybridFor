@@ -38,13 +38,13 @@ namespace Hybrid.Examples.CudaByExample
 
             int[] temp = new int[sizeZ];
 
-            Parallel.For(0, sizeZ, delegate(int thread_id)
+            Parallel.For(ExecuteOn, 0, sizeZ, delegate(int thread_id)
             {
                 temp[thread_id] = 0;
             });
 
 
-            Parallel.For(0, sizeY, delegate(int thread_id)
+            Parallel.For(ExecuteOn, 0, sizeY, delegate(int thread_id)
             {
                 int i = thread_id;
 
@@ -55,7 +55,7 @@ namespace Hybrid.Examples.CudaByExample
                 }
             });
 
-            Parallel.For(0, sizeZ, delegate(int thread_id)
+            Parallel.For(ExecuteOn, 0, sizeZ, delegate(int thread_id)
             {
                 Atomic.Add(ref histo[thread_id], temp[thread_id]);
             });

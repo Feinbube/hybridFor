@@ -51,7 +51,7 @@ namespace Hybrid.Examples.Upcrc2010
         protected override void algorithm()
         {
             // assumes "padding" to avoid messy border cases   
-            Parallel.For(1, sizeX - 1, 1, sizeY - 1, delegate(int i, int j)
+            Parallel.For(ExecuteOn, 1, sizeX - 1, 1, sizeY - 1, delegate(int i, int j)
             {
                 outImage[i, j] = (1.0 / 5.0) * (startImage[i, j] + startImage[i, j + 1] + startImage[i, j - 1] + startImage[i + 1, j] + startImage[i - 1, j]);
             });

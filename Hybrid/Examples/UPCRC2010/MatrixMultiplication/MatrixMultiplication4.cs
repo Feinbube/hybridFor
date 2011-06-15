@@ -25,7 +25,7 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
             int JTILE3 = 32;
             int KTILE3 = 32;
 
-            Parallel.For(0, m, delegate(int i)
+            Parallel.For(ExecuteOn, 0, m, delegate(int i)
             {
                 for (int j = 0; j < n; j++)
                     c[i, j] = 0;
@@ -39,7 +39,7 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
                 {
                     int jl = Math.Min(jj + JTILE3, n);
 
-                    GpuParallel.For(0, (p + KTILE3 - 1) / KTILE3, delegate(int kk)
+                    Parallel.For(ExecuteOn, 0, (p + KTILE3 - 1) / KTILE3, delegate(int kk)
                     {
                         int kl = Math.Min((kk * KTILE3) + KTILE3, p);
 
@@ -52,7 +52,7 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
             }
 			*/
 
-			Parallel.For(0, (m + ITILE3 - 1) / ITILE3, 0, (n + JTILE3 - 1) / JTILE3, delegate(int idx_ii, int idx_jj)
+			Parallel.For(ExecuteOn, 0, (m + ITILE3 - 1) / ITILE3, 0, (n + JTILE3 - 1) / JTILE3, delegate(int idx_ii, int idx_jj)
 			{
 				//for (int idx_ii = 0; idx_ii < (m + ITILE3 - 1) / ITILE3; idx_ii++) {
 				//  for (int idx_jj = 0; idx_jj < (n + JTILE3 - 1) / JTILE3; idx_jj++) {

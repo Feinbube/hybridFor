@@ -576,7 +576,7 @@ namespace Hybrid.Examples
 
         protected override void algorithm()
         {
-            Parallel.For(0, dictionary.Count, delegate(int j)
+            Parallel.For(ExecuteOn, 0, dictionary.Count, delegate(int j)
             {
                 foreach (PasswordEntry passwordEntry in passwordEntries)
                 {

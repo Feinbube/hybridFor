@@ -144,7 +144,7 @@ namespace Hybrid.Examples.Upcrc2010
 
         protected override void algorithm()
         {
-            Parallel.For(0, (int)inputMatrix.nrow, delegate(int i)
+            Parallel.For(ExecuteOn, 0, (int)inputMatrix.nrow, delegate(int i)
             {
                 resultVector[i] = 0.0;
                 for (uint j = inputMatrix.rc_ptr[i]; j < inputMatrix.rc_ptr[i + 1]; j++)

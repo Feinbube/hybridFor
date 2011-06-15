@@ -55,12 +55,12 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void algorithm()
         {
-            Parallel.For(0, sizeY, 0, sizeX, delegate(int y, int x)
+            Parallel.For(ExecuteOn, 0, sizeY, 0, sizeX, delegate(int y, int x)
             {
                 bitmap[x, y] = julia(x, y);
             });
 
-			Parallel.For(0, sizeY, 0, sizeX, delegate(int y, int x) {
+			Parallel.For(ExecuteOn, 0, sizeY, 0, sizeX, delegate(int y, int x) {
 				const float scale = 1.5f;
 
 				float jx = scale * (float)(sizeX / 2.0f - x) / (sizeX / 2.0f);

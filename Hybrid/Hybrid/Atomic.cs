@@ -9,18 +9,11 @@ namespace Hybrid
 {
     public class Atomic
     {
-        public static ExecutionMode Mode = ExecutionMode.TaskParallel;
-
         [OpenClAlias("atom_add")]
         public static int Add(ref int location1, int value)
         {
-            if (Mode == ExecutionMode.TaskParallel || Mode == ExecutionMode.TaskParallel2D || Mode == ExecutionMode.Serial)
-                return System.Threading.Interlocked.Add(ref location1, value);
-
-            if (Mode == ExecutionMode.Automatic) // HACK -> Architektur ändern!
-                return System.Threading.Interlocked.Add(ref location1, value);
-
-            throw new Exception("ParallelMode " + Mode + " is not known.");
+            // due to the attribute above, this will never be replaced for Gpus
+            return System.Threading.Interlocked.Add(ref location1, value);
         }
     }
 }

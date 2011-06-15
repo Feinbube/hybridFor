@@ -50,12 +50,12 @@ namespace Hybrid.Examples.Upcrc2010
             while (increment < sizeX)
             {
 
-                Parallel.For(1, increment, delegate(int i)
+                Parallel.For(ExecuteOn, 1, increment, delegate(int i)
                 {
                     p2[i] = p1[i];
                 });
 
-                Parallel.For(increment, sizeX, delegate(int i)
+                Parallel.For(ExecuteOn, increment, sizeX, delegate(int i)
                 {
                     p2[i] = p1[i] + p1[i - increment];
                 });

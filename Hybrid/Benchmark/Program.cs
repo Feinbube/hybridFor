@@ -135,12 +135,8 @@ namespace Hybrid.Benchmark
             {
                 scale += 15.0 - executionTime * 10.0;
 
-                Parallel.Mode = ExecutionMode.Gpu;
-                Atomic.Mode = ExecutionMode.Gpu;
-
+                example.ExecuteOn = Execute.OnSingleGpu;
                 executionTime = example.Run(scale, scale, scale, false, 20, 5, null);
-
-                System.Threading.Thread.Sleep(100);
             }
 
             Console.WriteLine("Scale " + scale + " for " + example.GetType().Name + " for " + executionTime + "s.");
@@ -156,35 +152,26 @@ namespace Hybrid.Benchmark
         private void runExample(ExampleBase forGpuExample)
         {
             Console.Write("[Automatic]  ");
-            runExample(forGpuExample, ExecutionMode.Automatic);
+            runExample(forGpuExample, Execute.OnEverythingAvailable);
             Parallel.ReInitialize();
 
             Console.Write("[Serial]     ");
-            runExample(forGpuExample, ExecutionMode.Serial);
+            runExample(forGpuExample, Execute.OnSingleCpu);
 
             Console.Write("[GPU]        ");
-            runExample(forGpuExample, ExecutionMode.Gpu);
+            runExample(forGpuExample, Execute.OnSingleGpu);
             Parallel.ReInitialize();
 
             Console.Write("[Parallel]   ");
-            runExample(forGpuExample, ExecutionMode.TaskParallel);
-
-            Console.Write("[Parallel2D] ");
-            runExample(forGpuExample, ExecutionMode.TaskParallel2D);
-
-            Console.Write("[GPU2D]      ");
-            runExample(forGpuExample, ExecutionMode.Gpu2D);
-            Parallel.ReInitialize();
+            runExample(forGpuExample, Execute.OnAllCpus);
 
             Console.WriteLine();
         }
 
-        private void runExample(ExampleBase forGpuExample, ExecutionMode mode)
+        private void runExample(ExampleBase example, Execute mode)
         {
-            Parallel.Mode = mode;
-            Atomic.Mode = mode;
-
-            forGpuExample.Run(sizeX, sizeY, sizeZ, print, rounds, warmup_rounds, tw);
+            example.ExecuteOn = mode;
+            example.Run(sizeX, sizeY, sizeZ, print, rounds, warmup_rounds, tw);
 
             System.Threading.Thread.Sleep(500);
         }
