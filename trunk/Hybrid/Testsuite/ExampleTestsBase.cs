@@ -13,22 +13,28 @@ using Hybrid.Examples.Upcrc2010;
 namespace Hybrid.Testsuite
 {
     [TestClass]
-    public class EverywhereExampleTests
+    abstract public class ExampleTestBase
     {
         [TestMethod]
-        public void Everywhere_StaticFunctionCall()
+        public void Lists()
+        {
+            testExample(new Lists());
+        }
+
+        [TestMethod]
+        public void StaticFunctionCall()
         {
             testExample(new StaticFunctionCall());
         }
 
         [TestMethod]
-        public void Everywhere_LocalFunctionCall()
+        public void LocalFunctionCall()
         {
             testExample(new LocalFunctionCall());
         }
 
         [TestMethod]
-        public void Everywhere_MatrixMultiplicationTest()
+        public void MatrixMultiplicationTest()
         {
             testExample(new MatrixMultiplication0());
             testExample(new MatrixMultiplication1());
@@ -39,103 +45,95 @@ namespace Hybrid.Testsuite
         }
 
         [TestMethod]
-        public void Everywhere_AverageTest()
+        public void AverageTest()
         {
             testExample(new Average());
         }
 
         [TestMethod]
-        public void Everywhere_DotProductTest()
+        public void DotProductTest()
         {
             testExample(new DotProduct());
         }
 
         [TestMethod]
-        public void Everywhere_HeatTransferTest()
+        public void HeatTransferTest()
         {
             testExample(new HeatTransfer());
         }
 
         [TestMethod]
-        public void Everywhere_HistogramTest()
+        public void HistogramTest()
         {
             testExample(new Histogram());
         }
 
         [TestMethod,Ignore]
-        public void Everywhere_JuliaSetTest()
+        public void JuliaSetTest()
         {
             testExample(new JuliaSet());
         }
 
         [TestMethod,Ignore]
-        public void Everywhere_RayTracingTest()
+        public void RayTracingTest()
         {
             testExample(new RayTracing());
         }
 
         [TestMethod]
-        public void Everywhere_RippleTest()
+        public void RippleTest()
         {
             testExample(new Ripple());
         }
 
         [TestMethod]
-        public void Everywhere_SummingVectorsTest()
+        public void SummingVectorsTest()
         {
             testExample(new SummingVectors());
         }
 
         [TestMethod]
-        public void Everywhere_ConvolutionTest()
+        public void ConvolutionTest()
         {
             testExample(new Convolution());
         }
 
         [TestMethod]
-        public void Everywhere_MatrixVectorMultiplicationTest()
+        public void MatrixVectorMultiplicationTest()
         {
             testExample(new MatrixVectorMultiplication());
         }
 
         [TestMethod]
-        public void Everywhere_MinimumSpanningTreeTest()
+        public void MinimumSpanningTreeTest()
         {
             testExample(new MinimumSpanningTree());
         }
 
         [TestMethod]
-        public void Everywhere_PrefixScanTest()
+        public void PrefixScanTest()
         {
             testExample(new PrefixScan());
         }
 
         [TestMethod]
-        public void Everywhere_GameOfLifeTest()
+        public void GameOfLifeTest()
         {
             testExample(new GameOfLife());
         }
 
         [TestMethod]
-        public void Everywhere_WatorTest()
+        public void WatorTest()
         {
             testExample(new Wator());
         }
 
         [TestMethod]
-        public void Everywhere_QuickSortTest()
+        public void QuickSortTest()
         {
             testExample(new QuickSort());
         }
 
-        private void testExample(ExampleBase example)
-        {
-            example.ExecuteOn = Execute.OnEverythingAvailable;
-
-            if(example.Run(0.1, 0.1, 0.1, false, 5, 2, null) < 0 )
-                throw new Exception("Invalid result for " + example.GetType());
-
-            Parallel.ReInitialize();
-        }
+        protected abstract void testExample(ExampleBase example);
     }
 }
