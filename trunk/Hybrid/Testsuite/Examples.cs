@@ -16,6 +16,18 @@ namespace Hybrid.Testsuite
     public class Examples
     {
         [TestMethod]
+        public void StaticFunctionCall()
+        {
+            testExample(new StaticFunctionCall());
+        }
+
+        [TestMethod]
+        public void LocalFunctionCall()
+        {
+            testExample(new LocalFunctionCall());
+        }
+
+        [TestMethod]
         public void MatrixMultiplicationTest()
         {
             testExample(new MatrixMultiplication0());

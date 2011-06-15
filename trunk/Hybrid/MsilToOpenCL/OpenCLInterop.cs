@@ -90,6 +90,9 @@ namespace Hybrid.MsilToOpenCL
 
         internal static OpenCLNet.Device GetFirstGpu()
         {
+            if (OpenCLNet.OpenCL.NumberOfPlatforms == 0)
+                return null;
+
             foreach (OpenCLNet.Platform platform in OpenCLNet.OpenCL.GetPlatforms())
                 foreach (OpenCLNet.Device device in platform.QueryDevices(OpenCLNet.DeviceType.GPU))
                     return device;

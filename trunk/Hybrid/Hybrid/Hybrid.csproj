@@ -53,6 +53,7 @@
     <Compile Include="Cpu\CpuComputeDevice.cs" />
     <Compile Include="Cpu\CpuComputeUnit.cs" />
     <Compile Include="Cpu\CpuProcessingElement.cs" />
+    <Compile Include="Scheduling\ExecutionInfo.cs" />
     <Compile Include="Scheduling\ExecutionMode.cs" />
     <Compile Include="Gpu\GpuComputeDevice.cs" />
     <Compile Include="Gpu\GpuComputeUnit.cs" />

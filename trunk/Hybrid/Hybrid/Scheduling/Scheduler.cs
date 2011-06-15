@@ -16,6 +16,8 @@ namespace Hybrid
 
         private static void ExecuteEvenDistributed(int fromInclusive, int toExclusive, Action<int> action)
         {
+            List<ExecuteInfo> executeInfos = new List<ExecuteInfo>();
+
             int count = toExclusive - fromInclusive;
             int computeDeviceCount = Platform.ComputeDevices.Count;
             int workshare = count / computeDeviceCount;
@@ -28,7 +30,7 @@ namespace Hybrid
             {
                 int from = fromInclusive + i * (workshare + 1);
                 int to = from + (workshare + 1);
-                execute(from, to, action, Platform.ComputeDevices[i]);
+                executeInfos.Add(new ExecuteInfo(from, to, action, Platform.ComputeDevices[i]));
             }
 
             fromInclusive = fromInclusive + moreWorkCount * (workshare + 1);
@@ -37,13 +39,10 @@ namespace Hybrid
             {
                 int from = fromInclusive + i * workshare;
                 int to = from + workshare;
-                execute(from, to, action, Platform.ComputeDevices[i]);
+                executeInfos.Add(new ExecuteInfo(from, to, action, Platform.ComputeDevices[i]));
             }
-        }
-
-        private static void execute(int fromInclusive, int toExclusive, Action<int> action, ComputeDevice computeDevice)
-        {
-            computeDevice.ParallelFor(fromInclusive, toExclusive, action);
+            
+            System.Threading.Tasks.Parallel.ForEach(executeInfos, executeInfo => { executeInfo.Execute(); });
         }
 
         public static void AutomaticFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
