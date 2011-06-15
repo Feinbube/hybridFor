@@ -13,6 +13,9 @@ namespace Hybrid.Gpu
         {
             List<GpuComputeDevice> result = new List<GpuComputeDevice>();
 
+            if (OpenCLNet.OpenCL.NumberOfPlatforms == 0)
+                return new List<GpuComputeDevice>();
+
             OpenCLNet.Platform[] platforms = OpenCLNet.OpenCL.GetPlatforms();
             foreach (OpenCLNet.Platform platform in platforms)
             {
