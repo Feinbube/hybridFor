@@ -130,6 +130,9 @@ namespace Hybrid.MsilToOpenCL
             if (device == null)
                 device = OpenCLInterop.GetFirstGpu();
 
+            if (device == null)
+                throw new Exception("No Gpu Compute Device found in the system!");
+
             if(hlGraphCache.TryGetValue(device.DeviceID, Method, out CacheEntry))
                 return CacheEntry;
 
