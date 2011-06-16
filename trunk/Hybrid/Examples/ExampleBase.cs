@@ -68,7 +68,7 @@ namespace Hybrid.Examples
             }
 
             if (!valid)
-                return -1;
+                return double.MaxValue;
             else
                 return Watch.Elapsed.TotalSeconds;
         }
@@ -184,6 +184,21 @@ namespace Hybrid.Examples
         {
             if (value >= fromInclusive && value < toExclusive)
                 Console.Write(output);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.GetType() == obj.GetType();
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetType().GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return this.GetType().ToString();
         }
     }
 }

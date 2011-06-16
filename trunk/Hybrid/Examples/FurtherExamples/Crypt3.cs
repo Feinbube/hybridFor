@@ -557,14 +557,18 @@ namespace Hybrid.Examples
 
         protected override void setup()
         {
-            dictionary = new List<string>();
+            if(dictionary == null)
+                dictionary = new List<string>();
 
-            for (int i = 0; i < sizeY; i++)
+            int count = dictionary.Count;
+            for (int i = count; i < sizeY; i++)
                 dictionary.Add(randomString(random.Next(5, 10)));
 
-            passwordEntries = new List<PasswordEntry>();
+            if(passwordEntries == null)
+                passwordEntries = new List<PasswordEntry>();
 
-            for (int i = 0; i < sizeX; i++)
+            count = passwordEntries.Count;
+            for (int i = count; i < sizeX; i++)
                 passwordEntries.Add(randomPasswordEntry(i));
         }
 
