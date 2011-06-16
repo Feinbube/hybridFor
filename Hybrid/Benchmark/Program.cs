@@ -15,9 +15,9 @@ namespace Hybrid.Benchmark
 {
     public class Program
     {
-        double sizeX;
-        double sizeY;
-        double sizeZ;
+        static SystemCharacteristics systemCharacteristics = new SystemCharacteristics();
+
+        double minSequentialExecutionTime;
 
         int rounds;
         int warmup_rounds;
@@ -30,7 +30,7 @@ namespace Hybrid.Benchmark
         {
             Environment.SetEnvironmentVariable("CL_LOG_ERRORS", "stdout");
 
-            printSystemInfo();
+            Console.WriteLine(systemCharacteristics.ToString());
 
             new Program().RunBenchmark();
 
@@ -38,19 +38,12 @@ namespace Hybrid.Benchmark
             Console.ReadLine();
         }
 
-        static void printSystemInfo()
-        {
-            Console.WriteLine("Compute Devices found on the current platform:");
-
-            foreach (ComputeDevice computeDevice in Hybrid.Scheduler.Platform.ComputeDevices)
-                Console.WriteLine(" * " + computeDevice.Name + " [performance index: " + computeDevice.PredictPerformance(new AlgorithmCharacteristics()) + "]");
-        }
-
         static TextWriter evaluationLog()
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
 
-            string fileName = "ForGPU_Evaluation_"
+            string fileName = "Evaluation_"
+                + System.Environment.MachineName + "_"
                 + DateTime.Now.ToShortDateString() + "_"
                 + DateTime.Now.ToShortTimeString().Replace(":", ".") + "."
                 + DateTime.Now.Second
@@ -66,11 +59,17 @@ namespace Hybrid.Benchmark
         static List<ExampleBase> examples()
         {
             return new List<ExampleBase>(new ExampleBase[]{
+                
+                /* // function tests
                 new StaticFunctionCall(),
                 new LocalFunctionCall(),
+                new Lists(), */
+
+                /* // big examples
                 new Crypt3(),
                 new GameOfLife(),
-                new Wator(),
+                new Wator(), */
+
                 new MatrixMultiplication0(),
                 new MatrixMultiplication1(),
                 new MatrixMultiplication2(),
@@ -79,17 +78,25 @@ namespace Hybrid.Benchmark
                 new MatrixMultiplication5(),
 
                 new Convolution(),
-                //new MatrixVectorMultiplication(),
+                
+                /* // example is to small
+                new MatrixVectorMultiplication(), */
+
                 new MinimumSpanningTree(),
                 new PrefixScan(),
-                new QuickSort(),
+
+                /* // not Gpu-enabled
+                new QuickSort(), */
 
                 new Average(),
                 new DotProduct(),
                 new HeatTransfer(),
                 new Histogram(),
-                new JuliaSet(),
-                //new RayTracing(),
+               
+                /* // not reliable
+                new JuliaSet(),*/
+
+                new RayTracing(),
                 new Ripple(),
                 new SummingVectors()
             });
@@ -98,50 +105,25 @@ namespace Hybrid.Benchmark
         private void RunBenchmark()
         {
             benchmark(0.1);
-            // benchmark(0.5);
-            // benchmark(1.0);
+            benchmark(0.5);
+            benchmark(1.0);
         }
 
-        private void benchmark(double size)
+        private void benchmark(double minSequentialExecutionTime)
         {
             tw = evaluationLog();
+
+            this.minSequentialExecutionTime = minSequentialExecutionTime;
 
             rounds = 20;
             warmup_rounds = 5;
 
             print = false;
 
-            sizeX = size;
-            sizeY = size;
-            sizeZ = size;
-
             runExamples();
 
             tw.Close();
         }
-
-        private void runFindGoodSizes()
-        {
-            foreach (ExampleBase example in examples())
-                findGoodSize(example);
-        }
-
-        private void findGoodSize(ExampleBase example)
-        {
-            double executionTime = 0.9;
-            double scale = 0.0;
-
-            while (executionTime < 1.0)
-            {
-                scale += 15.0 - executionTime * 10.0;
-
-                example.ExecuteOn = Execute.OnSingleGpu;
-                executionTime = example.Run(scale, scale, scale, false, 20, 5, null);
-            }
-
-            Console.WriteLine("Scale " + scale + " for " + example.GetType().Name + " for " + executionTime + "s.");
-        }
-
 
         private void runExamples()
         {
@@ -149,31 +131,45 @@ namespace Hybrid.Benchmark
                 runExample(example);
         }
 
-        private void runExample(ExampleBase forGpuExample)
+        private void runExample(ExampleBase example)
         {
-            Console.Write("[Automatic]  ");
-            runExample(forGpuExample, Execute.OnEverythingAvailable);
+            double sizeFactor = systemCharacteristics.GetScale(example, minSequentialExecutionTime);
+
+            Console.Write("[Automatic] ");
+            runExample(example, Execute.OnEverythingAvailable, sizeFactor);
             Parallel.ReInitialize();
 
-            Console.Write("[Serial]     ");
-            runExample(forGpuExample, Execute.OnSingleCpu);
+            Console.Write("[Serial]    ");
+            runExample(example, Execute.OnSingleCpu, sizeFactor);
 
-            Console.Write("[GPU]        ");
-            runExample(forGpuExample, Execute.OnSingleGpu);
-            Parallel.ReInitialize();
+            if (!systemCharacteristics.Platform.ContainsAGpu)
+                Console.WriteLine("[GPU]       No GPUs available!");
+            else
+            {
+                Console.Write("[GPU]       ");
+                runExample(example, Execute.OnSingleGpu, sizeFactor);
+                Parallel.ReInitialize();
+            }
 
-            Console.Write("[Parallel]   ");
-            runExample(forGpuExample, Execute.OnAllCpus);
+            Console.Write("[Parallel]  ");
+            runExample(example, Execute.OnAllCpus, sizeFactor);
 
             Console.WriteLine();
         }
 
-        private void runExample(ExampleBase example, Execute mode)
+        private void runExample(ExampleBase example, Execute mode, double sizeFactor)
         {
             example.ExecuteOn = mode;
-            example.Run(sizeX, sizeY, sizeZ, print, rounds, warmup_rounds, tw);
+            try
+            {
+                example.Run(sizeFactor, sizeFactor, sizeFactor, print, rounds, warmup_rounds, tw);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.ToString());
+            }
 
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(100);
         }
     }
 }

@@ -18,15 +18,15 @@ namespace Hybrid.Examples
 
         protected override void setup()
         {
-            a = new int[100];
+            a = new int[sizeX];
             for (int x = 0; x < sizeX; x++)
                 a[x] = random.Next(100);
 
-            b = new int[100];
+            b = new int[sizeX];
             for (int x = 0; x < sizeX; x++)
                 b[x] = random.Next(100);
 
-            c = new int[100];
+            c = new int[sizeX];
         }
 
         protected override void printInput()

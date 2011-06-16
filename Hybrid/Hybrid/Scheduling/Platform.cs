@@ -10,11 +10,13 @@ namespace Hybrid
     {
         public List<ComputeDevice> ComputeDevices = new List<ComputeDevice>();
 
+        public bool ContainsAGpu { get { return deviceOfTypeInDeviceList(ComputeDevice.DeviceTypes.Gpu); } }
+
         public Platform()
         {
             findOpenCLDevices();
 
-            if (noCpuInDeviceList())
+            if (!deviceOfTypeInDeviceList(ComputeDevice.DeviceTypes.Cpu))
                 findProcessors();
         }
 
@@ -23,13 +25,13 @@ namespace Hybrid
             ComputeDevices.AddRange(Gpu.GpuComputeDevice.GpuComputeDevices());
         }
 
-        private bool noCpuInDeviceList()
+        private bool deviceOfTypeInDeviceList(ComputeDevice.DeviceTypes type)
         {
             foreach (ComputeDevice computeDevice in ComputeDevices)
-                if (computeDevice.DeviceType == ComputeDevice.DeviceTypes.Cpu)
-                    return false;
+                if (computeDevice.DeviceType == type)
+                    return true;
 
-            return true;
+            return false;
         }
 
         private void findProcessors()

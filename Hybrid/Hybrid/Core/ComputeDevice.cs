@@ -5,6 +5,7 @@ using System.Text;
 using System.Management;
 using System.Runtime.InteropServices;
 using Hybrid.Core;
+using System.Xml.Serialization;
 
 namespace Hybrid
 {

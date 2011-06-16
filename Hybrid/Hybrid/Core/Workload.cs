@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Hybrid.Core
-{
+{    
     public class Workload
     {
         public enum Dimensions { None, OneDimensional, TwoDimensional }
