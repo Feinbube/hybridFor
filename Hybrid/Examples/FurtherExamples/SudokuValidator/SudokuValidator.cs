@@ -7,28 +7,65 @@ namespace Hybrid.Examples
 {
     public class SudokuValidator : ExampleBase
     {
-        int[] field;
-        int n = 0;
-        int shift = 0;
-        bool isValidField = false;
+        protected int[] field;
+        protected int n = 0;
+        protected int shift = 0;
+        protected bool isValidField = false;
 
         protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
         {
             this.sizeX = (int)(sizeX * 100.0);
+            if (this.sizeX < 10)
+                this.sizeX = 10;
+
             this.sizeY = (int)(sizeY * 100.0);
+            if (this.sizeY < 10)
+                this.sizeY = 10;
+
             this.sizeZ = (int)(sizeZ * 100.0);
+            if (this.sizeZ < 10)
+                this.sizeZ = 10;
         }
 
-        private int coords(int x, int y, int n)
+        protected int coords(int x, int y, int n)
         {
             return x + y * n * n;
         }
 
-        private void generateSolvedField()
+        protected void generateSolvedField()
         {
             for (int x = 0; x < n * n; x++)
                 for (int y = 0; y < n * n; y++)
                     field[coords(x, y, n)] = (x * n + x / n + y + shift) % (n * n) + 1;
+        }
+
+        protected void generateFieldWithInvalidNumbers()
+        {
+            generateSolvedField();
+
+            field[coords(n * n / 2, n * n - 1, n)] = -2;
+            field[coords(n * n / 2 - 1, n * n - 1, n)] = n * n + 2;
+        }
+
+        protected void generateFieldWithInvalidRow()
+        {
+            generateSolvedField();
+
+            field[coords(n * n / 2, n * n - 1, n)] = field[coords(n * n / 2 + 2, n * n - 1, n)];
+        }
+
+        protected void generateFieldWithInvalidColumn()
+        {
+            generateSolvedField();
+
+            field[coords(n * n / 2, n * n - 1, n)] = field[coords(n * n / 2, n * n - 3, n)];
+        }
+
+        protected void generateFieldWithInvalidSubfield()
+        {
+            generateSolvedField();
+
+            field[coords(n * n - 1, n * n - 1, n)] = field[coords(n * n - 2, n * n - 2, n)];
         }
 
         protected override void setup()
@@ -49,7 +86,7 @@ namespace Hybrid.Examples
             int[] invalidFieldIndicator = new int[4];
 
             // contains invalid number
-            Parallel.For(ExecuteOn, 0, n * n, delegate(int id)
+            Parallel.For(ExecuteOn, 0, n * n * n * n, delegate(int id)
             {
                 int x = id / (n * n);
                 int y = id % (n * n);
@@ -63,7 +100,7 @@ namespace Hybrid.Examples
             });
 
             // contains invalid row
-            Parallel.For(ExecuteOn, 0, n * n, delegate(int id)
+            Parallel.For(ExecuteOn, 0, n * n * n * n, delegate(int id)
             {
                 int x = id / (n * n);
                 int y = id % (n * n);
@@ -74,7 +111,7 @@ namespace Hybrid.Examples
             });
 
             // contains invalid column
-            Parallel.For(ExecuteOn, 0, n * n, delegate(int threadId)
+            Parallel.For(ExecuteOn, 0, n * n * n * n, delegate(int threadId)
             {
                 int n2 = n * n;
 
@@ -92,7 +129,7 @@ namespace Hybrid.Examples
             });
 
             // contains invalid subfield
-            Parallel.For(ExecuteOn, 0, n * n, delegate(int threadId)
+            Parallel.For(ExecuteOn, 0, n * n * n * n, delegate(int threadId)
             {
                 int n2 = n * n;
 
@@ -120,7 +157,12 @@ namespace Hybrid.Examples
                 }
             });
 
-            isValidField =
+            isValidField = fieldIsValid(invalidFieldIndicator);
+        }
+
+        protected virtual bool fieldIsValid(int[] invalidFieldIndicator)
+        {
+            return
                 invalidFieldIndicator[0] == 0 &&
                 invalidFieldIndicator[1] == 0 &&
                 invalidFieldIndicator[2] == 0 &&
