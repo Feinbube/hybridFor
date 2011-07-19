@@ -8,38 +8,20 @@ namespace Hybrid.Examples
     public class SudokuValidator : ExampleBase
     {
         int[] field;
-        int n = 50;
+        int n = 0;
         int shift = 0;
+        bool isValidField = false;
 
         protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
         {
-            this.sizeX = this.sizeY = n * n;
-            this.sizeZ = -1; // unused
+            this.sizeX = (int)(sizeX * 100.0);
+            this.sizeY = (int)(sizeY * 100.0);
+            this.sizeZ = (int)(sizeZ * 100.0);
         }
 
-        protected override void setup()
+        private int coords(int x, int y, int n)
         {
-            field = new int[n * n * n * n];
-        }
-
-        protected override void printInput()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void algorithm()
-        {
-            bool isValid = false;
-
-            generateSolvedField();
-
-            // warm up
-            // for (int i = 0; i < warmUpRounds; i++)
-            //     isValid = isValidField(field);
-
-            for (int round = 0; round < sizeZ; round++)
-                isValid = isValidField();
-
+            return x + y * n * n;
         }
 
         private void generateSolvedField()
@@ -49,32 +31,38 @@ namespace Hybrid.Examples
                     field[coords(x, y, n)] = (x * n + x / n + y + shift) % (n * n) + 1;
         }
 
-        private int coords(int x, int y, int n)
+        protected override void setup()
         {
-            return x + y * n * n;
+            n = this.sizeX;
+
+            field = new int[n * n * n * n];
+            generateSolvedField();
         }
 
-        private bool containsInvalidNumberKernel()
+        protected override void printInput()
         {
-            int invalidFieldIndicator = 0;
+            throw new NotImplementedException();
+        }
 
+        protected override void algorithm()
+        {
+            int[] invalidFieldIndicator = new int[4];
+
+            // contains invalid number
             Parallel.For(ExecuteOn, 0, n * n, delegate(int id)
             {
                 int x = id / (n * n);
                 int y = id % (n * n);
                 int value = field[x + y * n * n];
 
-                if (value > (n * n) || value <= 0)
-                    invalidFieldIndicator = 1;
+                if (value > (n * n))
+                    invalidFieldIndicator[0] = 1;
+
+                if (value <= 0)
+                    invalidFieldIndicator[0] = 1;
             });
 
-            return invalidFieldIndicator != 0;
-        }
-
-        private bool containsInvalidRowKernel()
-        {
-            int invalidFieldIndicator = 0;
-
+            // contains invalid row
             Parallel.For(ExecuteOn, 0, n * n, delegate(int id)
             {
                 int x = id / (n * n);
@@ -82,16 +70,28 @@ namespace Hybrid.Examples
 
                 for (int x2 = (x + 1); x2 < n * n; x2++)
                     if (field[x + y * n * n] == field[x2 + y * n * n])
-                        invalidFieldIndicator = 2; // return true;	
+                        invalidFieldIndicator[1] = 1; // return true;	
             });
 
-            return invalidFieldIndicator != 0;
-        }
+            // contains invalid column
+            Parallel.For(ExecuteOn, 0, n * n, delegate(int threadId)
+            {
+                int n2 = n * n;
 
-        private bool containsInvalidSubfieldKernel()
-        {
-            int invalidFieldIndicator = 0;
+                // for (int y = 0; y < n2; y++)                             
+                int y = threadId / (n2);
 
+                // for (int x = 0; x < n2-1; x++)                            
+                int x = threadId % (n2);
+                if (x >= n2 - 1)
+                    return;
+
+                for (int y2 = y + 1; y2 < n2; y2++)
+                    if (field[x + y * n2] == field[x + y2 * n2])
+                        invalidFieldIndicator[2] = 1; // return true;		
+            });
+
+            // contains invalid subfield
             Parallel.For(ExecuteOn, 0, n * n, delegate(int threadId)
             {
                 int n2 = n * n;
@@ -116,45 +116,15 @@ namespace Hybrid.Examples
                     int y2 = subfield_t2 + (cell2 / n);
 
                     if (field[x1 + y1 * n2] == field[x2 + y2 * n2])
-                        invalidFieldIndicator = 4; // return true;				
+                        invalidFieldIndicator[3] = 1; // return true;				
                 }
             });
 
-            return invalidFieldIndicator != 0;
-        }
-
-        private bool containsInvalidColumnKernel()
-        {
-            int invalidFieldIndicator = 0;
-
-            Parallel.For(ExecuteOn, 0, n * n, delegate(int threadId)
-            {
-                int n2 = n * n;
-
-                // for (int y = 0; y < n2; y++)                             
-                int y = threadId / (n2);
-
-                // for (int x = 0; x < n2-1; x++)                            
-                int x = threadId % (n2);
-                if (x >= n2 - 1)
-                    return;
-
-                for (int y2 = y + 1; y2 < n2; y2++)
-                    if (field[x + y * n2] == field[x + y2 * n2])
-                        invalidFieldIndicator = 3; // return true;		
-            });
-
-            return invalidFieldIndicator != 0;
-        }
-
-        private bool isValidField()
-        {
-            bool invalid = containsInvalidNumberKernel()
-                || containsInvalidRowKernel()
-                || containsInvalidColumnKernel()
-                || containsInvalidSubfieldKernel();
-
-            return !invalid;
+            isValidField =
+                invalidFieldIndicator[0] == 0 &&
+                invalidFieldIndicator[1] == 0 &&
+                invalidFieldIndicator[2] == 0 &&
+                invalidFieldIndicator[3] == 0;
         }
 
         protected override void printResult()
@@ -164,7 +134,7 @@ namespace Hybrid.Examples
 
         protected override bool isValid()
         {
-            return false;
+            return isValidField;
         }
     }
 }

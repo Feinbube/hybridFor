@@ -327,6 +327,8 @@ namespace Hybrid.MsilToOpenCL
             Map.Add(OpCodes.Stloc_3, CilStoreLocalInstruction.Create);
             Map.Add(OpCodes.Stloc_S, CilStoreLocalInstruction.Create);
 
+            Map.Add(OpCodes.Stfld, CilStoreFieldInstruction.Create);
+
             Map.Add(OpCodes.Stobj, CilStoreObjectInstruction.Create);
 
             Map.Add(OpCodes.Sub, CilBinaryNumericInstruction.Create);

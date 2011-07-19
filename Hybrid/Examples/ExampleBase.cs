@@ -41,11 +41,11 @@ namespace Hybrid.Examples
             for (int warmupRound = 0; warmupRound < warmupRounds; warmupRound++)
                 algorithm();
 
-            System.Diagnostics.Stopwatch Watch = new System.Diagnostics.Stopwatch();
-            Watch.Start();
+            System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
             for (int round = 0; round < rounds; round++)
                 algorithm();
-            Watch.Stop();
+            watch.Stop();
 
             for (int warmupRound = 0; warmupRound < warmupRounds; warmupRound++)
                 algorithm();
@@ -59,18 +59,18 @@ namespace Hybrid.Examples
 
             bool valid = checkResult(print);
 
-            Console.WriteLine("Done in " + Watch.Elapsed.TotalSeconds + "s. " + (valid ? "SUCCESS" : "<!!! FAILED !!!>"));
+            Console.WriteLine("Done in " + watch.Elapsed.TotalSeconds + "s. " + (valid ? "SUCCESS" : "<!!! FAILED !!!>"));
 
             if (tw != null)
             {
-                tw.WriteLine(this.GetType().Name + ";" + this.sizeX + ";" + this.sizeY + ";" + this.sizeZ + ";" + ExecuteOn + ";" + Watch.Elapsed.TotalMilliseconds + ";" + valid);
+                tw.WriteLine(this.GetType().Name + ";" + this.sizeX + ";" + this.sizeY + ";" + this.sizeZ + ";" + ExecuteOn + ";" + watch.Elapsed.TotalMilliseconds + ";" + valid);
                 tw.Flush();
             }
 
             if (!valid)
                 return double.MaxValue;
             else
-                return Watch.Elapsed.TotalSeconds;
+                return watch.Elapsed.TotalSeconds;
         }
 
         protected abstract void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ);
