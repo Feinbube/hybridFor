@@ -69,6 +69,7 @@ namespace Hybrid.Benchmark
                 new Crypt3(),
                 new GameOfLife(),
                 new Wator(), */
+                new SudokuValidator(),
 
                 new MatrixMultiplication0(),
                 new MatrixMultiplication1(),
@@ -104,9 +105,9 @@ namespace Hybrid.Benchmark
 
         private void RunBenchmark()
         {
-            benchmark(0.1);
             benchmark(0.5);
-            benchmark(1.0);
+            //benchmark(3.0);
+            //benchmark(4.0);
         }
 
         private void benchmark(double minSequentialExecutionTime)

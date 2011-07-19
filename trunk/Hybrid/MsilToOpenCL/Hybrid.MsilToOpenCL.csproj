@@ -43,7 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicBlock.cs" />
+    <Compile Include="Instructions\CilStoreFieldInstruction.cs" />
+    <Compile Include="Nodes\BasicBlock.cs" />
     <Compile Include="Context\AccessPathEntry.cs" />
     <Compile Include="Context\ArrayInfo.cs" />
     <Compile Include="Context\CallContext.cs" />

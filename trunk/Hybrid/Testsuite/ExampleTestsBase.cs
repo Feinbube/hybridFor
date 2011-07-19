@@ -134,6 +134,12 @@ namespace Hybrid.Testsuite
             testExample(new QuickSort());
         }
 
+        [TestMethod]
+        public void SudokuValidatorTest()
+        {
+            testExample(new SudokuValidator());
+        }
+
         protected abstract void testExample(ExampleBase example);
     }
 }
