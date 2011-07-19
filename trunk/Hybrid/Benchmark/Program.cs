@@ -70,6 +70,11 @@ namespace Hybrid.Benchmark
                 new GameOfLife(),
                 new Wator(), */
                 new SudokuValidator(),
+                new SudokuValidatorInvalidColumn(),
+                new SudokuValidatorInvalidNumbers(),
+                new SudokuValidatorInvalidRow(),
+                new SudokuValidatorInvalidSubfield(),
+                new SudokuValidator2D(),
 
                 new MatrixMultiplication0(),
                 new MatrixMultiplication1(),

@@ -140,6 +140,36 @@ namespace Hybrid.Testsuite
             testExample(new SudokuValidator());
         }
 
+        [TestMethod]
+        public void SudokuValidatorInvalidColumnTest()
+        {
+            testExample(new SudokuValidatorInvalidColumn());
+        }
+
+        [TestMethod]
+        public void SudokuValidatorInvalidNumbersTest()
+        {
+            testExample(new SudokuValidatorInvalidNumbers());
+        }
+
+        [TestMethod]
+        public void SudokuValidatorInvalidRowTest()
+        {
+            testExample(new SudokuValidatorInvalidRow());
+        }
+
+        [TestMethod]
+        public void SudokuValidatorInvalidSubfieldTest()
+        {
+            testExample(new SudokuValidatorInvalidSubfield());
+        }
+
+        [TestMethod]
+        public void SudokuValidator2DTest()
+        {
+            testExample(new SudokuValidator2D());
+        }
+
         protected abstract void testExample(ExampleBase example);
     }
 }
