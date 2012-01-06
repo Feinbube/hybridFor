@@ -51,7 +51,7 @@ namespace Hybrid.Benchmark
 
             TextWriter tw = File.CreateText(fileName);
 
-            tw.WriteLine("alogrithm;scaleX;scaleY;scaleZ;mode;executionTime;valid");
+            tw.WriteLine("alogrithm;scaleX;scaleY;scaleZ;AbsSerial;AbsCPUs;AbsGPU;AbsAll;SpdUpSerial;SpdUpCPUs;SpdUpGPU;SpdUpAll;");
 
             return tw;
         }
@@ -141,41 +141,91 @@ namespace Hybrid.Benchmark
         {
             double sizeFactor = systemCharacteristics.GetScale(example, minSequentialExecutionTime);
 
+            Console.Write("[Serial]    ");
+            ExampleBase.RunResult runResultSerial = runExample(example, Execute.OnSingleCpu, sizeFactor);
+
+            Console.Write("[Parallel]  ");
+            ExampleBase.RunResult runResultParallel = runExample(example, Execute.OnAllCpus, sizeFactor);
+
             Console.Write("[Automatic] ");
-            runExample(example, Execute.OnEverythingAvailable, sizeFactor);
+            ExampleBase.RunResult runResultAutomatic = runExample(example, Execute.OnEverythingAvailable, sizeFactor);
             Parallel.ReInitialize();
 
-            Console.Write("[Serial]    ");
-            runExample(example, Execute.OnSingleCpu, sizeFactor);
+            if(runResultAutomatic == null)
+                runResultAutomatic = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            
 
+            ExampleBase.RunResult runResultGPU = null;
             if (!systemCharacteristics.Platform.ContainsAGpu)
                 Console.WriteLine("[GPU]       No GPUs available!");
             else
             {
                 Console.Write("[GPU]       ");
-                runExample(example, Execute.OnSingleGpu, sizeFactor);
+                runResultGPU = runExample(example, Execute.OnSingleGpu, sizeFactor);
                 Parallel.ReInitialize();
             }
 
-            Console.Write("[Parallel]  ");
-            runExample(example, Execute.OnAllCpus, sizeFactor);
-
+            if (runResultGPU == null)
+                runResultGPU = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            
             Console.WriteLine();
+
+            writeOutputs(example, runResultSerial, runResultParallel, runResultGPU, runResultAutomatic);
         }
 
-        private void runExample(ExampleBase example, Execute mode, double sizeFactor)
+        private void writeOutputs(ExampleBase example, ExampleBase.RunResult runResultSerial, ExampleBase.RunResult runResultParallel, ExampleBase.RunResult runResultGPU, ExampleBase.RunResult runResultAutomatic)
+        {
+            reasonablyEqual(runResultSerial, runResultParallel);
+            reasonablyEqual(runResultSerial, runResultGPU);
+            reasonablyEqual(runResultSerial, runResultAutomatic);
+
+            double relSerial = runResultSerial.RelativeExecutionTime(runResultSerial.ElapsedTotalSeconds);
+            double relCPUs = runResultParallel.RelativeExecutionTime(runResultSerial.ElapsedTotalSeconds);
+            double relGPU = runResultGPU.RelativeExecutionTime(runResultSerial.ElapsedTotalSeconds);
+            double relAll = runResultAutomatic.RelativeExecutionTime(runResultSerial.ElapsedTotalSeconds);
+
+            tw.WriteLine(example.Name + ";" + runResultSerial.SizeX + ";" + runResultSerial.SizeY + ";" + runResultSerial.SizeZ + ";"
+                + runResultSerial.ElapsedTotalSeconds + ";" + runResultParallel.ElapsedTotalSeconds + ";" + runResultGPU.ElapsedTotalSeconds + ";" + runResultAutomatic.ElapsedTotalSeconds + ";"
+                + relSerial + ";" + relCPUs + ";" + relGPU + ";" + relAll + ";");
+            tw.Flush();
+        }
+
+        private void reasonablyEqual(ExampleBase.RunResult one, ExampleBase.RunResult other)
+        {
+            if (!other.Valid)
+                return;
+
+            if (!one.Valid)
+            {
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!");
+                Console.WriteLine("!!!!ONE IS INVALID!!!!");
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!");
+            }
+
+            if (one.SizeX != other.SizeX || one.SizeY != other.SizeY || one.SizeZ != other.SizeZ || one.Name != other.Name)
+            {
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!");
+                Console.WriteLine("!!!!INVALID STATE!!!!");
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!");
+                throw new Exception("Invalid state!!");
+            }
+        }
+
+        private ExampleBase.RunResult runExample(ExampleBase example, Execute mode, double sizeFactor)
         {
             example.ExecuteOn = mode;
+
+            System.Threading.Thread.Sleep(100);
+
             try
             {
-                example.Run(sizeFactor, sizeFactor, sizeFactor, print, rounds, warmup_rounds, tw);
+                return example.Run(sizeFactor, sizeFactor, sizeFactor, print, rounds, warmup_rounds);
             }
             catch (Exception exception)
             {
                 Console.WriteLine(exception.ToString());
+                return null;
             }
-
-            System.Threading.Thread.Sleep(100);
         }
     }
 }

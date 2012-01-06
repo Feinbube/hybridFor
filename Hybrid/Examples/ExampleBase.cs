@@ -8,6 +8,27 @@ namespace Hybrid.Examples
 {
     public abstract class ExampleBase
     {
+        public class RunResult
+        {
+            public string Name;
+            public Execute ExecutedOn;
+
+            public double SizeX;
+            public double SizeY;
+            public double SizeZ;
+
+            public bool Valid;
+            public double ElapsedTotalSeconds;
+
+            public double RelativeExecutionTime(double other)
+            {
+                if (!Valid)
+                    return -1;
+
+                return other / this.ElapsedTotalSeconds;
+            }
+        }
+
         public Execute ExecuteOn = Execute.OnEverythingAvailable;
 
         protected Random random = new Random();
@@ -16,19 +37,21 @@ namespace Hybrid.Examples
         protected int sizeY = 0;
         protected int sizeZ = 0;
 
-        public double Run(double size, bool print, int rounds)
+        public string Name { get { return this.GetType().Name; } }
+
+        public RunResult Run(double size, bool print, int rounds)
         {
-            return Run(size, size, size, print, rounds, 0, null);
+            return Run(size, size, size, print, rounds, 0);
         }
 
-        public double Run(double sizeX, double sizeY, double sizeZ, bool print, int rounds, int warmupRounds, TextWriter tw)
+        public RunResult Run(double sizeX, double sizeY, double sizeZ, bool print, int rounds, int warmupRounds)
         {
             Console.Write("Running " + this.GetType().Name);
 
             scaleAndSetSizes(sizeX, sizeY, sizeZ);
 
             Console.Write("(" + this.sizeX + " / " + this.sizeY + " / " + this.sizeZ + ")...");
-            
+
             setup();
 
             if (print)
@@ -61,16 +84,16 @@ namespace Hybrid.Examples
 
             Console.WriteLine("Done in " + watch.Elapsed.TotalSeconds + "s. " + (valid ? "SUCCESS" : "<!!! FAILED !!!>"));
 
-            if (tw != null)
+            return new RunResult()
             {
-                tw.WriteLine(this.GetType().Name + ";" + this.sizeX + ";" + this.sizeY + ";" + this.sizeZ + ";" + ExecuteOn + ";" + watch.Elapsed.TotalMilliseconds + ";" + valid);
-                tw.Flush();
-            }
-
-            if (!valid)
-                return double.MaxValue;
-            else
-                return watch.Elapsed.TotalSeconds;
+                Name = this.GetType().Name,
+                ExecutedOn = ExecuteOn,
+                SizeX = this.sizeX,
+                SizeY = this.sizeY,
+                SizeZ = this.sizeZ,
+                ElapsedTotalSeconds = watch.Elapsed.TotalSeconds,
+                Valid = valid
+            };
         }
 
         protected abstract void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ);
@@ -122,7 +145,7 @@ namespace Hybrid.Examples
             }
         }
 
-        protected void printField(byte[,] fields, int sizeX, int sizeY, Action<int,int> printAction)
+        protected void printField(byte[,] fields, int sizeX, int sizeY, Action<int, int> printAction)
         {
             for (int y = 0; y < sizeY; y++)
             {

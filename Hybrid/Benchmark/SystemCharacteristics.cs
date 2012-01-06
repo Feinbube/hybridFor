@@ -41,12 +41,12 @@ namespace Hybrid.Benchmark
                 example.ExecuteOn = Execute.OnSingleCpu;
 
                 double scale = 0.01;
-                double executionTime = example.Run(scale, scale, scale, false, 20, 5, null);
+                double executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
 
                 while (executionTime < minSequentialExecutionTime)
                 {
                     scale *= 2; //+= 15.0 * minSequentialExecutionTime - executionTime * 10.0 * minSequentialExecutionTime;
-                    executionTime = example.Run(scale, scale, scale, false, 20, 5, null);
+                    executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
                 }
 
                 Console.WriteLine("Scale " + scale + " for " + example.GetType().Name + " for " + executionTime + "s.");
