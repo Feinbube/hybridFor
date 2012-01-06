@@ -24,13 +24,12 @@ namespace Hybrid.Benchmark
 
         bool print;
 
-        TextWriter tw;
+        TextWriter csv;
+        TextWriter log;
 
         static void Main(string[] args)
         {
             Environment.SetEnvironmentVariable("CL_LOG_ERRORS", "stdout");
-
-            Console.WriteLine(systemCharacteristics.ToString());
 
             new Program().RunBenchmark();
 
@@ -38,22 +37,49 @@ namespace Hybrid.Benchmark
             Console.ReadLine();
         }
 
+        private void logWrite(string text)
+        {
+            Console.Write(text);
+            log.Write(text);
+            log.Flush();
+        }
+
+        private void logWriteLine()
+        {
+            logWriteLine("");
+        }
+
+        private void logWriteLine(string text)
+        {
+            Console.WriteLine(text);
+            log.WriteLine(text);
+            log.Flush();
+        }
+
+        static TextWriter errorLog()
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+
+            return File.CreateText(uniqueFileName() + ".log");
+        }
+
         static TextWriter evaluationLog()
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
 
-            string fileName = "Evaluation_"
-                + System.Environment.MachineName + "_"
-                + DateTime.Now.ToShortDateString() + "_"
-                + DateTime.Now.ToShortTimeString().Replace(":", ".") + "."
-                + DateTime.Now.Second
-                + ".csv";
-
-            TextWriter tw = File.CreateText(fileName);
-
+            TextWriter tw = File.CreateText(uniqueFileName() + ".csv");
             tw.WriteLine("alogrithm;scaleX;scaleY;scaleZ;AbsSerial;AbsCPUs;AbsGPU;AbsAll;SpdUpSerial;SpdUpCPUs;SpdUpGPU;SpdUpAll;");
 
             return tw;
+        }
+
+        private static string uniqueFileName()
+        {
+            return "Evaluation_"
+                + System.Environment.MachineName + "_"
+                + DateTime.Now.ToShortDateString() + "_"
+                + DateTime.Now.ToShortTimeString().Replace(":", ".") + "."
+                + DateTime.Now.Second;
         }
 
         static List<ExampleBase> examples()
@@ -69,6 +95,7 @@ namespace Hybrid.Benchmark
                 new Crypt3(),
                 new GameOfLife(),
                 new Wator(), */
+
                 new SudokuValidator(),
                 new SudokuValidatorInvalidColumn(),
                 new SudokuValidatorInvalidNumbers(),
@@ -115,7 +142,10 @@ namespace Hybrid.Benchmark
 
         private void benchmark(double minSequentialExecutionTime)
         {
-            tw = evaluationLog();
+            csv = evaluationLog();
+            log = errorLog();
+
+            logWriteLine(systemCharacteristics.ToString());
 
             this.minSequentialExecutionTime = minSequentialExecutionTime;
 
@@ -126,7 +156,8 @@ namespace Hybrid.Benchmark
 
             runExamples();
 
-            tw.Close();
+            csv.Close();
+            log.Close();
         }
 
         private void runExamples()
@@ -139,26 +170,31 @@ namespace Hybrid.Benchmark
         {
             double sizeFactor = systemCharacteristics.GetScale(example, minSequentialExecutionTime);
 
-            Console.Write("[Serial]    ");
+            logWrite("[Serial]    ");
             ExampleBase.RunResult runResultSerial = runExample(example, Execute.OnSingleCpu, sizeFactor);
 
-            Console.Write("[Parallel]  ");
+            if (runResultSerial == null)
+                runResultSerial = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+
+            logWrite("[Parallel]  ");
             ExampleBase.RunResult runResultParallel = runExample(example, Execute.OnAllCpus, sizeFactor);
 
-            Console.Write("[Automatic] ");
+            if (runResultParallel == null)
+                runResultParallel = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+
+            logWrite("[Automatic] ");
             ExampleBase.RunResult runResultAutomatic = runExample(example, Execute.OnEverythingAvailable, sizeFactor);
             Parallel.ReInitialize();
 
             if(runResultAutomatic == null)
                 runResultAutomatic = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
-            
 
             ExampleBase.RunResult runResultGPU = null;
             if (!systemCharacteristics.Platform.ContainsAGpu)
-                Console.WriteLine("[GPU]       No GPUs available!");
+                logWriteLine("[GPU]       No GPUs available!");
             else
             {
-                Console.Write("[GPU]       ");
+                logWrite("[GPU]       ");
                 runResultGPU = runExample(example, Execute.OnSingleGpu, sizeFactor);
                 Parallel.ReInitialize();
             }
@@ -166,7 +202,7 @@ namespace Hybrid.Benchmark
             if (runResultGPU == null)
                 runResultGPU = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
             
-            Console.WriteLine();
+            logWriteLine();
 
             writeOutputs(example, runResultSerial, runResultParallel, runResultGPU, runResultAutomatic);
         }
@@ -182,10 +218,10 @@ namespace Hybrid.Benchmark
             double relGPU = runResultGPU.RelativeExecutionTime(runResultSerial.ElapsedTotalSeconds);
             double relAll = runResultAutomatic.RelativeExecutionTime(runResultSerial.ElapsedTotalSeconds);
 
-            tw.WriteLine(example.Name + ";" + runResultSerial.SizeX + ";" + runResultSerial.SizeY + ";" + runResultSerial.SizeZ + ";"
+            csv.WriteLine(example.Name + ";" + runResultSerial.SizeX + ";" + runResultSerial.SizeY + ";" + runResultSerial.SizeZ + ";"
                 + runResultSerial.ElapsedTotalSeconds + ";" + runResultParallel.ElapsedTotalSeconds + ";" + runResultGPU.ElapsedTotalSeconds + ";" + runResultAutomatic.ElapsedTotalSeconds + ";"
                 + relSerial + ";" + relCPUs + ";" + relGPU + ";" + relAll + ";");
-            tw.Flush();
+            csv.Flush();
         }
 
         private void reasonablyEqual(ExampleBase.RunResult one, ExampleBase.RunResult other)
@@ -195,16 +231,16 @@ namespace Hybrid.Benchmark
 
             if (!one.Valid)
             {
-                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!");
-                Console.WriteLine("!!!!ONE IS INVALID!!!!");
-                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!");
+                logWriteLine("!!!!!!!!!!!!!!!!!!!!!!");
+                logWriteLine("!!!!ONE IS INVALID!!!!");
+                logWriteLine("!!!!!!!!!!!!!!!!!!!!!!");
             }
 
             if (one.SizeX != other.SizeX || one.SizeY != other.SizeY || one.SizeZ != other.SizeZ || one.Name != other.Name)
             {
-                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!");
-                Console.WriteLine("!!!!INVALID STATE!!!!");
-                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!");
+                logWriteLine("!!!!!!!!!!!!!!!!!!!!!");
+                logWriteLine("!!!!INVALID STATE!!!!");
+                logWriteLine("!!!!!!!!!!!!!!!!!!!!!");
                 throw new Exception("Invalid state!!");
             }
         }
@@ -221,7 +257,8 @@ namespace Hybrid.Benchmark
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.ToString());
+                logWriteLine(exception.ToString());
+                
                 return null;
             }
         }
