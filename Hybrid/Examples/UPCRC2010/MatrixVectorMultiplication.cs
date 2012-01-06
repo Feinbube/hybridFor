@@ -30,12 +30,6 @@ namespace Hybrid.Examples.Upcrc2010
         uint M;
         uint N;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 500.0);
-            this.sizeY = (int)(sizeY * 500.0);
-        }
-
         protected override void setup()
         {
             M = (uint)sizeX;

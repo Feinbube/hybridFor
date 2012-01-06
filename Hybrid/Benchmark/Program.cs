@@ -84,9 +84,7 @@ namespace Hybrid.Benchmark
                 new MatrixMultiplication5(),
 
                 new Convolution(),
-                
-                /* // example is to small
-                new MatrixVectorMultiplication(), */
+                new MatrixVectorMultiplication(),
 
                 new MinimumSpanningTree(),
                 new PrefixScan(),
@@ -110,8 +108,8 @@ namespace Hybrid.Benchmark
 
         private void RunBenchmark()
         {
-            benchmark(0.5);
-            //benchmark(3.0);
+            //benchmark(0.5);
+            benchmark(3.0);
             //benchmark(4.0);
         }
 

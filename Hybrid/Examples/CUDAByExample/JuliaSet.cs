@@ -36,13 +36,6 @@ namespace Hybrid.Examples.CudaByExample
 
         int[,] bitmap;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 3000.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = (int)(sizeY * factor);
-        }
-
         protected override void setup()
         {
             bitmap = new int[sizeX, sizeY];

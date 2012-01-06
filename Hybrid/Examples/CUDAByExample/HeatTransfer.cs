@@ -10,16 +10,10 @@ namespace Hybrid.Examples.CudaByExample
         float[,] input;
         float[,] bitmap;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 200.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = (int)(sizeY * factor);
-            this.sizeZ = this.sizeX / 10;
-        }
-
         protected override void setup()
         {
+            this.sizeZ = this.sizeX / 10;
+
             input = new float[sizeX, sizeY];
             bitmap = new float[sizeX, sizeY];
 

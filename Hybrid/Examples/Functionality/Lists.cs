@@ -10,11 +10,6 @@ namespace Hybrid.Examples
         List<int> a;
         List<int> b;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 100);
-        }
-
         protected override void setup()
         {
             a = new List<int>();

@@ -11,13 +11,6 @@ namespace Hybrid.Examples.CudaByExample
         float[] b;
         float result;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 3000.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = (int)(sizeY * factor);
-        }
-
         protected override void setup()
         {
             a = new float[sizeX * sizeY];

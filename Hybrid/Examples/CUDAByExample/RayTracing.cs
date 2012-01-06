@@ -38,13 +38,6 @@ namespace Hybrid.Examples.CudaByExample
         Sphere[] sphere;
         float[,] bitmap;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 500.0);
-            this.sizeY = (int)(sizeY * 500.0);
-            this.sizeZ = (int)(sizeZ * 500.0);
-        }
-
         protected override void setup()
         {
             // for nice rendering of the examples
