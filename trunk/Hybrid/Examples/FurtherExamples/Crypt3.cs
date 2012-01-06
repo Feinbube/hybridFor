@@ -523,12 +523,6 @@ namespace Hybrid.Examples
         List<string> dictionary;
         List<PasswordEntry> passwordEntries;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 50);
-            this.sizeY = (int)(sizeY * 1000);
-        }
-
         private string randomString(int length)
         {
             StringBuilder stringBuilder = new StringBuilder();
@@ -557,6 +551,8 @@ namespace Hybrid.Examples
 
         protected override void setup()
         {
+            this.sizeY = (int)(sizeX * 20);
+
             if(dictionary == null)
                 dictionary = new List<string>();
 

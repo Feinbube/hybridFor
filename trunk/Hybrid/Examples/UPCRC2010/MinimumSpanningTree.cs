@@ -10,11 +10,6 @@ namespace Hybrid.Examples.Upcrc2010
         float[,] W;
         int[,] MSTree;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 1400.0);
-        }
-
         protected override void setup()
         {
             W = new float[sizeX, sizeX];

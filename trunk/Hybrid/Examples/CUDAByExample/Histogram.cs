@@ -10,16 +10,10 @@ namespace Hybrid.Examples.CudaByExample
         byte[] buffer;
         int[] histo;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 5000000.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = (int)(sizeY * factor);
-            this.sizeZ = 256;
-        }
-
         protected override void setup()
         {
+            this.sizeZ = 256;
+
             histo = new int[sizeZ];
 
             buffer = new byte[sizeX];

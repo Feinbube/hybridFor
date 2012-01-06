@@ -12,21 +12,6 @@ namespace Hybrid.Examples
         protected int shift = 0;
         protected bool isValidField = false;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 100.0);
-            if (this.sizeX < 10)
-                this.sizeX = 10;
-
-            this.sizeY = (int)(sizeY * 100.0);
-            if (this.sizeY < 10)
-                this.sizeY = 10;
-
-            this.sizeZ = (int)(sizeZ * 100.0);
-            if (this.sizeZ < 10)
-                this.sizeZ = 10;
-        }
-
         protected int coords(int x, int y, int n)
         {
             return x + y * n * n;

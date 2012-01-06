@@ -10,11 +10,6 @@ namespace Hybrid.Examples.Upcrc2010
         int[] A;
         int threashold = 200;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 3000.0);
-        }
-
         protected override void setup()
         {
             A = new int[sizeX];

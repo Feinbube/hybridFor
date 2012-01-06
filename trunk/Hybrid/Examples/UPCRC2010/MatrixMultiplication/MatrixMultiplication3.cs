@@ -7,14 +7,6 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
 {
     public class MatrixMultiplication3 : MatrixMultiplicationBase
     {
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 50.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = (int)(sizeY * factor);
-            this.sizeZ = (int)(sizeZ * factor);
-        }
-
         protected override void algorithm() // http://myssa.upcrc.illinois.edu/files/Lab_OpenMP_Assignments/
         {
             int ITILE2 = 32;

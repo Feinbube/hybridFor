@@ -48,11 +48,13 @@ namespace Hybrid.Examples
         {
             Console.Write("Running " + this.GetType().Name);
 
-            scaleAndSetSizes(sizeX, sizeY, sizeZ);
-
-            Console.Write("(" + this.sizeX + " / " + this.sizeY + " / " + this.sizeZ + ")...");
+            this.sizeX = (int)sizeX;
+            this.sizeY = (int)sizeY;
+            this.sizeZ = (int)sizeZ;
 
             setup();
+
+            Console.Write("(" + this.sizeX + " / " + this.sizeY + " / " + this.sizeZ + ")...");
 
             if (print)
             {
@@ -96,7 +98,6 @@ namespace Hybrid.Examples
             };
         }
 
-        protected abstract void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ);
         protected abstract void setup();
         protected abstract void printInput();
         protected abstract void algorithm();

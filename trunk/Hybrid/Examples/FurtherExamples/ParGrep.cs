@@ -11,14 +11,6 @@ namespace Hybrid.Examples
         byte[] haystack;
         int[] positions;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 200000.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = -1; // unused
-            this.sizeZ = -1; // unused
-        }
-
         protected override void setup()
         {
             haystack = new byte[sizeX];

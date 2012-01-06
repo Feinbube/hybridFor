@@ -23,16 +23,10 @@ namespace Hybrid.Examples
         int[,] starve;
         byte[,] state2;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 200.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = (int)(sizeY * factor);
-            this.sizeZ = 10; // number of rounds
-        }
-
         protected override void setup()
         {
+            this.sizeZ = 10;
+
             state1 = new byte[sizeX, sizeY];
             state2 = new byte[sizeX, sizeY];
             age = new int[sizeX, sizeY];

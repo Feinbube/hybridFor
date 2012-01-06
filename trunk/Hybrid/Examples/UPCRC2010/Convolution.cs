@@ -10,13 +10,6 @@ namespace Hybrid.Examples.Upcrc2010
         double[,] startImage;
         double[,] outImage;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 2000.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = (int)(sizeY * factor);
-        }
-
         protected override void setup()
         {
             double EDGE = 5.0;

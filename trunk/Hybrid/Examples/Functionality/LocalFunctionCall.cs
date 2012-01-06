@@ -11,11 +11,6 @@ namespace Hybrid.Examples
         int[] b;
         int[] c;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 100);
-        }
-
         protected override void setup()
         {
             a = new int[sizeX];

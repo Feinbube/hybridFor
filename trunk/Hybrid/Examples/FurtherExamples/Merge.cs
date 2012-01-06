@@ -10,14 +10,6 @@ namespace Hybrid.Examples
         int[] input1, input2;
         int[] output;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            double factor = 200.0;
-            this.sizeX = (int)(sizeX * factor);
-            this.sizeY = -1; // unused
-            this.sizeZ = -1; // unused
-        }
-
         protected override void setup()
         {
             input1 = new int[sizeX];

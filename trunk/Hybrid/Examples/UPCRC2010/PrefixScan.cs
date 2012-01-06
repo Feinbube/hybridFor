@@ -10,11 +10,6 @@ namespace Hybrid.Examples.Upcrc2010
         float[] startData;
         float[] IscanData;
 
-        protected override void scaleAndSetSizes(double sizeX, double sizeY, double sizeZ)
-        {
-            this.sizeX = (int)(sizeX * 500.0);
-        }
-
         protected override void setup()
         {
             startData = new float[sizeX];
