@@ -19,7 +19,7 @@ namespace Hybrid.Testsuite
         {
             example.ExecuteOn = Execute.OnSingleGpu;
 
-            if(example.Run(0.1, 0.1, 0.1, false, 5, 2, null) < 0 )
+            if (!example.Run(0.1, 0.1, 0.1, false, 5, 2).Valid)
                 throw new Exception("Invalid result for " + example.GetType());
             
             Parallel.ReInitialize();
