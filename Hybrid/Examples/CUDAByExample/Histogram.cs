@@ -12,8 +12,8 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
-            if (sizeX > 20000000 || sizeX < 0)
-                sizeX = 20000000;
+            if (sizeX > Int32.MaxValue || sizeX < 0)
+                sizeX = Int32.MaxValue;
 
             this.sizeZ = 256;
 

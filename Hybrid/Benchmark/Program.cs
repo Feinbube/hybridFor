@@ -112,8 +112,7 @@ namespace Hybrid.Benchmark
 
                 new Convolution(),
 
-                /* // to small -> out of memory
-                new MatrixVectorMultiplication(), */
+                new MatrixVectorMultiplication(),
 
                 new MinimumSpanningTree(),
                 new PrefixScan(),
@@ -129,7 +128,9 @@ namespace Hybrid.Benchmark
                 /* // not reliable
                 new JuliaSet(),*/
 
-                new RayTracing(),
+                /* // no gpu-support (subcall)
+                new RayTracing(), */
+                   
                 new Ripple(),
                 new SummingVectors()
             });
@@ -140,7 +141,9 @@ namespace Hybrid.Benchmark
             csv = evaluationLog();
             log = errorLog();
 
-            for(int i=0; i<10; i++)
+            logWriteLine(systemCharacteristics.ToString());
+
+            for(int i=1; i<10; i++)
                 benchmark(i);
 
             csv.Close();
@@ -149,8 +152,6 @@ namespace Hybrid.Benchmark
 
         private void benchmark(double minSequentialExecutionTime)
         {
-            logWriteLine(systemCharacteristics.ToString());
-
             this.minSequentialExecutionTime = minSequentialExecutionTime;
 
             rounds = 20;

@@ -32,6 +32,12 @@ namespace Hybrid.Examples.Upcrc2010
 
         protected override void setup()
         {
+            if (sizeX * sizeY > 67108864)
+            {
+                sizeX = 8192;
+                sizeY = 8192;
+            }
+
             M = (uint)sizeX;
             N = (uint)sizeY;
 
