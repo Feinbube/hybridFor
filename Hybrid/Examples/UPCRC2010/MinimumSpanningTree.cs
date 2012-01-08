@@ -115,5 +115,11 @@ namespace Hybrid.Examples.Upcrc2010
             // TODO: check result
             return true;
         }
+
+        protected override void cleanup()
+        {
+            W = null;
+            MSTree = null;
+        }
     }
 }

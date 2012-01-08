@@ -60,5 +60,12 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
 
             return true;
         }
+
+        protected override void cleanup()
+        {
+            a = null;
+            b = null;
+            c = null;
+        }
     }
 }

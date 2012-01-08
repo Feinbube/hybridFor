@@ -48,9 +48,20 @@ namespace Hybrid.Examples
         {
             Console.Write("Running " + this.GetType().Name);
 
-            this.sizeX = (int)sizeX;
-            this.sizeY = (int)sizeY;
-            this.sizeZ = (int)sizeZ;
+            if (sizeX > int.MaxValue)
+                sizeX = int.MaxValue;
+            else
+                this.sizeX = (int)sizeX;
+
+            if (sizeY > int.MaxValue)
+                sizeY = int.MaxValue;
+            else
+                this.sizeY = (int)sizeY;
+
+            if (sizeZ > int.MaxValue)
+                sizeZ = int.MaxValue;
+            else
+                this.sizeZ = (int)sizeZ;
 
             setup();
 
@@ -84,6 +95,8 @@ namespace Hybrid.Examples
 
             bool valid = checkResult(print);
 
+            cleanup();
+
             Console.WriteLine("Done in " + watch.Elapsed.TotalSeconds + "s. " + (valid ? "SUCCESS" : "<!!! FAILED !!!>"));
 
             return new RunResult()
@@ -102,6 +115,7 @@ namespace Hybrid.Examples
         protected abstract void printInput();
         protected abstract void algorithm();
         protected abstract void printResult();
+        protected abstract void cleanup();
 
         protected bool checkResult(bool throwOnError)
         {

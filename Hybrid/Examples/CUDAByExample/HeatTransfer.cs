@@ -69,5 +69,11 @@ namespace Hybrid.Examples.CudaByExample
             // TODO implement check
             return true;
         }
+
+        protected override void cleanup()
+        {
+            input = null;
+            bitmap = null;
+        }
     }
 }
