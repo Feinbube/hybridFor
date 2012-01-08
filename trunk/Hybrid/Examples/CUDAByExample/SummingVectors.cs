@@ -13,6 +13,9 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
+            if (sizeX > 10000000 || sizeX < 0)
+                sizeX = 10000000;
+
             a = new int[sizeX];
             b = new int[sizeX];
             c = new int[sizeX];
