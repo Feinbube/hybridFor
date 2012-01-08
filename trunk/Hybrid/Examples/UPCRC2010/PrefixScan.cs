@@ -12,8 +12,8 @@ namespace Hybrid.Examples.Upcrc2010
 
         protected override void setup()
         {
-            if (sizeX > 10000000 || sizeX < 0)
-                sizeX = 10000000;
+            if (sizeX > Int32.MaxValue || sizeX < 0)
+                sizeX = Int32.MaxValue;
 
             startData = new float[sizeX];
             IscanData = new float[sizeX];

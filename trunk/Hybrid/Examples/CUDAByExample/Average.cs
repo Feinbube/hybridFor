@@ -13,8 +13,8 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
-            if (sizeX > 10000000 || sizeX < 0)
-                sizeX = 10000000;
+            if (sizeX > Int32.MaxValue || sizeX < 0)
+                sizeX = Int32.MaxValue;
           
             a = new float[sizeX];
             for (int i = 0; i < sizeX; i++)
