@@ -163,5 +163,10 @@ namespace Hybrid.Examples
         {
             return isValidField;
         }
+
+        protected override void cleanup()
+        {
+            field = null;
+        }
     }
 }

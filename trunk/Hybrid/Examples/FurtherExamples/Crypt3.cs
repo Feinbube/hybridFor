@@ -625,5 +625,14 @@ namespace Hybrid.Examples
 
             return true;
         }
+
+        protected override void cleanup()
+        {
+            dictionary.Clear();
+            dictionary = null;
+
+            passwordEntries.Clear();
+            passwordEntries = null;
+        }
     }
 }

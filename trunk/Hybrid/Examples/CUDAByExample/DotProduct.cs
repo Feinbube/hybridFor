@@ -78,5 +78,11 @@ namespace Hybrid.Examples.CudaByExample
             else
                 return true;
         }
+
+        protected override void cleanup()
+        {
+            a = null;
+            b = null;
+        }
     }
 }

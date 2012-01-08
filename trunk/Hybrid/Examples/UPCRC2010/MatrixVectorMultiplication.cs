@@ -32,10 +32,10 @@ namespace Hybrid.Examples.Upcrc2010
 
         protected override void setup()
         {
-            if (sizeX * sizeY > 67108864)
+            if (sizeX * sizeY > 1024 * 1024)
             {
-                sizeX = 8192;
-                sizeY = 8192;
+                sizeX = 1024;
+                sizeY = 1024;
             }
 
             M = (uint)sizeX;
@@ -193,6 +193,19 @@ namespace Hybrid.Examples.Upcrc2010
                 for (j = 0; j < N; j++)
                     fullResultVector[i] += fullInputMatrix[i, j] * inputVector[j];
             }
+        }
+
+        protected override void cleanup()
+        {
+            inputMatrix.val = null;
+            inputMatrix.rc_ind = null;
+            inputMatrix.rc_ptr = null;
+            inputMatrix.rc_len = null;
+
+            fullInputMatrix = null;
+            inputVector = null;
+            resultVector = null;
+            fullResultVector = null;
         }
     }
 }

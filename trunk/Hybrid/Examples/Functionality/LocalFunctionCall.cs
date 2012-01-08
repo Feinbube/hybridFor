@@ -56,5 +56,12 @@ namespace Hybrid.Examples
 
             return true;
         }
+
+        protected override void cleanup()
+        {
+            a = null;
+            b = null;
+            c = null;
+        }
     }
 }

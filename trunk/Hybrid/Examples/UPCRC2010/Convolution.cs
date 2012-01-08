@@ -68,5 +68,11 @@ namespace Hybrid.Examples.Upcrc2010
 
             return true;
         }
+
+        protected override void cleanup()
+        {
+            startImage = null;
+            outImage = null;
+        }
     }
 }

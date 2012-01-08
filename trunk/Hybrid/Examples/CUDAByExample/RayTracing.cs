@@ -143,5 +143,11 @@ namespace Hybrid.Examples.CudaByExample
 
             return true;
         }
+
+        protected override void cleanup()
+        {
+            sphere = null;
+            bitmap = null;
+        }
     }
 }

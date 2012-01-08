@@ -47,5 +47,14 @@ namespace Hybrid.Examples
 
             return true;
         }
+
+        protected override void cleanup()
+        {
+            a.Clear();
+            a = null;
+
+            b.Clear();
+            b = null;
+        }
     }
 }

@@ -110,10 +110,9 @@ namespace Hybrid.Benchmark
                 new MatrixMultiplication4(),
                 new MatrixMultiplication5(),
 
-                new Convolution(),
-
                 new MatrixVectorMultiplication(),
 
+                new Convolution(),
                 new MinimumSpanningTree(),
                 new PrefixScan(),
 

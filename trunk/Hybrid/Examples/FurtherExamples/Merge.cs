@@ -77,5 +77,12 @@ namespace Hybrid.Examples
 
             return true;
         }
+
+        protected override void cleanup()
+        {
+            input1 = null;
+            input2 = null;
+            output = null;
+        }
     }
 }

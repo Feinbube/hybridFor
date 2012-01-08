@@ -70,5 +70,11 @@ namespace Hybrid.Examples
 
             return true;
         }
+
+        protected override void cleanup()
+        {
+            haystack = null;
+            positions = null;
+        }
     }
 }
