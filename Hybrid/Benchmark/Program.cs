@@ -97,10 +97,10 @@ namespace Hybrid.Benchmark
                 new Wator(), */
 
                 new SudokuValidator(),
-                new SudokuValidatorInvalidColumn(),
-                new SudokuValidatorInvalidNumbers(),
-                new SudokuValidatorInvalidRow(),
-                new SudokuValidatorInvalidSubfield(),
+                 //new SudokuValidatorInvalidColumn(),
+                 //new SudokuValidatorInvalidNumbers(),
+                 //new SudokuValidatorInvalidRow(),
+                 //new SudokuValidatorInvalidSubfield(),
                 new SudokuValidator2D(),
 
                 new MatrixMultiplication0(),
@@ -111,7 +111,9 @@ namespace Hybrid.Benchmark
                 new MatrixMultiplication5(),
 
                 new Convolution(),
-                new MatrixVectorMultiplication(),
+
+                /* // to small -> out of memory
+                new MatrixVectorMultiplication(), */
 
                 new MinimumSpanningTree(),
                 new PrefixScan(),
@@ -135,16 +137,18 @@ namespace Hybrid.Benchmark
 
         private void RunBenchmark()
         {
-            //benchmark(0.5);
-            benchmark(3.0);
-            //benchmark(4.0);
+            csv = evaluationLog();
+            log = errorLog();
+
+            for(int i=0; i<10; i++)
+                benchmark(i);
+
+            csv.Close();
+            log.Close();
         }
 
         private void benchmark(double minSequentialExecutionTime)
         {
-            csv = evaluationLog();
-            log = errorLog();
-
             logWriteLine(systemCharacteristics.ToString());
 
             this.minSequentialExecutionTime = minSequentialExecutionTime;
@@ -155,9 +159,6 @@ namespace Hybrid.Benchmark
             print = false;
 
             runExamples();
-
-            csv.Close();
-            log.Close();
         }
 
         private void runExamples()

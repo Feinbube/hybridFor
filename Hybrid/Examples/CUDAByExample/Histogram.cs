@@ -12,6 +12,9 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
+            if (sizeX > 20000000 || sizeX < 0)
+                sizeX = 20000000;
+
             this.sizeZ = 256;
 
             histo = new int[sizeZ];

@@ -12,6 +12,9 @@ namespace Hybrid.Examples.Upcrc2010
 
         protected override void setup()
         {
+            if (sizeX > 10000000 || sizeX < 0)
+                sizeX = 10000000;
+
             startData = new float[sizeX];
             IscanData = new float[sizeX];
 
@@ -73,7 +76,7 @@ namespace Hybrid.Examples.Upcrc2010
         protected override bool isValid()
         {
             for (int i = 0; i < sizeX/2 /* FIX ME */; i++)
-                if (IscanData[i] > IscanData[i + 1])
+                if (IscanData[i + 1]/IscanData[i] < 0.99999f)
                     return false;
 
             return true;

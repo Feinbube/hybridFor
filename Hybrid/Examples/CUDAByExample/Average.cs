@@ -13,6 +13,9 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
+            if (sizeX > 10000000 || sizeX < 0)
+                sizeX = 10000000;
+          
             a = new float[sizeX];
             for (int i = 0; i < sizeX; i++)
                 a[i] = random.Next(0, 1000);

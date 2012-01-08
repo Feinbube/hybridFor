@@ -13,6 +13,12 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
+            if (sizeX * sizeY > 10000000 || sizeX * sizeY < 0)
+            {
+                sizeX = 10000;
+                sizeY = 1000;
+            }
+
             a = new float[sizeX * sizeY];
             b = new float[sizeX * sizeY];
 
@@ -67,7 +73,7 @@ namespace Hybrid.Examples.CudaByExample
             for (int i = 0; i < sizeX * sizeY; i++)
                 result += a[i] * b[i];
 
-            if (this.result / result < 0.99999f)
+            if (this.result / result < 0.99999f && this.result - result > 0.0001f)
                 return false;
             else
                 return true;

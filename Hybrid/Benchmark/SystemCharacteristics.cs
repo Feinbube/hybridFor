@@ -43,9 +43,9 @@ namespace Hybrid.Benchmark
                 double scale = 5;
 
                 double executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
-                while (executionTime <= 0.0005)
+                while (executionTime <= 0.001)
                 {
-                    scale *= 2; //+= 15.0 * minSequentialExecutionTime - executionTime * 10.0 * minSequentialExecutionTime;
+                    scale *= 2;
                     executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
                 }
 
@@ -54,9 +54,9 @@ namespace Hybrid.Benchmark
                 double log = Math.Log(executionTime2/executionTime, 2);
                 scale = Math.Pow(minSequentialExecutionTime / executionTime, 1/log) * scale;
 
-                executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
+                // executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
 
-                Console.WriteLine("Scale " + scale + " for " + example.GetType().Name + " for " + executionTime + "s.");
+                Console.WriteLine("Scale " + scale + " for " + example.GetType().Name + "."); // + " for " + executionTime + "s.");
 
                 return scale;
             }
