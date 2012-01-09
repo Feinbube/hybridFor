@@ -171,25 +171,29 @@ namespace Hybrid.Benchmark
         {
             double sizeFactor = systemCharacteristics.GetScale(example, minSequentialExecutionTime);
 
-            logWrite("[Serial]    ");
-            ExampleBase.RunResult runResultSerial = runExample(example, Execute.OnSingleCpu, sizeFactor);
+            ExampleBase.RunResult runResultSerial = executeSerial(example, sizeFactor);
+            ExampleBase.RunResult runResultParallel = executeParallel(example, sizeFactor);
+            ExampleBase.RunResult runResultGPU = executeGpu(example, sizeFactor);
+            ExampleBase.RunResult runResultAutomatic = executeAutomatic(example, sizeFactor);
 
-            if (runResultSerial == null)
-                runResultSerial = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            logWriteLine();
 
-            logWrite("[Parallel]  ");
-            ExampleBase.RunResult runResultParallel = runExample(example, Execute.OnAllCpus, sizeFactor);
+            writeOutputs(example, runResultSerial, runResultParallel, runResultGPU, runResultAutomatic);
+        }
 
-            if (runResultParallel == null)
-                runResultParallel = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
-
+        private ExampleBase.RunResult executeAutomatic(ExampleBase example, double sizeFactor)
+        {
             logWrite("[Automatic] ");
             ExampleBase.RunResult runResultAutomatic = runExample(example, Execute.OnEverythingAvailable, sizeFactor);
             Parallel.ReInitialize();
 
-            if(runResultAutomatic == null)
+            if (runResultAutomatic == null)
                 runResultAutomatic = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            return runResultAutomatic;
+        }
 
+        private ExampleBase.RunResult executeGpu(ExampleBase example, double sizeFactor)
+        {
             ExampleBase.RunResult runResultGPU = null;
             if (!systemCharacteristics.Platform.ContainsAGpu)
                 logWriteLine("[GPU]       No GPUs available!");
@@ -202,10 +206,27 @@ namespace Hybrid.Benchmark
 
             if (runResultGPU == null)
                 runResultGPU = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
-            
-            logWriteLine();
+            return runResultGPU;
+        }
 
-            writeOutputs(example, runResultSerial, runResultParallel, runResultGPU, runResultAutomatic);
+        private ExampleBase.RunResult executeParallel(ExampleBase example, double sizeFactor)
+        {
+            logWrite("[Parallel]  ");
+            ExampleBase.RunResult runResultParallel = runExample(example, Execute.OnAllCpus, sizeFactor);
+
+            if (runResultParallel == null)
+                runResultParallel = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            return runResultParallel;
+        }
+
+        private ExampleBase.RunResult executeSerial(ExampleBase example, double sizeFactor)
+        {
+            logWrite("[Serial]    ");
+            ExampleBase.RunResult runResultSerial = runExample(example, Execute.OnSingleCpu, sizeFactor);
+
+            if (runResultSerial == null)
+                runResultSerial = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            return runResultSerial;
         }
 
         private void writeOutputs(ExampleBase example, ExampleBase.RunResult runResultSerial, ExampleBase.RunResult runResultParallel, ExampleBase.RunResult runResultGPU, ExampleBase.RunResult runResultAutomatic)

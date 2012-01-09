@@ -68,7 +68,7 @@ namespace Hybrid.Gpu
             return deviceType;
         }
 
-        override protected void parallelFor(int fromInclusive, int toExclusive, Action<int> action)
+        override public void ParallelFor(int fromInclusive, int toExclusive, Action<int> action)
         {
             if (fromInclusive >= toExclusive)
                 return;
@@ -84,7 +84,7 @@ namespace Hybrid.Gpu
             Hybrid.MsilToOpenCL.Parallel.ForGpu(fromInclusive, toExclusive, action, null);
         }
 
-        override protected void parallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
+        override public void ParallelFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
         {
             if (fromInclusiveX >= toExclusiveX)
                 return;
