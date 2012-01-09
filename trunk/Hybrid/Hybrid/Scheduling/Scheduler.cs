@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Hybrid
 {
@@ -11,10 +12,57 @@ namespace Hybrid
 
         public static void AutomaticFor(int fromInclusive, int toExclusive, Action<int> action)
         {
-            ExecuteEvenDistributed(fromInclusive, toExclusive, action);
+            executeFarmerWorker(fromInclusive, toExclusive, action);
         }
 
-        private static void ExecuteEvenDistributed(int fromInclusive, int toExclusive, Action<int> action)
+        static Queue<ExecuteInfo> executionInfos = new Queue<ExecuteInfo>();
+
+        private static void executeFarmerWorker(int fromInclusive, int toExclusive, Action<int> action)
+        {
+            if(Platform.ComputeDevices.Count > 1)
+                Platform.ComputeDevices.RemoveAt(1);
+
+            int workPackages = 10;
+            int count = toExclusive - fromInclusive;
+            int workshare = count / workPackages;
+            int moreWorkCount = count - workshare * workPackages;
+
+            for (int i = 0; i < workPackages; i++)
+                executionInfos.Enqueue(new ExecuteInfo(fromInclusive + i * workshare, fromInclusive + (i+1) * workshare, action));
+
+            if(moreWorkCount > 0)
+                executionInfos.Enqueue(new ExecuteInfo(workshare * workPackages, toExclusive, action));
+
+            List<Thread> threads = new List<Thread>();
+            for (int i = 0; i < Platform.ComputeDevices.Count; i++)
+            {
+                Thread thread = new Thread(worker);
+                threads.Add(thread);
+                thread.Start(Platform.ComputeDevices[i]);
+            }
+
+            for (int i = 0; i < Platform.ComputeDevices.Count; i++)
+                threads[i].Join();
+        }
+
+        private static void worker(object device)
+        {
+            while (true)
+            {
+                ExecuteInfo executionInfo;
+                lock (executionInfos)
+                {
+                    if (executionInfos.Count == 0)
+                        return;
+
+                    executionInfo = executionInfos.Dequeue();
+                }
+
+                executionInfo.Execute(device as ComputeDevice);
+            }
+        }
+
+        private static void executeEvenDistributed(int fromInclusive, int toExclusive, Action<int> action)
         {
             List<ExecuteInfo> executeInfos = new List<ExecuteInfo>();
 
@@ -47,10 +95,10 @@ namespace Hybrid
 
         public static void AutomaticFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)
         {
-            ExecuteEvenDistributedByColumn(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
+            executeEvenDistributedByColumn(fromInclusiveX, toExclusiveX, fromInclusiveY, toExclusiveY, action);
         }
 
-        private static void ExecuteEvenDistributedByColumn(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int,int> action)
+        private static void executeEvenDistributedByColumn(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int,int> action)
         {
             int count = toExclusiveX - fromInclusiveX;
             int computeDeviceCount = Platform.ComputeDevices.Count;

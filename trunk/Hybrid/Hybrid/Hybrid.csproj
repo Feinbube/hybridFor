@@ -49,7 +49,6 @@
     <Compile Include="Core\ComputeDevice.cs" />
     <Compile Include="Core\ComputeUnit.cs" />
     <Compile Include="Core\DataAccessAttribute.cs" />
-    <Compile Include="Core\Workload.cs" />
     <Compile Include="Cpu\CpuComputeDevice.cs" />
     <Compile Include="Cpu\CpuComputeUnit.cs" />
     <Compile Include="Cpu\CpuProcessingElement.cs" />

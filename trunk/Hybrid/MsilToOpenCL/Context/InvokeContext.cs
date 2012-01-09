@@ -107,15 +107,15 @@ namespace Hybrid.MsilToOpenCL
 
         public void Dispose()
         {
-            foreach (InvokeArgument Argument in m_Arguments)
-            {
-                if (Argument != null)
-                {
-                    Argument.Dispose();
-                }
-            }
+            //foreach (InvokeArgument Argument in m_Arguments)
+            //{
+            //    if (Argument != null)
+            //    {
+            //        Argument.Dispose();
+            //    }
+            //}
             m_Arguments.Clear();
-            System.GC.SuppressFinalize(this);
+            //System.GC.SuppressFinalize(this);
         }
 
         #endregion
