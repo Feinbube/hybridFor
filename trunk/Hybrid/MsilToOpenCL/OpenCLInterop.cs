@@ -36,8 +36,15 @@ namespace Hybrid.MsilToOpenCL
                 program = CacheEntry.Program;
                 if (program == null)
                 {
-                    string source = GetOpenCLSourceHeader(Platform, device) + CacheEntry.Source;
-                    program = context.CreateProgramWithSource(source);
+                    StringBuilder source = new StringBuilder();
+                    source.Append(GetOpenCLSourceHeader(Platform, device));
+
+                    foreach (HlGraphEntry RelatedGraphEntry in CacheEntry.HlGraph.RelatedGraphs.Values)
+                        source.Append(RelatedGraphEntry.Source);
+
+                    source.Append(CacheEntry.Source);
+
+                    program = context.CreateProgramWithSource(source.ToString());
 
                     try
                     {
@@ -100,6 +107,17 @@ namespace Hybrid.MsilToOpenCL
             return null;
         }
 
+		internal static OpenCLNet.Device GetFirstCpu() {
+			if (OpenCLNet.OpenCL.NumberOfPlatforms == 0)
+				return null;
+
+			foreach (OpenCLNet.Platform platform in OpenCLNet.OpenCL.GetPlatforms())
+				foreach (OpenCLNet.Device device in platform.QueryDevices(OpenCLNet.DeviceType.CPU))
+					return device;
+
+			return null;
+		}
+
         private static string GetOpenCLSourceHeader(OpenCLNet.Platform platform, OpenCLNet.Device device)
         {
             StringBuilder result = new System.Text.StringBuilder();
@@ -149,8 +167,8 @@ namespace Hybrid.MsilToOpenCL
 
         internal static void WriteOpenCL(HighLevel.HlGraph HLgraph, TextWriter writer)
         {
-            writer.WriteLine("// OpenCL kernel for method '{0}' of type '{1}'", HLgraph.MethodBase.ToString(), HLgraph.MethodBase.DeclaringType.ToString());
-            writer.WriteLine("__kernel {0} {1}(", GetOpenClType(((MethodInfo)HLgraph.MethodBase).ReturnType), HLgraph.MethodName);
+            writer.WriteLine("// OpenCL source for {2} method '{0}' of type '{1}'", HLgraph.MethodBase.ToString(), HLgraph.MethodBase.DeclaringType.ToString(), HLgraph.IsKernel ? "kernel" : "related");
+            writer.WriteLine("{2}{0} {1}(", GetOpenClType(((MethodInfo)HLgraph.MethodBase).ReturnType), HLgraph.MethodName, HLgraph.IsKernel ? "__kernel " : string.Empty);
             for (int i = 0; i < HLgraph.Arguments.Count; i++)
             {
                 HighLevel.ArgumentLocation Argument = HLgraph.Arguments[i];
