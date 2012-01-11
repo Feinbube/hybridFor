@@ -39,6 +39,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
         private int m_MaxStack;
 
+        private bool m_IsKernel;
+        public bool IsKernel { get { return m_IsKernel; } set { m_IsKernel = value; } }
+
         private System.Reflection.MethodBase m_MethodBase;
         public System.Reflection.MethodBase MethodBase { get { return m_MethodBase; } }
 
@@ -451,19 +454,19 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
         }
 
-        public void ConvertForOpenCl()
+        public void ConvertForOpenCl(HlGraphCache RelatedGraphCache)
         {
             foreach (BasicBlock BasicBlock in BasicBlocks)
             {
                 foreach (Instruction Instruction in BasicBlock.Instructions)
                 {
                     Node Node = Instruction.Argument;
-                    if (ConvertForOpenCl(ref Node, false))
+                    if (ConvertForOpenCl(ref Node, false, RelatedGraphCache))
                     {
                         Instruction.Argument = Node;
                     }
                     Node = Instruction.Result;
-                    if (ConvertForOpenCl(ref Node, true))
+                    if (ConvertForOpenCl(ref Node, true, RelatedGraphCache))
                     {
                         Instruction.Result = Node;
                     }
@@ -679,7 +682,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
         }
 
-        private bool ConvertForOpenCl(ref Node Node, bool IsDef)
+        private bool ConvertForOpenCl(ref Node Node, bool IsDef, HlGraphCache RelatedGraphCache)
         {
             bool Changed = false;
 
@@ -748,7 +751,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     for (int i = 0; i < Node.SubNodes.Count; i++)
                     {
                         Node SubNode = Node.SubNodes[i];
-                        if (ConvertForOpenCl(ref SubNode, false))
+                        if (ConvertForOpenCl(ref SubNode, false, RelatedGraphCache))
                         {
                             Node.SubNodes[i] = SubNode;
                             Changed = true;
@@ -827,9 +830,14 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
                             HlGraphEntry RelatedGraphEntry;
 
-                            if (!m_RelatedGraphs.TryGetValue(CallNode.MethodInfo, out RelatedGraphEntry))
+                            if (!m_RelatedGraphs.TryGetValue(CallNode.MethodInfo, out RelatedGraphEntry) &&
+                                !RelatedGraphCache.TryGetValue(IntPtr.Zero, CallNode.MethodInfo, out RelatedGraphEntry))
                             {
-                                //TODO: m_RelatedGraphs[CallNode.MethodInfo] = null;
+                                RelatedGraphEntry = Parallel.ConstructRelatedHlGraphEntry(CallNode.MethodInfo, this, RelatedGraphCache);
+                            }
+
+                            if (RelatedGraphEntry == null)
+                            {
                                 throw new InvalidOperationException(string.Format("Sorry, no equivalent OpenCL function call available for '{0}'.", CallNode));
                             }
                         }

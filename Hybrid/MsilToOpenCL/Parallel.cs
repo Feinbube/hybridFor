@@ -14,6 +14,7 @@ namespace Hybrid.MsilToOpenCL
     public class Parallel
     {
         private static HlGraphCache hlGraphCache = new HlGraphCache();
+		private static HlGraphCache subGraphCache = new HlGraphCache();
         private static int HlGraphSequenceNumber = 0;
 
         public static void ForGpu(int fromInclusive, int toExclusive, Action<int> action, OpenCLNet.Device device)
@@ -118,26 +119,55 @@ namespace Hybrid.MsilToOpenCL
         public static void PurgeCaches()
         {
             hlGraphCache.purge();
+			subGraphCache.purge();
         }
 
         private static HlGraphEntry GetHlGraph(MethodInfo Method, int GidParamCount, OpenCLNet.Device device)
         {
-            HlGraphEntry CacheEntry;
-            HighLevel.HlGraph HLgraph;
-            string MethodName;
-            TextWriter writer = System.Console.Out;
+			HlGraphEntry CacheEntry;
 
             if (device == null)
                 device = OpenCLInterop.GetFirstGpu();
 
-            if (device == null)
-                throw new Exception("No Gpu Compute Device found in the system!");
+			if (device == null)
+				device = OpenCLInterop.GetFirstCpu();
 
-            if(hlGraphCache.TryGetValue(device.DeviceID, Method, out CacheEntry))
+            if (device == null)
+                throw new Exception("No OpenCL Compute Device found in the system!");
+
+            if (hlGraphCache.TryGetValue(device.DeviceID, Method, out CacheEntry))
                 return CacheEntry;
 
-            MethodName = string.Format("Cil2OpenCL_Root_Seq{0}", HlGraphSequenceNumber++);
-            HLgraph = new HighLevel.HlGraph(Method, MethodName);
+            CacheEntry = ConstructKernelHlGraphEntry(Method, GidParamCount);
+			CacheEntry.Device = device;
+
+			hlGraphCache.SetValue(device.DeviceID, Method, CacheEntry);
+			return CacheEntry;
+		}
+
+        internal static HlGraphEntry ConstructRelatedHlGraphEntry(MethodInfo Method, HighLevel.HlGraph ParentGraph, HlGraphCache RelatedGraphCache)
+        {
+            HlGraphEntry CacheEntry = ConstructHlGraphEntry(Method, 0, "Cil2OpenCL_Sub_Seq{0}");
+            RelatedGraphCache.SetValue(IntPtr.Zero, Method, CacheEntry);
+            ParentGraph.RelatedGraphs[Method] = CacheEntry;
+
+            GenerateOpenCLSource(CacheEntry);
+            return CacheEntry;
+        }
+
+        private static HlGraphEntry ConstructKernelHlGraphEntry(MethodInfo Method, int GidParamCount)
+        {
+            HlGraphEntry CacheEntry = ConstructHlGraphEntry(Method, GidParamCount, "Cil2OpenCL_Kernel_Seq{0}");
+            CacheEntry.HlGraph.IsKernel = true;
+
+            GenerateOpenCLSource(CacheEntry);
+            return CacheEntry;
+        }
+
+		private static HlGraphEntry ConstructHlGraphEntry(MethodInfo Method, int GidParamCount, string NameTemplate) {
+            TextWriter writer = System.Console.Out;
+            string MethodName = string.Format(NameTemplate, HlGraphSequenceNumber++);
+            HighLevel.HlGraph HLgraph = new HighLevel.HlGraph(Method, MethodName);
 
             if (DumpCode > 3)
                 WriteCode(HLgraph, writer);
@@ -150,7 +180,7 @@ namespace Hybrid.MsilToOpenCL
                 WriteCode(HLgraph, writer);
 
             // Convert all expression trees into something OpenCL can understand
-            HLgraph.ConvertForOpenCl();
+            HLgraph.ConvertForOpenCl(subGraphCache);
             System.Diagnostics.Debug.Assert(!HLgraph.HasThisParameter);
 
             // Change the real first arguments (the "int"s of the Action<> method) to local variables
@@ -223,15 +253,14 @@ namespace Hybrid.MsilToOpenCL
             HLgraph.AnalyzeLocationUsage();
 
             // Finally, add the graph to the cache
-            CacheEntry = new HlGraphEntry(HLgraph, StartIdLocation, EndIdLocation);
-
-            // Get OpenCL source code
-            CacheEntry.Source = getOpenCLSource(HLgraph);
-            CacheEntry.Device = device;
-
-            hlGraphCache.SetValue(device.DeviceID, Method, CacheEntry);
+            HlGraphEntry CacheEntry = new HlGraphEntry(HLgraph, StartIdLocation, EndIdLocation);
 
             return CacheEntry;
+        }
+
+        private static void GenerateOpenCLSource(HlGraphEntry CacheEntry) {
+            // Get OpenCL source code
+            CacheEntry.Source = getOpenCLSource(CacheEntry.HlGraph);
         }
 
         private static string getOpenCLSource(HighLevel.HlGraph HLgraph)
