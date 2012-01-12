@@ -43,6 +43,7 @@ namespace Hybrid.MsilToOpenCL
                         source.Append(RelatedGraphEntry.Source);
 
                     source.Append(CacheEntry.Source);
+                    source.Append(GetOpenCLSourceFooter(Platform, device));
 
                     program = context.CreateProgramWithSource(source.ToString());
 
@@ -132,7 +133,15 @@ namespace Hybrid.MsilToOpenCL
             setExtensionIfAvailable(result, device, "cl_khr_local_int32_base_atomics");
             setExtensionIfAvailable(result, device, "cl_khr_local_int32_extended_atomics");
 
+            return result.ToString();
+        }
+
+        private static string GetOpenCLSourceFooter(OpenCLNet.Platform platform, OpenCLNet.Device device)
+        {
+            StringBuilder result = new System.Text.StringBuilder();
+
             result.AppendLine();
+            result.AppendLine("// END GENERATED OpenCL");
 
             return result.ToString();
         }
@@ -154,6 +163,7 @@ namespace Hybrid.MsilToOpenCL
                 throw new ArgumentException(string.Format("Unable to generate OpenCL code for non-ValueType '{0}'", StructType.FullName));
             }
 
+            writer.WriteLine();
             writer.WriteLine("// OpenCL structure definition for type '{0}'", StructType.FullName);
             writer.WriteLine("struct {0} {{", StructType.Name);
             FieldInfo[] Fields = StructType.GetFields();
@@ -162,11 +172,11 @@ namespace Hybrid.MsilToOpenCL
                 writer.WriteLine("\t{0} {1};", GetOpenClType(Field.FieldType), Field.Name);
             }
             writer.WriteLine("}}");
-            writer.WriteLine();
         }
 
         internal static void WriteOpenCL(HighLevel.HlGraph HLgraph, TextWriter writer)
         {
+            writer.WriteLine();
             writer.WriteLine("// OpenCL source for {2} method '{0}' of type '{1}'", HLgraph.MethodBase.ToString(), HLgraph.MethodBase.DeclaringType.ToString(), HLgraph.IsKernel ? "kernel" : "related");
             writer.WriteLine("{2}{0} {1}(", GetOpenClType(((MethodInfo)HLgraph.MethodBase).ReturnType), HLgraph.MethodName, HLgraph.IsKernel ? "__kernel " : string.Empty);
             for (int i = 0; i < HLgraph.Arguments.Count; i++)
@@ -280,7 +290,6 @@ namespace Hybrid.MsilToOpenCL
             }
 
             writer.WriteLine("}");
-            writer.WriteLine("// END GENERATED OpenCL");
         }
 
         public static string GetOpenClType(Type DataType)

@@ -35,6 +35,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             public List<Location> DefinedLocations = new List<Location>();
             public List<Location> IndirectDefinedLocations = new List<Location>();
             public List<Location> IndirectUsedLocations = new List<Location>();
+            public Dictionary<System.Reflection.MethodInfo, HlGraphEntry> RelatedGraphs;
 
             public static LocationUsage ForTree(Node Node, bool TopIsDef)
             {
@@ -45,7 +46,13 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
             public static LocationUsage ForInstruction(Instruction Instruction)
             {
+                return ForInstruction(Instruction, null);
+            }
+
+            public static LocationUsage ForInstruction(Instruction Instruction, Dictionary<System.Reflection.MethodInfo, HlGraphEntry> RelatedGraphs)
+            {
                 LocationUsage LocationUsage = new LocationUsage();
+                LocationUsage.RelatedGraphs = RelatedGraphs;
                 LocationUsage.TraverseTree(Instruction.Argument, false, false);
                 LocationUsage.TraverseTree(Instruction.Result, true, false);
                 return LocationUsage;
@@ -103,6 +110,8 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     }
                     else
                     {
+                        HlGraphEntry RelatedGraphEntry;
+
                         if (Node.NodeType == NodeType.ArrayAccess && Node.SubNodes.Count > 0 && Node.SubNodes[0].NodeType == NodeType.Location)
                         {
                             Location ArrayLocation = ((LocationNode)Node.SubNodes[0]).Location;
@@ -114,6 +123,35 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                             else if (!ArrayDef && !IndirectUsedLocations.Contains(ArrayLocation))
                             {
                                 IndirectUsedLocations.Add(ArrayLocation);
+                            }
+                        }
+                        else if (Node.NodeType == NodeType.Call && Node.SubNodes.Count > 0 && !object.ReferenceEquals(RelatedGraphs, null)
+                            && RelatedGraphs.TryGetValue(((CallNode)Node).MethodInfo, out RelatedGraphEntry))
+                        {
+                            // Call to other generated method. Propagate indirect usage flags
+
+                            HlGraph HlGraph = RelatedGraphEntry.HlGraph;
+
+                            for (int i = 0; i < Math.Min(Node.SubNodes.Count, HlGraph.Arguments.Count); i++)
+                            {
+                                ArgumentLocation Argument = HlGraph.Arguments[i];
+
+                                if ((Argument.Flags & (LocationFlags.IndirectRead | LocationFlags.IndirectWrite)) != 0)
+                                {
+                                    Node SubNode = Node.SubNodes[i];
+                                    if (SubNode.NodeType == NodeType.Location)
+                                    {
+                                        Location ArrayLocation = ((LocationNode)SubNode).Location;
+                                        if ((Argument.Flags & LocationFlags.IndirectRead) != 0 && !IndirectUsedLocations.Contains(ArrayLocation))
+                                        {
+                                            IndirectUsedLocations.Add(ArrayLocation);
+                                        }
+                                        if ((Argument.Flags & LocationFlags.IndirectWrite) != 0 && !IndirectDefinedLocations.Contains(ArrayLocation))
+                                        {
+                                            IndirectDefinedLocations.Add(ArrayLocation);
+                                        }
+                                    }
+                                }
                             }
                         }
 
