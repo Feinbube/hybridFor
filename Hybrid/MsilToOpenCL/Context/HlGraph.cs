@@ -953,7 +953,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             {
                 foreach (Instruction Instruction in BasicBlock.Instructions)
                 {
-                    LocationUsage LocationUsage = LocationUsage.ForInstruction(Instruction);
+                    LocationUsage LocationUsage = LocationUsage.ForInstruction(Instruction, RelatedGraphs);
                     foreach (Location Location in LocationUsage.DefinedLocations)
                     {
                         Location.Flags |= LocationFlags.Write;
