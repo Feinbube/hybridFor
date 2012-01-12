@@ -411,7 +411,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         }
 
         private Dictionary<System.Reflection.FieldInfo, ArgumentLocation> m_StaticFieldMap = new Dictionary<System.Reflection.FieldInfo, ArgumentLocation>();
-        private Dictionary<System.Reflection.FieldInfo, ArgumentLocation> m_ThisFieldMap = new Dictionary<System.Reflection.FieldInfo, ArgumentLocation>();
+        //private Dictionary<System.Reflection.FieldInfo, ArgumentLocation> m_ThisFieldMap = new Dictionary<System.Reflection.FieldInfo, ArgumentLocation>();
         //private Dictionary<System.Reflection.FieldInfo, Dictionary<System.Reflection.FieldInfo, ArgumentLocation>> m_OuterThisFieldMap = new Dictionary<System.Reflection.FieldInfo, Dictionary<System.Reflection.FieldInfo, ArgumentLocation>>();
         public AccessPathEntry RootPathEntry = new AccessPathEntry();
         private Dictionary<ArgumentLocation, ArrayInfo> m_MultiDimensionalArrayInfo = new Dictionary<ArgumentLocation, ArrayInfo>();
@@ -748,6 +748,15 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 }
                 else
                 {
+                    // Check for function call on "this", and convert it to static form
+                    if (m_HasThisParameter && Node.NodeType == NodeType.Call && Node.SubNodes.Count > 0
+                        && ((((CallNode)Node).MethodInfo.CallingConvention & System.Reflection.CallingConventions.HasThis) != 0)
+                        && Node.SubNodes[0].NodeType == NodeType.Location && object.ReferenceEquals(((LocationNode)Node.SubNodes[0]).Location, Arguments[0]))
+                    {
+                        Node.SubNodes.RemoveAt(0);
+                        ((CallNode)Node).IsStaticCall = true;
+                    }
+
                     for (int i = 0; i < Node.SubNodes.Count; i++)
                     {
                         Node SubNode = Node.SubNodes[i];
@@ -868,6 +877,10 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                                 if (object.ReferenceEquals(RelatedArgument, null))
                                     continue;
 
+                                // References to "this" and related objects
+                                if (MapThisFieldAccess(CallNode, RelatedArgument, RelatedGraphEntry))
+                                    continue;
+
                                 // TODO: multi-dimensional arrays, references to "this", ...
 
                                 if (!object.ReferenceEquals(RelatedArgument, null))
@@ -883,6 +896,52 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
 
             return Changed;
+        }
+
+        private bool MapThisFieldAccess(CallNode CallNode, ArgumentLocation RelatedArgument, HlGraphEntry RelatedGraphEntry)
+        {
+            List<System.Reflection.FieldInfo> RelatedPathList = new List<System.Reflection.FieldInfo>();
+            if (!ConstructAccessPathList(RelatedArgument, RelatedGraphEntry.HlGraph.RootPathEntry, RelatedPathList))
+                return false;
+            System.Diagnostics.Debug.Assert(RelatedPathList.Count > 0);
+
+            // Now construct a temporary node that mimics the user accessing this field, then go through the regular path
+            // to get the access inserted into our AccessPathEntry hierarchy...
+            InstanceFieldNode TempFieldNode = new InstanceFieldNode(new LocationNode(Arguments[0]), RelatedPathList[RelatedPathList.Count - 1]);
+            for (int i = RelatedPathList.Count - 2; i >= 0; i++)
+                TempFieldNode = new InstanceFieldNode(TempFieldNode, RelatedPathList[i]);
+
+            AccessPathEntry PathEntry = TraverseFieldAccess(TempFieldNode, true, RootPathEntry);
+            if (PathEntry == null)
+            {
+                throw new InvalidOperationException(string.Format("Generated field access operation '{0}' not supported.", TempFieldNode));
+            }
+            else
+            {
+                System.Diagnostics.Debug.Assert(PathEntry.ArgumentLocation != null);
+                CallNode.SubNodes.Add(new LocationNode(PathEntry.ArgumentLocation));
+            }
+
+            return true;
+        }
+
+        private bool ConstructAccessPathList(ArgumentLocation RelatedArgument, AccessPathEntry RelatedPathEntry, List<System.Reflection.FieldInfo> RelatedPathList)
+        {
+            if (object.ReferenceEquals(RelatedPathEntry.ArgumentLocation, RelatedArgument))
+            {
+                return true;
+            }
+
+            foreach (KeyValuePair<System.Reflection.FieldInfo, AccessPathEntry> SubEntry in RelatedPathEntry.SubEntries)
+            {
+                if (ConstructAccessPathList(RelatedArgument, SubEntry.Value, RelatedPathList))
+                {
+                    RelatedPathList.Add(SubEntry.Key);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool ConvertLocationToPointer(ref Node Node, Location Location)
