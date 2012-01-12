@@ -8,6 +8,11 @@ namespace Hybrid.Benchmark
     {
         protected int[] a, b, c;
 
+        private static int AddTwoInts_2ndFromArray(int a, int[] b, int i)
+        {
+            return AddTwoInts(a, b[i]);
+        }
+
         private static int AddTwoInts(int a, int b)
         {
             return a + b;
@@ -35,7 +40,7 @@ namespace Hybrid.Benchmark
         {
             Parallel.For(ExecuteOn, 0, sizeX, delegate(int i)
             {
-                c[i] = AddTwoInts(a[i], b[i]);
+                c[i] = AddTwoInts_2ndFromArray(a[i], b, i);
             });
         }
 

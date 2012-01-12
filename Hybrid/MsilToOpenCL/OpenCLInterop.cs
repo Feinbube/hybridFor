@@ -38,10 +38,6 @@ namespace Hybrid.MsilToOpenCL
                 {
                     StringBuilder source = new StringBuilder();
                     source.Append(GetOpenCLSourceHeader(Platform, device));
-
-                    foreach (HlGraphEntry RelatedGraphEntry in CacheEntry.HlGraph.RelatedGraphs.Values)
-                        source.Append(RelatedGraphEntry.Source);
-
                     source.Append(CacheEntry.Source);
                     source.Append(GetOpenCLSourceFooter(Platform, device));
 
