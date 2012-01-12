@@ -216,32 +216,35 @@ namespace Hybrid.MsilToOpenCL
             }
 
             // "if (i0 >= toExclusive0) return;"
-            HighLevel.BasicBlock ReturnBlock = null;
-            foreach (HighLevel.BasicBlock BB in HLgraph.BasicBlocks)
+            if (GidParamCount > 0)
             {
-                if (BB.Instructions.Count == 1 && BB.Instructions[0].InstructionType == HighLevel.InstructionType.Return)
+                HighLevel.BasicBlock ReturnBlock = null;
+                foreach (HighLevel.BasicBlock BB in HLgraph.BasicBlocks)
                 {
-                    ReturnBlock = BB;
-                    break;
+                    if (BB.Instructions.Count == 1 && BB.Instructions[0].InstructionType == HighLevel.InstructionType.Return)
+                    {
+                        ReturnBlock = BB;
+                        break;
+                    }
                 }
-            }
-            if (ReturnBlock == null)
-            {
-                ReturnBlock = new HighLevel.BasicBlock("CANONICAL_RETURN_BLOCK");
-                ReturnBlock.Instructions.Add(new HighLevel.ReturnInstruction(null));
-                HLgraph.BasicBlocks.Add(ReturnBlock);
-            }
-            ReturnBlock.LabelNameUsed = true;
-            for (int i = 0; i < GidParamCount; i++)
-            {
-                HLgraph.CanonicalStartBlock.Instructions.Insert(GidParamCount + i, new HighLevel.ConditionalBranchInstruction(
-                    new HighLevel.GreaterEqualsNode(
-                        new HighLevel.LocationNode(IdLocation[i]),
-                        new HighLevel.LocationNode(EndIdLocation[i])
-                    ),
-                    ReturnBlock
-                    )
-                );
+                if (ReturnBlock == null)
+                {
+                    ReturnBlock = new HighLevel.BasicBlock("CANONICAL_RETURN_BLOCK");
+                    ReturnBlock.Instructions.Add(new HighLevel.ReturnInstruction(null));
+                    HLgraph.BasicBlocks.Add(ReturnBlock);
+                }
+                ReturnBlock.LabelNameUsed = true;
+                for (int i = 0; i < GidParamCount; i++)
+                {
+                    HLgraph.CanonicalStartBlock.Instructions.Insert(GidParamCount + i, new HighLevel.ConditionalBranchInstruction(
+                        new HighLevel.GreaterEqualsNode(
+                            new HighLevel.LocationNode(IdLocation[i]),
+                            new HighLevel.LocationNode(EndIdLocation[i])
+                        ),
+                        ReturnBlock
+                        )
+                    );
+                }
             }
 
             if (DumpCode > 5)
