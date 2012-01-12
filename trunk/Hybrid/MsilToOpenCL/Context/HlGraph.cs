@@ -840,6 +840,43 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                             {
                                 throw new InvalidOperationException(string.Format("Sorry, no equivalent OpenCL function call available for '{0}'.", CallNode));
                             }
+
+                            // Map additional parameters introduced as part of OpenCL conversion of the RelatedGraphEntry
+                            for (int i = CallNode.SubNodes.Count; i < RelatedGraphEntry.HlGraph.Arguments.Count; i++)
+                            {
+                                ArgumentLocation RelatedArgument = RelatedGraphEntry.HlGraph.Arguments[i];
+
+                                // Static fields
+                                foreach (KeyValuePair<System.Reflection.FieldInfo, ArgumentLocation> RelatedMapEntry in RelatedGraphEntry.HlGraph.StaticFieldMap)
+                                {
+                                    if (object.ReferenceEquals(RelatedMapEntry.Value, RelatedArgument))
+                                    {
+                                        System.Reflection.FieldInfo FieldInfo = RelatedMapEntry.Key;
+
+                                        ArgumentLocation ArgumentLocation;
+                                        if (!StaticFieldMap.TryGetValue(FieldInfo, out ArgumentLocation))
+                                        {
+                                            ArgumentLocation = CreateArgument("static_" + FieldInfo.Name, FieldInfo.FieldType, false);
+                                            StaticFieldMap[FieldInfo] = ArgumentLocation;
+                                        }
+                                        CallNode.SubNodes.Add(new LocationNode(ArgumentLocation));
+                                        RelatedArgument = null;
+                                        break;
+                                    }
+                                }
+
+                                if (object.ReferenceEquals(RelatedArgument, null))
+                                    continue;
+
+                                // TODO: multi-dimensional arrays, references to "this", ...
+
+                                if (!object.ReferenceEquals(RelatedArgument, null))
+                                {
+                                    // Not good. This code won't compile...
+                                    throw new InvalidOperationException(string.Format("Unable to map additional argument '{0}' (index {1}) in related function call '{2}'.",
+                                        RelatedArgument, i + 1, CallNode.ToString()));
+                                }
+                            }
                         }
                     }
                 }
