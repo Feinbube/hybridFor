@@ -259,8 +259,70 @@ namespace Hybrid.MsilToOpenCL
         }
 
         private static void GenerateOpenCLSource(HlGraphEntry CacheEntry) {
-            // Get OpenCL source code
-            CacheEntry.Source = getOpenCLSource(CacheEntry.HlGraph);
+            // Non-kernel methods include just their own code, but kernel methods include everything required
+            if (!CacheEntry.HlGraph.IsKernel || CacheEntry.HlGraph.RelatedGraphs.Count == 0)
+            {
+                CacheEntry.Source = getOpenCLSource(CacheEntry.HlGraph);
+                return;
+            }
+
+            // No recursion allowed, so we can get away with a topological sort of all involved functions
+            // with no prototypes beforehand.
+            // The following code has been adapted from
+            // http://www.logarithmic.net/pfh-files/blog/01208083168/sort.py
+            // "Tarjan's algorithm and topological sorting implementation in Python" by Paul Harrison
+   
+            // Step 1: get list of all involved methods
+            List<HighLevel.HlGraph> Nodes = new List<HighLevel.HlGraph>();
+            Nodes.Add(CacheEntry.HlGraph);
+            for (int i = 0; i < Nodes.Count; i++)
+            {
+                HighLevel.HlGraph Entry = Nodes[i];
+                foreach (HlGraphEntry SubEntry in Entry.RelatedGraphs.Values)
+                {
+                    if (!Nodes.Contains(SubEntry.HlGraph))
+                    {
+                        Nodes.Add(SubEntry.HlGraph);
+                    }
+                }
+            }
+
+            // Step 2: topological sort
+            Dictionary<HighLevel.HlGraph, int> count = new Dictionary<HighLevel.HlGraph, int>();
+            foreach (HighLevel.HlGraph Current in Nodes)
+                count[Current] = 0;
+            foreach (HighLevel.HlGraph Current in Nodes)
+                foreach (HlGraphEntry SuccessorEntry in Current.RelatedGraphs.Values)
+                    count[SuccessorEntry.HlGraph]++;
+
+            List<HighLevel.HlGraph> Ready = new List<HighLevel.HlGraph>();
+            List<HighLevel.HlGraph> Result = new List<HighLevel.HlGraph>(Nodes.Count);
+            Ready.Add(CacheEntry.HlGraph);
+            while (Ready.Count > 0)
+            {
+                HighLevel.HlGraph Current = Ready[Ready.Count - 1];
+                Ready.RemoveAt(Ready.Count - 1);
+                Result.Add(Current);
+                System.Diagnostics.Debug.Assert(count[Current] == 0);
+
+                foreach (HlGraphEntry Successor in Current.RelatedGraphs.Values)
+                {
+                    count[Successor.HlGraph]--;
+                    if (count[Successor.HlGraph] == 0)
+                        Ready.Add(Successor.HlGraph);
+                }
+            }
+
+            // Step 3: check for recursions. If there is any strongly-connected component, count[s]
+            // will never reach zero, so the Ready list runs empty without all functions being
+            // inserted into the Result list.
+            if (Result.Count != Nodes.Count)
+                throw new InvalidOperationException("Unable to compute topological sort of functions. Recursions are not supported.");
+
+            // Generate code for all HlGraphs in the Result list, in reverse order
+            Result.Reverse();
+
+            CacheEntry.Source = getOpenCLSource(Result);
         }
 
         private static string getOpenCLSource(HighLevel.HlGraph HLgraph)
@@ -268,6 +330,22 @@ namespace Hybrid.MsilToOpenCL
             using (StringWriter Srcwriter = new StringWriter())
             {
                 OpenCLInterop.WriteOpenCL(HLgraph, Srcwriter);
+                string OpenClSource = Srcwriter.ToString();
+
+                if (DumpCode > 2)
+                    System.Console.WriteLine(OpenClSource);
+
+                return OpenClSource;
+            }
+        }
+
+        private static string getOpenCLSource(List<HighLevel.HlGraph> List)
+        {
+            using (StringWriter Srcwriter = new StringWriter())
+            {
+                foreach(HighLevel.HlGraph HLgraph in List)
+                    OpenCLInterop.WriteOpenCL(HLgraph, Srcwriter);
+
                 string OpenClSource = Srcwriter.ToString();
 
                 if (DumpCode > 2)
