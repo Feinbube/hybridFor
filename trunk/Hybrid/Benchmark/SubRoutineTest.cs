@@ -7,15 +7,17 @@ namespace Hybrid.Benchmark
     internal class SubRoutineTest : Hybrid.Examples.ExampleBase
     {
         protected int[] a, b, c;
+        private static int special = 1;
+        private int d = 2;
 
-        private static int AddTwoInts_2ndFromArray(int a, int[] b, int i)
+        private int AddTwoInts_2ndFromArray(int a, int[] b, int i)
         {
             return AddTwoInts(a, b[i]);
         }
 
-        private static int AddTwoInts(int a, int b)
+        private int AddTwoInts(int a, int b)
         {
-            return a + b;
+            return a + b + special + d;
         }
 
         protected override void setup()
@@ -62,7 +64,7 @@ namespace Hybrid.Benchmark
         {
             for (int i = 0; i < sizeX; i++)
             {
-                if (a[i] + b[i] != c[i])
+                if (a[i] + b[i] + special + d != c[i])
                     return false;
             }
             return true;

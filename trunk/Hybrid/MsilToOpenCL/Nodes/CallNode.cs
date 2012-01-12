@@ -8,11 +8,13 @@ namespace Hybrid.MsilToOpenCL.HighLevel
     public class CallNode : Node
     {
         private System.Reflection.MethodInfo m_MethodInfo;
+        private bool m_IsStaticCall;
 
         public CallNode(System.Reflection.MethodInfo MethodInfo)
             : base(NodeType.Call, MethodInfo.ReturnType, false)
         {
             m_MethodInfo = MethodInfo;
+            m_IsStaticCall = !object.ReferenceEquals(MethodInfo, null) && ((MethodInfo.CallingConvention & System.Reflection.CallingConventions.HasThis) == 0);
         }
 
         public CallNode(System.Reflection.MethodInfo MethodInfo, params Node[] Arguments)
@@ -22,13 +24,14 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         }
 
         public System.Reflection.MethodInfo MethodInfo { get { return m_MethodInfo; } }
+        public bool IsStaticCall { get { return m_IsStaticCall; } set { m_IsStaticCall = value; } }
 
         public override string ToString()
         {
             StringBuilder String = new StringBuilder();
             int i = 0;
 
-            if ((MethodInfo.CallingConvention & System.Reflection.CallingConventions.HasThis) != 0)
+            if (!IsStaticCall)
             {
                 if (SubNodes.Count == 0)
                 {
