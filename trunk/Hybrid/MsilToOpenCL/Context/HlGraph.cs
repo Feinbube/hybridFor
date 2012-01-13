@@ -718,7 +718,28 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             m_Arguments.RemoveAt(Index);
             for (int i = Index; i < m_Arguments.Count; i++)
             {
-                m_Arguments[i].Index--;
+                ArgumentLocation Argument = m_Arguments[i];
+                bool Found = false;
+                ArrayInfo ArrayInfo;
+
+                // Changing the argument index also changes its hash value, so
+                // we need to update the MultiDimensionalArrayInfo here
+                if (MultiDimensionalArrayInfo.TryGetValue(Argument, out ArrayInfo))
+                {
+                    MultiDimensionalArrayInfo.Remove(Argument);
+                    Found = true;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.Assert(!(new List<ArgumentLocation>(MultiDimensionalArrayInfo.Keys)).Contains(Argument));
+                }
+
+                Argument.Index--;
+
+                if (Found)
+                {
+                    MultiDimensionalArrayInfo[Argument] = ArrayInfo;
+                }
             }
         }
 
@@ -956,39 +977,96 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                             }
 
                             // Map additional parameters introduced as part of OpenCL conversion of the RelatedGraphEntry
+                            Dictionary<ArgumentLocation, ArgumentLocation> ArrayScaleArgsMap = new Dictionary<ArgumentLocation, ArgumentLocation>();
                             for (int i = CallNode.SubNodes.Count; i < RelatedGraphEntry.HlGraph.Arguments.Count; i++)
                             {
                                 ArgumentLocation RelatedArgument = RelatedGraphEntry.HlGraph.Arguments[i];
+                                ArgumentLocation ArgumentLocation = null;
+
+                                // Multi-dimensional array scale factors
+                                if (ArrayScaleArgsMap.TryGetValue(RelatedArgument, out ArgumentLocation))
+                                {
+                                    CallNode.SubNodes.Add(new LocationNode(ArgumentLocation));
+                                }
 
                                 // Static fields
-                                foreach (KeyValuePair<System.Reflection.FieldInfo, ArgumentLocation> RelatedMapEntry in RelatedGraphEntry.HlGraph.StaticFieldMap)
+                                if (object.ReferenceEquals(ArgumentLocation, null))
                                 {
-                                    if (object.ReferenceEquals(RelatedMapEntry.Value, RelatedArgument))
+                                    foreach (KeyValuePair<System.Reflection.FieldInfo, ArgumentLocation> RelatedMapEntry in RelatedGraphEntry.HlGraph.StaticFieldMap)
                                     {
-                                        System.Reflection.FieldInfo FieldInfo = RelatedMapEntry.Key;
-
-                                        ArgumentLocation ArgumentLocation;
-                                        if (!StaticFieldMap.TryGetValue(FieldInfo, out ArgumentLocation))
+                                        if (object.ReferenceEquals(RelatedMapEntry.Value, RelatedArgument))
                                         {
-                                            ArgumentLocation = CreateArgument("static_" + FieldInfo.Name, FieldInfo.FieldType, false);
-                                            StaticFieldMap[FieldInfo] = ArgumentLocation;
+                                            System.Reflection.FieldInfo FieldInfo = RelatedMapEntry.Key;
+
+                                            if (!StaticFieldMap.TryGetValue(FieldInfo, out ArgumentLocation))
+                                            {
+                                                ArgumentLocation = CreateArgument("static_" + FieldInfo.Name, FieldInfo.FieldType, false);
+                                                StaticFieldMap[FieldInfo] = ArgumentLocation;
+                                            }
+                                            CallNode.SubNodes.Add(new LocationNode(ArgumentLocation));
+                                            break;
                                         }
-                                        CallNode.SubNodes.Add(new LocationNode(ArgumentLocation));
-                                        RelatedArgument = null;
-                                        break;
                                     }
                                 }
 
-                                if (object.ReferenceEquals(RelatedArgument, null))
-                                    continue;
-
                                 // References to "this" and related objects
-                                if (MapThisFieldAccess(CallNode, RelatedArgument, RelatedGraphEntry))
-                                    continue;
+                                if (object.ReferenceEquals(ArgumentLocation,null))
+                                {
+                                    ArgumentLocation = MapThisFieldAccess(CallNode, RelatedArgument, RelatedGraphEntry);
+                                }
 
-                                // TODO: multi-dimensional arrays, references to "this", ...
+                                // Multi-dimensional arrays
+                                if (!object.ReferenceEquals(ArgumentLocation, null))
+                                {
+                                    ArrayInfo RelatedArrayInfo;
+                                    if (RelatedGraphEntry.HlGraph.MultiDimensionalArrayInfo.TryGetValue(RelatedArgument, out RelatedArrayInfo))
+                                    {
+                                        System.Diagnostics.Debug.Assert(ArgumentLocation.DataType == RelatedArgument.DataType);
 
-                                if (!object.ReferenceEquals(RelatedArgument, null))
+                                        ArrayInfo ArrayInfo;
+                                        if (!MultiDimensionalArrayInfo.TryGetValue(ArgumentLocation, out ArrayInfo))
+                                        {
+                                            ArrayInfo = new ArrayInfo(ArgumentLocation);
+
+                                            for (int Dimension = 0; Dimension < ArrayInfo.DimensionCount; Dimension++)
+                                            {
+                                                Node ScaleNode;
+                                                ArgumentLocation ScaleArgument;
+                                                if (Dimension == 0)
+                                                {
+                                                    ScaleArgument = null;
+                                                    ScaleNode = new IntegerConstantNode(1);
+                                                }
+                                                else
+                                                {
+                                                    ScaleArgument = CreateArgument(ArgumentLocation.Name + "_scdim_" + Dimension.ToString(), typeof(int), false);
+                                                    ScaleNode = new LocationNode(ScaleArgument);
+                                                }
+                                                ArrayInfo.ScaleNode[Dimension] = ScaleNode;
+                                                ArrayInfo.ScaleArgument[Dimension] = ScaleArgument;
+                                            }
+
+                                            MultiDimensionalArrayInfo[ArgumentLocation] = ArrayInfo;
+                                        }
+                                        System.Diagnostics.Debug.Assert(RelatedArrayInfo.ScaleArgument.Count == ArrayInfo.ScaleArgument.Count);
+
+                                        for (int k = 1; k < Math.Min(RelatedArrayInfo.ScaleArgument.Count, ArrayInfo.ScaleArgument.Count); k++)
+                                        {
+                                            ArgumentLocation ScaleArgument;
+
+                                            if (ArrayScaleArgsMap.TryGetValue(RelatedArrayInfo.ScaleArgument[k], out ScaleArgument))
+                                            {
+                                                System.Diagnostics.Debug.Assert(object.ReferenceEquals(ScaleArgument, ArrayInfo.ScaleArgument[k]));
+                                            }
+                                            else
+                                            {
+                                                ArrayScaleArgsMap[RelatedArrayInfo.ScaleArgument[k]] = ArrayInfo.ScaleArgument[k];
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (object.ReferenceEquals(ArgumentLocation, null))
                                 {
                                     // Not good. This code won't compile...
                                     throw new InvalidOperationException(string.Format("Unable to map additional argument '{0}' (index {1}) in related function call '{2}'.",
@@ -1003,11 +1081,11 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             return Changed;
         }
 
-        private bool MapThisFieldAccess(CallNode CallNode, ArgumentLocation RelatedArgument, HlGraphEntry RelatedGraphEntry)
+        private ArgumentLocation MapThisFieldAccess(CallNode CallNode, ArgumentLocation RelatedArgument, HlGraphEntry RelatedGraphEntry)
         {
             List<System.Reflection.FieldInfo> RelatedPathList = new List<System.Reflection.FieldInfo>();
             if (!ConstructAccessPathList(RelatedArgument, RelatedGraphEntry.HlGraph.RootPathEntry, RelatedPathList))
-                return false;
+                return null;
             System.Diagnostics.Debug.Assert(RelatedPathList.Count > 0);
 
             // Now construct a temporary node that mimics the user accessing this field, then go through the regular path
@@ -1025,9 +1103,8 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             {
                 System.Diagnostics.Debug.Assert(PathEntry.ArgumentLocation != null);
                 CallNode.SubNodes.Add(new LocationNode(PathEntry.ArgumentLocation));
+                return PathEntry.ArgumentLocation;
             }
-
-            return true;
         }
 
         private bool ConstructAccessPathList(ArgumentLocation RelatedArgument, AccessPathEntry RelatedPathEntry, List<System.Reflection.FieldInfo> RelatedPathList)
