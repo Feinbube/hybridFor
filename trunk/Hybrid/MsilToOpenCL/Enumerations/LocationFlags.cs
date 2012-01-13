@@ -13,5 +13,6 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         Write = 4,
         IndirectWrite = 8,
         ForcePointer = 0x10,
+        PointerGlobal = 0x20,
     }
 }

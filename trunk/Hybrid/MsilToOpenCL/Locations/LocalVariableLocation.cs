@@ -8,6 +8,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
     public class LocalVariableLocation : Location
     {
         private int m_Index;
+        private List<ArgumentLocation> m_RelatedArguments = new List<ArgumentLocation>();
 
         public LocalVariableLocation(int Index, string Name, Type DataType)
             : base(LocationType.LocalVariable, Name, Name, DataType)
@@ -46,6 +47,14 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
 
             return m_Index.CompareTo(((LocalVariableLocation)Other).m_Index);
+        }
+
+        public List<ArgumentLocation> RelatedArguments
+        {
+            get
+            {
+                return m_RelatedArguments;
+            }
         }
 
         #region ICloneable members

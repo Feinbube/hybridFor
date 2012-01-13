@@ -235,6 +235,10 @@ namespace Hybrid.MsilToOpenCL
                     AttributeString += "deref_write";
                 }
                 if (AttributeString == string.Empty) { AttributeString = "/*UNUSED*/ // "; } else { AttributeString += "]*/ "; }
+                if ((LocalVariable.Flags & Hybrid.MsilToOpenCL.HighLevel.LocationFlags.PointerGlobal) != 0)
+                {
+                    AttributeString += "__global ";
+                }
 
                 writer.WriteLine("\t{0}{1} {2};", AttributeString, GetOpenClType(LocalVariable.DataType), LocalVariable.Name);
             }
