@@ -37,5 +37,10 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         {
             return new StackLocation(Index, DataType);
         }
+
+        public override string ToString()
+        {
+            return string.Format("StackStage: complete={0}, count={1}", m_Complete, m_StackLocations.Count);
+        }
     }
 }
