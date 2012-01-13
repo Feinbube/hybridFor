@@ -72,5 +72,11 @@ namespace Hybrid.MsilToOpenCL
             __target_only();
             return 0;
         }
+
+        [OpenClAlias("MWC64X")]
+        public static uint rnd()
+        {
+            return 0;
+        }
     }
 }

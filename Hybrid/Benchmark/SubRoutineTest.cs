@@ -18,6 +18,7 @@ namespace Hybrid.Benchmark
 
         private int AddTwoInts(int a, int b)
         {
+            int z = (int)Hybrid.MsilToOpenCL.OpenClFunctions.rnd();
             return a + b + special + d + e[a % 2, b % 2];
         }
 

@@ -147,7 +147,7 @@ namespace Hybrid.MsilToOpenCL
 
         internal static HlGraphEntry ConstructRelatedHlGraphEntry(MethodInfo Method, HighLevel.HlGraph ParentGraph, HlGraphCache RelatedGraphCache)
         {
-            HlGraphEntry CacheEntry = ConstructHlGraphEntry(Method, 0, "Cil2OpenCL_Sub_Seq{0}");
+            HlGraphEntry CacheEntry = ConstructHlGraphEntry(Method, 0, false, "Cil2OpenCL_Sub_Seq{0}");
             RelatedGraphCache.SetValue(IntPtr.Zero, Method, CacheEntry);
             ParentGraph.RelatedGraphs[Method] = CacheEntry;
 
@@ -157,17 +157,17 @@ namespace Hybrid.MsilToOpenCL
 
         private static HlGraphEntry ConstructKernelHlGraphEntry(MethodInfo Method, int GidParamCount)
         {
-            HlGraphEntry CacheEntry = ConstructHlGraphEntry(Method, GidParamCount, "Cil2OpenCL_Kernel_Seq{0}");
-            CacheEntry.HlGraph.IsKernel = true;
+            HlGraphEntry CacheEntry = ConstructHlGraphEntry(Method, GidParamCount, true, "Cil2OpenCL_Kernel_Seq{0}");
 
             GenerateOpenCLSource(CacheEntry);
             return CacheEntry;
         }
 
-		private static HlGraphEntry ConstructHlGraphEntry(MethodInfo Method, int GidParamCount, string NameTemplate) {
+		private static HlGraphEntry ConstructHlGraphEntry(MethodInfo Method, int GidParamCount, bool IsKernel, string NameTemplate) {
             TextWriter writer = System.Console.Out;
             string MethodName = string.Format(NameTemplate, HlGraphSequenceNumber++);
             HighLevel.HlGraph HLgraph = new HighLevel.HlGraph(Method, MethodName);
+            HLgraph.IsKernel = IsKernel;
 
             if (DumpCode > 3)
                 WriteCode(HLgraph, writer);
