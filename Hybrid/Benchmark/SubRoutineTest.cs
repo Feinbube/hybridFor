@@ -9,6 +9,7 @@ namespace Hybrid.Benchmark
         protected int[] a, b, c;
         private static int special = 1;
         private int d = 2;
+        private int[,] e = new int[2, 2] { { 0, 1 }, { 2, 3 } };
 
         private int AddTwoInts_2ndFromArray(int a, int[] b, int i)
         {
@@ -17,7 +18,7 @@ namespace Hybrid.Benchmark
 
         private int AddTwoInts(int a, int b)
         {
-            return a + b + special + d;
+            return a + b + special + d + e[a % 2, b % 2];
         }
 
         protected override void setup()
@@ -42,6 +43,7 @@ namespace Hybrid.Benchmark
         {
             Parallel.For(ExecuteOn, 0, sizeX, delegate(int i)
             {
+                int[] a = this.a;
                 c[i] = AddTwoInts_2ndFromArray(a[i], b, i);
             });
         }
@@ -64,7 +66,7 @@ namespace Hybrid.Benchmark
         {
             for (int i = 0; i < sizeX; i++)
             {
-                if (a[i] + b[i] + special + d != c[i])
+                if (a[i] + b[i] + special + d + e[a[i]%2,b[i]%2] != c[i])
                     return false;
             }
             return true;
