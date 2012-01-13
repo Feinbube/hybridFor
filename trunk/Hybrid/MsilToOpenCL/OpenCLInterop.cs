@@ -37,7 +37,7 @@ namespace Hybrid.MsilToOpenCL
                 if (program == null)
                 {
                     StringBuilder source = new StringBuilder();
-                    source.Append(GetOpenCLSourceHeader(Platform, device));
+                    source.Append(GetOpenCLSourceHeader(Platform, device, CacheEntry));
                     source.Append(CacheEntry.Source);
                     source.Append(GetOpenCLSourceFooter(Platform, device));
 
@@ -115,7 +115,7 @@ namespace Hybrid.MsilToOpenCL
 			return null;
 		}
 
-        private static string GetOpenCLSourceHeader(OpenCLNet.Platform platform, OpenCLNet.Device device)
+        private static string GetOpenCLSourceHeader(OpenCLNet.Platform platform, OpenCLNet.Device device, HlGraphEntry KernelGraphEntry)
         {
             StringBuilder result = new System.Text.StringBuilder();
 
@@ -128,6 +128,23 @@ namespace Hybrid.MsilToOpenCL
             setExtensionIfAvailable(result, device, "cl_khr_global_int32_extended_atomics");
             setExtensionIfAvailable(result, device, "cl_khr_local_int32_base_atomics");
             setExtensionIfAvailable(result, device, "cl_khr_local_int32_extended_atomics");
+
+            if (KernelGraphEntry.HlGraph.RandomStateLocation != null)
+            {
+                result.AppendLine();
+                result.AppendLine("// Source: http://www.doc.ic.ac.uk/~dt10/research/rngs-gpu-mwc64x.html");
+                result.AppendLine("uint MWC64X(uint2 *state)");
+                result.AppendLine("{");
+                result.AppendLine("    enum{ A=4294883355U };");
+                result.AppendLine("    uint x=(*state).x, c=(*state).y;  // Unpack the state");
+                result.AppendLine("    uint res=x^c;                     // Calculate the result");
+                result.AppendLine("    uint hi=mul_hi(x,A);              // Step the RNG");
+                result.AppendLine("    x=x*A+c;");
+                result.AppendLine("    c=hi+(x<c);");
+                result.AppendLine("    *state=(uint2)(x,c);              // Pack the state back up");
+                result.AppendLine("    return res;                       // Return the next result");
+                result.AppendLine("}");
+            }
 
             return result.ToString();
         }
@@ -198,7 +215,8 @@ namespace Hybrid.MsilToOpenCL
 
                 if (AttributeString != string.Empty) { AttributeString += "]*/ "; }
 
-                if (Argument.DataType.IsArray || Argument.DataType.IsPointer || Argument.DataType.IsByRef)
+                if ((Argument.DataType.IsArray || Argument.DataType.IsPointer || Argument.DataType.IsByRef)
+                    && ((Argument.Flags & Hybrid.MsilToOpenCL.HighLevel.LocationFlags.PointerLocal) == 0))
                 {
                     AttributeString += "__global ";
                 }
@@ -297,6 +315,17 @@ namespace Hybrid.MsilToOpenCL
             return InnerGetOpenClType(DataType);
         }
 
+        public static readonly Type RandomStateDataType = ConstructRandomStateDataType();
+
+        private static Type ConstructRandomStateDataType()
+        {
+            return typeof(rnd_state);
+        }
+
+        private class rnd_state
+        {
+        }
+
         private static string InnerGetOpenClType(Type DataType)
         {
             if (DataType == typeof(void))
@@ -350,6 +379,10 @@ namespace Hybrid.MsilToOpenCL
             else if (DataType.IsArray)
             {
                 return InnerGetOpenClType(DataType.GetElementType()) + "*";
+            }
+            else if (object.ReferenceEquals(DataType, RandomStateDataType))
+            {
+                return "uint2";
             }
             else
             {

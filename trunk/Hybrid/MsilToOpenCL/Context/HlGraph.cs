@@ -10,6 +10,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         private List<ArgumentLocation> m_Arguments = new List<ArgumentLocation>();
         public List<ArgumentLocation> Arguments { get { return m_Arguments; } }
 
+        private Location m_RandomStateLocation;
+        public Location RandomStateLocation { get { return m_RandomStateLocation; } }
+
         private List<LocalVariableLocation> m_LocalVariables = new List<LocalVariableLocation>();
         public List<LocalVariableLocation> LocalVariables { get { return m_LocalVariables; } }
 
@@ -547,6 +550,10 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 return true;
             }
 
+            // The special state of the random number generator is fine
+            if (object.ReferenceEquals(DataType, OpenCLInterop.RandomStateDataType))
+                return true;
+
             // Everything else is fine if it is unused. This prevents temporary variables
             // from causing an abort
             if (!((Location.Flags & LocationFlags.Read) != 0) && !((Location.Flags & LocationFlags.Write) != 0))
@@ -959,7 +966,8 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     else if (Node.NodeType == NodeType.Call)
                     {
                         CallNode CallNode = (CallNode)Node;
-                        if (string.IsNullOrEmpty(GetOpenClFunctionName(CallNode.MethodInfo)))
+                        string TargetName = GetOpenClFunctionName(CallNode.MethodInfo);
+                        if (string.IsNullOrEmpty(TargetName))
                         {
                             // Not a built-in method, so we need to check whether this method can be compiled from CIL...
 
@@ -987,6 +995,14 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                                 if (ArrayScaleArgsMap.TryGetValue(RelatedArgument, out ArgumentLocation))
                                 {
                                     CallNode.SubNodes.Add(new LocationNode(ArgumentLocation));
+                                    continue;
+                                }
+
+                                // State of the random number generator
+                                if (object.ReferenceEquals(RelatedArgument, RelatedGraphEntry.HlGraph.RandomStateLocation))
+                                {
+                                    CallNode.SubNodes.Add(CreateRandomStateNode());
+                                    continue;
                                 }
 
                                 // Static fields
@@ -1074,11 +1090,36 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                                 }
                             }
                         }
+                        else if (TargetName == "MWC64X")
+                        {
+                            CallNode.SubNodes.Add(CreateRandomStateNode());
+                        }
                     }
                 }
             }
 
             return Changed;
+        }
+
+        private Node CreateRandomStateNode()
+        {
+            if (object.ReferenceEquals(m_RandomStateLocation, null))
+            {
+                if (m_IsKernel)
+                {
+                    m_RandomStateLocation = CreateLocalVariable("rnd_state", OpenCLInterop.RandomStateDataType);
+                }
+                else
+                {
+                    m_RandomStateLocation = CreateArgument("rnd_state", Type.GetType(OpenCLInterop.RandomStateDataType.FullName + "&", true), false);
+                    m_RandomStateLocation.Flags |= LocationFlags.PointerLocal;
+                }
+            }
+
+            if (object.ReferenceEquals(m_RandomStateLocation.DataType, OpenCLInterop.RandomStateDataType))
+                return new AddressOfNode(new LocationNode(m_RandomStateLocation));
+            else
+                return new LocationNode(m_RandomStateLocation);
         }
 
         private ArgumentLocation MapThisFieldAccess(CallNode CallNode, ArgumentLocation RelatedArgument, HlGraphEntry RelatedGraphEntry)
