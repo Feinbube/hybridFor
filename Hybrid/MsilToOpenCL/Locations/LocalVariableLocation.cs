@@ -10,7 +10,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         private int m_Index;
 
         public LocalVariableLocation(int Index, string Name, Type DataType)
-            : base(LocationType.LocalVariable, "local_" + Index.ToString(), Name, DataType)
+            : base(LocationType.LocalVariable, Name, Name, DataType)
         {
             m_Index = Index;
         }
