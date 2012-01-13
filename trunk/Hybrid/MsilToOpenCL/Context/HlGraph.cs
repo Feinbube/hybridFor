@@ -456,6 +456,10 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
         public void ConvertForOpenCl(HlGraphCache RelatedGraphCache)
         {
+            // Convert intermediate CIL stack locations to local variables
+            ConvertCilStackLocations();
+
+            // Convert individual instructions
             foreach (BasicBlock BasicBlock in BasicBlocks)
             {
                 foreach (Instruction Instruction in BasicBlock.Instructions)
@@ -520,6 +524,85 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             return;
         }
 
+        private void ConvertCilStackLocations()
+        {
+            // Abort if there are no blocks with input or output CIL stack locations
+            bool HasCilStackLocations = false;
+            foreach (BasicBlock BasicBlock in BasicBlocks)
+            {
+                HasCilStackLocations |= !object.ReferenceEquals(BasicBlock.EntryStackState, null) && BasicBlock.EntryStackState.StackLocations.Count > 0;
+                HasCilStackLocations |= !object.ReferenceEquals(BasicBlock.ExitStackState, null) && BasicBlock.ExitStackState.StackLocations.Count > 0;
+            }
+
+            if (!HasCilStackLocations)
+                return;
+
+            // Construct node predecessor lists
+            Dictionary<BasicBlock, List<BasicBlock>> Predecessors = new Dictionary<BasicBlock, List<BasicBlock>>();
+            for (int i = 0; i < BasicBlocks.Count; i++)
+            {
+                BasicBlock BasicBlock = BasicBlocks[i];
+                foreach (BasicBlock Successor in BasicBlock.Successors)
+                {
+                    List<BasicBlock> PredecessorList;
+                    if (!Predecessors.TryGetValue(Successor, out PredecessorList))
+                    {
+                        Predecessors[Successor] = PredecessorList = new List<BasicBlock>();
+                        PredecessorList.Add(BasicBlock);
+                    }
+                    else if (!PredecessorList.Contains(BasicBlock))
+                    {
+                        PredecessorList.Add(BasicBlock);
+                    }
+                }
+            }
+
+            // Convert all CIL stack references to local variables of the same type
+            Dictionary<StackLocation, LocalVariableLocation> ReplacementMap = new Dictionary<StackLocation, LocalVariableLocation>();
+            foreach (BasicBlock BasicBlock in BasicBlocks)
+            {
+                if (object.ReferenceEquals(BasicBlock.EntryStackState, null) || BasicBlock.EntryStackState.StackLocations.Count == 0)
+                    continue;
+
+                foreach (StackLocation StackLocation in BasicBlock.EntryStackState.StackLocations)
+                {
+                    LocalVariableLocation LocalVariableLocation;
+                    if (!ReplacementMap.TryGetValue(StackLocation, out LocalVariableLocation))
+                    {
+                        ReplacementMap[StackLocation] = LocalVariableLocation = CreateLocalVariable("stacklocal_" + ReplacementMap.Count.ToString(), StackLocation.DataType);
+                    }
+                }
+
+                List<BasicBlock> PredecessorList = Predecessors[BasicBlock];
+                foreach (BasicBlock Predecessor in PredecessorList)
+                {
+                    System.Diagnostics.Debug.Assert(!object.ReferenceEquals(Predecessor.ExitStackState, null));
+                    System.Diagnostics.Debug.Assert(Predecessor.ExitStackState.StackLocations.Count == BasicBlock.EntryStackState.StackLocations.Count);
+
+                    for (int i = 0; i < Predecessor.ExitStackState.StackLocations.Count; i++)
+                    {
+                        StackLocation CurrentEntryLocation = BasicBlock.EntryStackState.StackLocations[i];
+                        StackLocation PredecessorExitLocation = Predecessor.ExitStackState.StackLocations[i];
+
+                        LocalVariableLocation LocalVariableLocation;
+                        LocalVariableLocation ReplacementVariableLocation = ReplacementMap[CurrentEntryLocation];
+                        if (ReplacementMap.TryGetValue(PredecessorExitLocation, out LocalVariableLocation))
+                        {
+                            System.Diagnostics.Debug.Assert(object.ReferenceEquals(LocalVariableLocation, ReplacementVariableLocation));
+                        }
+                        else
+                        {
+                            ReplacementMap[PredecessorExitLocation] = ReplacementVariableLocation;
+                        }
+                    }
+                }
+            }
+            foreach (KeyValuePair<StackLocation, LocalVariableLocation> Replacement in ReplacementMap)
+            {
+                ConvertLocation(Replacement.Key, Replacement.Value);
+            }
+        }
+
         public LocalVariableLocation ConvertArgumentToLocal(int Index)
         {
             if (m_Arguments.Count <= Index)
@@ -528,25 +611,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
 
             ArgumentLocation Argument = m_Arguments[Index];
-            LocalVariableLocation NewLocalVariable = new LocalVariableLocation(m_LocalVariables.Count, Argument.Name, Argument.DataType);
-            m_LocalVariables.Add(NewLocalVariable);
+            LocalVariableLocation NewLocalVariable = CreateLocalVariable("arg_" + Argument.Name, Argument.DataType);
 
-            foreach (BasicBlock BasicBlock in BasicBlocks)
-            {
-                foreach (Instruction Instruction in BasicBlock.Instructions)
-                {
-                    Node Node = Instruction.Argument;
-                    if (ConvertLocation(ref Node, Argument, NewLocalVariable))
-                    {
-                        Instruction.Argument = Node;
-                    }
-                    Node = Instruction.Result;
-                    if (ConvertLocation(ref Node, Argument, NewLocalVariable))
-                    {
-                        Instruction.Result = Node;
-                    }
-                }
-            }
+            ConvertLocation(Argument, NewLocalVariable);
 
             DestroyArgument(Index);
             return NewLocalVariable;
@@ -555,6 +622,13 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         public ArgumentLocation CreateArgument(string Name, Type DataType, bool FromIL)
         {
             return InsertArgument(m_Arguments.Count, Name, DataType, FromIL);
+        }
+
+        private LocalVariableLocation CreateLocalVariable(string Name, Type DataType)
+        {
+            LocalVariableLocation NewLocalVariable = new LocalVariableLocation(m_LocalVariables.Count, Name, DataType);
+            m_LocalVariables.Add(NewLocalVariable);
+            return NewLocalVariable;
         }
 
         public ArgumentLocation InsertArgument(int Index, string Name, Type DataType, bool FromIL)
@@ -1065,6 +1139,26 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     foreach (Location Location in LocationUsage.IndirectUsedLocations)
                     {
                         Location.Flags |= LocationFlags.IndirectRead;
+                    }
+                }
+            }
+        }
+
+        private void ConvertLocation(Location OldLocation, Location NewLocation)
+        {
+            foreach (BasicBlock BasicBlock in BasicBlocks)
+            {
+                foreach (Instruction Instruction in BasicBlock.Instructions)
+                {
+                    Node Node = Instruction.Argument;
+                    if (ConvertLocation(ref Node, OldLocation, NewLocation))
+                    {
+                        Instruction.Argument = Node;
+                    }
+                    Node = Instruction.Result;
+                    if (ConvertLocation(ref Node, OldLocation, NewLocation))
+                    {
+                        Instruction.Result = Node;
                     }
                 }
             }
