@@ -488,7 +488,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
             foreach (LocalVariableLocation Location in LocalVariables)
             {
-                if (!Location.DataType.IsPrimitive && (((Location.Flags & LocationFlags.Read) != 0) || ((Location.Flags & LocationFlags.Write) != 0)))
+                if (!LocalVariableValidForOpenCL(Location))
                 {
                     throw new InvalidOperationException(string.Format("Sorry, local variable \'{0}\' of type \'{1}\' cannot be mapped to OpenCL.", Location.Name, Location.DataType.ToString()));
                 }
@@ -522,6 +522,37 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
 
             return;
+        }
+
+        private static bool LocalVariableValidForOpenCL(LocalVariableLocation Location)
+        {
+            Type DataType = Location.DataType;
+
+            // Primitives types are okay
+            if (DataType.IsPrimitive)
+                return true;
+
+            // Arrays are okay only for primitive types and a single dimension
+            if (DataType.IsArray)
+            {
+                int Rank = DataType.GetArrayRank();
+                Type ElementType = DataType.GetElementType();
+
+                if (Rank != 1)
+                    return false;
+
+                if (!ElementType.IsPrimitive)
+                    return false;
+
+                return true;
+            }
+
+            // Everything else is fine if it is unused. This prevents temporary variables
+            // from causing an abort
+            if (!((Location.Flags & LocationFlags.Read) != 0) && !((Location.Flags & LocationFlags.Write) != 0))
+                return true;
+
+            return false;
         }
 
         private void ConvertCilStackLocations()
@@ -1117,8 +1148,60 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             return OpenClAliasAttribute.Get(MethodInfo);
         }
 
+        private void AnalyzeLocalRelatedArguments()
+        {
+            bool Changed;
+            do
+            {
+                Changed = false;
+                foreach (BasicBlock BasicBlock in this.BasicBlocks)
+                {
+                    foreach (Instruction Instruction in BasicBlock.Instructions)
+                    {
+                        if (Instruction.InstructionType == InstructionType.Assignment
+                            && !object.ReferenceEquals(Instruction.Result, null) && Instruction.Result.NodeType == NodeType.Location
+                            && ((LocationNode)Instruction.Result).Location.LocationType == LocationType.LocalVariable)
+                        {
+                            LocalVariableLocation TargetVariable = (LocalVariableLocation)((LocationNode)Instruction.Result).Location;
+                            List<ArgumentLocation> RelatedArguments = TargetVariable.RelatedArguments;
+
+                            if (!object.ReferenceEquals(Instruction.Argument, null) && Instruction.Argument.NodeType == NodeType.Location
+                                && ((LocationNode)Instruction.Argument).Location.LocationType == LocationType.Argument)
+                            {
+                                ArgumentLocation Argument = (ArgumentLocation)((LocationNode)Instruction.Argument).Location;
+                                if (!RelatedArguments.Contains(Argument))
+                                {
+                                    RelatedArguments.Add(Argument);
+                                    if (Argument.DataType.IsArray || Argument.DataType.IsPointer || Argument.DataType.IsByRef)
+                                        TargetVariable.Flags |= LocationFlags.PointerGlobal;
+                                    Changed = true;
+                                }
+                            }
+                            else if (!object.ReferenceEquals(Instruction.Argument, null) && Instruction.Argument.NodeType == NodeType.Location
+                                && ((LocationNode)Instruction.Argument).Location.LocationType == LocationType.LocalVariable)
+                            {
+                                List<ArgumentLocation> OtherList = ((LocalVariableLocation)((LocationNode)Instruction.Argument).Location).RelatedArguments;
+                                foreach (ArgumentLocation Argument in OtherList)
+                                {
+                                    if (!RelatedArguments.Contains(Argument))
+                                    {
+                                        RelatedArguments.Add(Argument);
+                                        if (Argument.DataType.IsArray || Argument.DataType.IsPointer || Argument.DataType.IsByRef)
+                                            TargetVariable.Flags |= LocationFlags.PointerGlobal;
+                                        Changed = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } while (Changed);
+        }
+
         public void AnalyzeLocationUsage()
         {
+            AnalyzeLocalRelatedArguments();
+
             foreach (BasicBlock BasicBlock in this.BasicBlocks)
             {
                 foreach (Instruction Instruction in BasicBlock.Instructions)
@@ -1131,6 +1214,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     foreach (Location Location in LocationUsage.IndirectDefinedLocations)
                     {
                         Location.Flags |= LocationFlags.IndirectWrite;
+                        if (Location.LocationType == LocationType.LocalVariable)
+                            foreach (Location RelatedArguments in ((LocalVariableLocation)Location).RelatedArguments)
+                                RelatedArguments.Flags |= LocationFlags.IndirectWrite;
                     }
                     foreach (Location Location in LocationUsage.UsedLocations)
                     {
@@ -1139,6 +1225,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     foreach (Location Location in LocationUsage.IndirectUsedLocations)
                     {
                         Location.Flags |= LocationFlags.IndirectRead;
+                        if (Location.LocationType == LocationType.LocalVariable)
+                            foreach (Location RelatedArguments in ((LocalVariableLocation)Location).RelatedArguments)
+                                RelatedArguments.Flags |= LocationFlags.IndirectRead;
                     }
                 }
             }
