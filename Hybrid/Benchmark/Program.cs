@@ -17,8 +17,6 @@ namespace Hybrid.Benchmark
     {
         static SystemCharacteristics systemCharacteristics = new SystemCharacteristics();
 
-        double minSequentialExecutionTime;
-
         int rounds;
         int warmup_rounds;
 
@@ -142,7 +140,7 @@ namespace Hybrid.Benchmark
 
             logWriteLine(systemCharacteristics.ToString());
 
-            for(int i=1; i<10; i++)
+            for(int i=1; i<10; i ++)
                 benchmark(i);
 
             csv.Close();
@@ -151,26 +149,31 @@ namespace Hybrid.Benchmark
 
         private void benchmark(double minSequentialExecutionTime)
         {
-            this.minSequentialExecutionTime = minSequentialExecutionTime;
-
-            rounds = 20;
-            warmup_rounds = 5;
+            rounds = 10;
+            warmup_rounds = 3;
 
             print = false;
 
-            runExamples();
-        }
-
-        private void runExamples()
-        {
             foreach (ExampleBase example in examples())
-                runExample(example);
+                runExample(example, systemCharacteristics.GetScale(example, minSequentialExecutionTime));
+                //runExampleGpuAndAutomaticOnly(example, minSequentialExecutionTime);
         }
 
-        private void runExample(ExampleBase example)
+        private void runExampleGpuAndAutomaticOnly(ExampleBase example, double sizeFactor)
         {
-            double sizeFactor = systemCharacteristics.GetScale(example, minSequentialExecutionTime);
+            ExampleBase.RunResult runResultSerial = new ExampleBase.RunResult() { 
+                Valid = true, ElapsedTotalSeconds = 1, SizeX = sizeFactor, SizeY = sizeFactor, SizeZ = sizeFactor, Name = example.Name }; //executeSerial(example, sizeFactor);
+            ExampleBase.RunResult runResultParallel = executeParallel(example, sizeFactor);
+            ExampleBase.RunResult runResultGPU = executeGpu(example, sizeFactor);
+            ExampleBase.RunResult runResultAutomatic = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 }; //executeAutomatic(example, sizeFactor);
 
+            logWriteLine();
+
+            writeOutputs(example, runResultSerial, runResultParallel, runResultGPU, runResultAutomatic);
+        }
+
+        private void runExample(ExampleBase example, double sizeFactor)
+        {
             ExampleBase.RunResult runResultSerial = executeSerial(example, sizeFactor);
             ExampleBase.RunResult runResultParallel = executeParallel(example, sizeFactor);
             ExampleBase.RunResult runResultGPU = executeGpu(example, sizeFactor);
