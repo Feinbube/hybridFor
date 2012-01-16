@@ -17,12 +17,27 @@ namespace Hybrid.MsilToOpenCL
         }
 
         public InvokeContext(HighLevel.HlGraph HLgraph)
+            : this(HLgraph, GetRandomSeed())
+        {
+        }
+
+        private static int GetRandomSeed()
+        {
+            return (new Random()).Next();
+        }
+
+        public InvokeContext(HighLevel.HlGraph HLgraph, int RandomSeed)
         {
             m_Arguments = new List<InvokeArgument>(HLgraph.Arguments.Count);
             for (int i = 0; i < HLgraph.Arguments.Count; i++)
             {
                 System.Diagnostics.Debug.Assert(HLgraph.Arguments[i].Index == i);
                 m_Arguments.Add(null);
+            }
+
+            if (!object.ReferenceEquals(HLgraph.RandomSeedArgument, null))
+            {
+                PutArgument(HLgraph.RandomSeedArgument, RandomSeed);
             }
         }
 

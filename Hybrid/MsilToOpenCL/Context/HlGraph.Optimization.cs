@@ -93,6 +93,10 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                         // Do nothing here. ConvertForOpenCl will convert this to an argument location,
                         // so regular analysis treats it as such at a later pass
                     }
+                    else if (Node.NodeType == NodeType.NamedField)
+                    {
+                        TraverseTree(((NamedFieldNode)Node).SubNodes[0], true, false);
+                    }
                     else
                     {
                         System.Diagnostics.Debugger.Break();

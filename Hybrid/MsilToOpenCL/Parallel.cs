@@ -247,6 +247,85 @@ namespace Hybrid.MsilToOpenCL
                 }
             }
 
+            // Create the argument to pass the random seed, if necessary
+            if (!object.ReferenceEquals(HLgraph.RandomStateLocation, null) && HLgraph.RandomStateLocation.LocationType == HighLevel.LocationType.LocalVariable)
+            {
+                // This can only happen for kernels. All nested routines get a pointer to
+                // the kernel's rnd_state instead
+
+                System.Diagnostics.Debug.Assert(HLgraph.IsKernel);
+                System.Diagnostics.Debug.Assert(object.ReferenceEquals(HLgraph.RandomSeedArgument, null));
+
+                HLgraph.RandomSeedArgument = HLgraph.CreateArgument("rnd_seed", typeof(uint), false);
+
+                if (GidParamCount > 0)
+                {
+                    HighLevel.Node LocalSeed = null;
+                    for (int i = 0; i < GidParamCount; i++)
+                    {
+                        if (LocalSeed == null)
+                        {
+                            LocalSeed = new HighLevel.LocationNode(IdLocation[i]);
+                        }
+                        else
+                        {
+                            LocalSeed = new HighLevel.AddNode(
+                                            new HighLevel.LocationNode(IdLocation[i]),
+                                            new HighLevel.MulNode(
+                                                LocalSeed,
+                                                new HighLevel.IntegerConstantNode(0x10000)  /* TODO: what is a good factor here ??? */
+                                            )
+                                        );
+                        }
+                    }
+                    HLgraph.CanonicalStartBlock.Instructions.Add(new HighLevel.AssignmentInstruction(
+                        new HighLevel.NamedFieldNode(new HighLevel.LocationNode(HLgraph.RandomStateLocation), "x", typeof(uint)),
+                        new HighLevel.AddNode(
+                            LocalSeed,
+                            new HighLevel.IntegerConstantNode(1)
+                            )
+                        )
+                    );
+                }
+                else
+                {
+                    HLgraph.CanonicalStartBlock.Instructions.Add(new HighLevel.AssignmentInstruction(
+                        new HighLevel.NamedFieldNode(new HighLevel.LocationNode(HLgraph.RandomStateLocation), "x", typeof(uint)),
+                        new HighLevel.IntegerConstantNode(1)
+                        )
+                    );
+                }
+
+                HLgraph.CanonicalStartBlock.Instructions.Add(new HighLevel.AssignmentInstruction(
+                    new HighLevel.NamedFieldNode(new HighLevel.LocationNode(HLgraph.RandomStateLocation), "y", typeof(uint)),
+                    new HighLevel.LocationNode(HLgraph.RandomSeedArgument)
+                    ));
+
+                // Perform TWO warmup rounds, so our not-so-random start states
+                // get a chance to really inflict changes to all 32 bits of
+                // generated random numbers.
+                HLgraph.CanonicalStartBlock.Instructions.Add(new HighLevel.AssignmentInstruction(
+                    null,
+                    new HighLevel.CallNode(
+                        typeof(OpenClFunctions).GetMethod("rnd"),
+                        new HighLevel.AddressOfNode(
+                            new HighLevel.LocationNode(HLgraph.RandomStateLocation)
+                            )
+                        )
+                    )
+                );
+                HLgraph.CanonicalStartBlock.Instructions.Add(new HighLevel.AssignmentInstruction(
+                    null,
+                    new HighLevel.CallNode(
+                        typeof(OpenClFunctions).GetMethod("rnd"),
+                        new HighLevel.AddressOfNode(
+                            new HighLevel.LocationNode(HLgraph.RandomStateLocation)
+                            )
+                        )
+                    )
+                );
+            }
+
             if (DumpCode > 5)
             {
                 WriteCode(HLgraph, writer);

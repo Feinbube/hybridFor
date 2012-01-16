@@ -13,6 +13,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         private Location m_RandomStateLocation;
         public Location RandomStateLocation { get { return m_RandomStateLocation; } }
 
+        private ArgumentLocation m_RandomSeedArgument;
+        public ArgumentLocation RandomSeedArgument { get { return m_RandomSeedArgument; } internal set { m_RandomSeedArgument = value; } } 
+
         private List<LocalVariableLocation> m_LocalVariables = new List<LocalVariableLocation>();
         public List<LocalVariableLocation> LocalVariables { get { return m_LocalVariables; } }
 
