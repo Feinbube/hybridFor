@@ -14,6 +14,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         Location,
 
         InstanceField,
+        NamedField,
 
         Call,
         ArrayAccess,
@@ -36,5 +37,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         Mul,
         Div,
         Mod,
+
+        And,
+        Or,
+        Xor,
     }
 }

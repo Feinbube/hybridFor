@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Instructions\CilStoreFieldInstruction.cs" />
+    <Compile Include="Nodes\AndNode.cs" />
     <Compile Include="Nodes\BasicBlock.cs" />
     <Compile Include="Context\AccessPathEntry.cs" />
     <Compile Include="Context\ArrayInfo.cs" />
@@ -119,9 +120,12 @@
     <Compile Include="Nodes\MulNode.cs" />
     <Compile Include="Nodes\NegNode.cs" />
     <Compile Include="Nodes\NotEqualsNode.cs" />
+    <Compile Include="Nodes\OrNode.cs" />
     <Compile Include="Nodes\StringConstantNode.cs" />
     <Compile Include="Nodes\SubNode.cs" />
     <Compile Include="Nodes\UnaryOperatorNode.cs" />
+    <Compile Include="Nodes\NamedFieldNode.cs" />
+    <Compile Include="Nodes\XorNode.cs" />
     <Compile Include="OpenClAliasAttribute.cs" />
     <Compile Include="OpenClFunctions.cs" />
     <Compile Include="OpenClIn.cs" />
