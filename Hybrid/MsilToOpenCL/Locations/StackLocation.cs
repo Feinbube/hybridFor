@@ -40,7 +40,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
         protected override bool InnerEquals(Location obj)
         {
-            return object.ReferenceEquals(this, obj); // base.InnerEquals(obj) && ((StackLocation)obj).m_Index == m_Index;
+            return base.InnerEquals(obj) && ((StackLocation)obj).m_Index == m_Index;
         }
 
         internal override int CompareToLocation(Location Other)
