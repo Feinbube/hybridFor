@@ -76,6 +76,7 @@ namespace Hybrid.MsilToOpenCL
         [OpenClAlias("MWC64X")]
         public static uint rnd()
         {
+            // Chosen by unfair dice roll. Guaranteed NOT to be random...
             return 0;
         }
     }
