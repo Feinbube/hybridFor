@@ -745,14 +745,27 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     {
                         Location Location = ((LocationNode)Instruction.Result).Location;
 
-                        if (DeadDefinitionList.Contains(Location))
+                        // Work around default equality check for stack locations. We only
+                        // care about the stack index, not the data type here...
+                        if (Location.LocationType == LocationType.CilStack)
+                        {
+                            foreach (Location Other in DeadDefinitionList)
+                            {
+                                if (Other.LocationType == LocationType.CilStack && ((StackLocation)Other).Index == ((StackLocation)Location).Index)
+                                {
+                                    IsDeadAssignment = true;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (DeadDefinitionList.Contains(Location))
                         {
                             IsDeadAssignment = true;
                         }
                     }
 
                     // TODO: check for side effects...
-                    if (IsDeadAssignment && Instruction.Argument != null && Instruction.Argument.NodeType == NodeType.Call)
+                    if (IsDeadAssignment && HasSideEffects(Instruction.Argument))
                     {
                         Instruction.Result = null;
                     }
@@ -760,27 +773,42 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     {
                         BasicBlock.Instructions.RemoveAt(i);
                         InstructionsDeleted = true;
+                        continue;
                     }
-                    else
-                    {
-                        LocationUsage LocationUsage = LocationUsage.ForInstruction(Instruction);
 
-                        foreach (Location Location in LocationUsage.DefinedLocations)
+                    LocationUsage LocationUsage = LocationUsage.ForInstruction(Instruction);
+
+                    foreach (Location Location in LocationUsage.DefinedLocations)
+                    {
+                        if (!DeadDefinitionList.Contains(Location))
                         {
-                            if (!DeadDefinitionList.Contains(Location))
-                            {
-                                DeadDefinitionList.Add(Location);
-                            }
+                            DeadDefinitionList.Add(Location);
                         }
-                        foreach (Location Location in LocationUsage.UsedLocations)
-                        {
-                            DeadDefinitionList.Remove(Location);
-                        }
+                    }
+                    foreach (Location Location in LocationUsage.UsedLocations)
+                    {
+                        DeadDefinitionList.Remove(Location);
                     }
                 }
 
                 return InstructionsDeleted;
             }
+        }
+
+        private static bool HasSideEffects(Node Node)
+        {
+            if (Node == null)
+                return false;
+            else if (Node.NodeType == NodeType.Call)
+                return true;
+
+            foreach (Node SubNode in Node.SubNodes)
+            {
+                if (HasSideEffects(SubNode))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
