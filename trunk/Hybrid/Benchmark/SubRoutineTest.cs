@@ -10,6 +10,7 @@ namespace Hybrid.Benchmark
         private static int special = 1;
         private int d = 2;
         private int[,] e = new int[2, 2] { { 0, 1 }, { 2, 3 } };
+        private uint[] r;
 
         private int AddTwoInts_2ndFromArray(int a, int[] b, int i)
         {
@@ -18,7 +19,8 @@ namespace Hybrid.Benchmark
 
         private int AddTwoInts(int a, int b)
         {
-            int z = (int)Hybrid.MsilToOpenCL.OpenClFunctions.rnd();
+            uint z = Hybrid.MsilToOpenCL.OpenClFunctions.rnd();
+            r[Hybrid.MsilToOpenCL.OpenClFunctions.get_global_id(0)] = z;
             return a + b + special + d + e[a % 2, b % 2];
         }
 
@@ -33,11 +35,13 @@ namespace Hybrid.Benchmark
                 b[i] = random.Next();
 
             c = new int[sizeX];
+            r = new uint[sizeX];
         }
 
         protected override void cleanup()
         {
             a = b = c = null;
+            r = null;
         }
 
         protected override void algorithm()
