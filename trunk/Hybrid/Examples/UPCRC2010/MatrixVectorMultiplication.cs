@@ -32,7 +32,7 @@ namespace Hybrid.Examples.Upcrc2010
 
         protected override void setup()
         {
-            if (sizeX * sizeY > 1024 * 1024)
+            if (sizeX * sizeY > 1024 * 1024 || sizeX * sizeY < 0)
             {
                 sizeX = 1024;
                 sizeY = 1024;
@@ -65,9 +65,9 @@ namespace Hybrid.Examples.Upcrc2010
 
             for (k = 0; k < 5 * M; k++)
             {
-                i = random.Next(0, (int)M);
-                j = random.Next(0, (int)N);
-                matrix[i, j] = random.NextDouble() * 10.0;
+                i = Random.Next(0, (int)M);
+                j = Random.Next(0, (int)N);
+                matrix[i, j] = Random.NextDouble() * 10.0;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Hybrid.Examples.Upcrc2010
             int i;
             for (i = 0; i < N; i++)
             {
-                vector[i] = random.NextDouble() * 10.0;
+                vector[i] = Random.NextDouble() * 10.0;
             }
         }
 

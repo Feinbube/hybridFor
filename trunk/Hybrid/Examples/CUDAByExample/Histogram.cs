@@ -21,7 +21,7 @@ namespace Hybrid.Examples.CudaByExample
 
             buffer = new byte[sizeX];
             for (int i = 0; i < sizeX; i++)
-                buffer[i] = (byte)random.Next(0, sizeZ);
+                buffer[i] = (byte)Random.Next(0, sizeZ);
         }
 
         protected override void printInput()

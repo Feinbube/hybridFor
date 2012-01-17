@@ -19,7 +19,7 @@ namespace Hybrid.Examples
             output = new int[sizeX];
 
             for (int i = 0; i < sizeX; i++)
-                input[i] = random.Next(10);
+                input[i] = Random.Next(10);
         }
 
         protected override void printInput()

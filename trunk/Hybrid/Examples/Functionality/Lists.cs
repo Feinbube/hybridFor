@@ -14,7 +14,7 @@ namespace Hybrid.Examples
         {
             a = new List<int>();
             for (int x = 0; x < sizeX; x++)
-                a.Add(random.Next(100));
+                a.Add(Random.Next(100));
 
             b = new List<int>();
             for (int x = 0; x < sizeX; x++)

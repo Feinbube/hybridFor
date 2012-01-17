@@ -19,7 +19,7 @@ namespace Hybrid.Examples.Upcrc2010
             IscanData = new float[sizeX];
 
             for (int i = 0; i < sizeX; i++)
-                startData[i] = (float)(random.NextDouble() * 10.0);
+                startData[i] = (float)(Random.NextDouble() * 10.0);
         }
 
         protected override void printInput()

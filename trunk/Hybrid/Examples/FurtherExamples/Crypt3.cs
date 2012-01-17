@@ -528,7 +528,7 @@ namespace Hybrid.Examples
             StringBuilder stringBuilder = new StringBuilder();
 
             for (int i = 0; i < length; i++)
-                stringBuilder.Append(Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65))).ToString());
+                stringBuilder.Append(Convert.ToChar(Convert.ToInt32(Math.Floor(26 * Random.NextDouble() + 65))).ToString());
 
             return stringBuilder.ToString();
         }
@@ -539,10 +539,10 @@ namespace Hybrid.Examples
             passwordEntry.Username = "user" + i;
             passwordEntry.Salt = randomString(2);
 
-            passwordEntry.OriginalPassword = dictionary[random.Next(dictionary.Count)];
+            passwordEntry.OriginalPassword = dictionary[Random.Next(dictionary.Count)];
 
-            if (random.Next(2) == 1 && passwordEntry.OriginalPassword.Length < 8)
-                passwordEntry.OriginalPassword += random.Next(10);
+            if (Random.Next(2) == 1 && passwordEntry.OriginalPassword.Length < 8)
+                passwordEntry.OriginalPassword += Random.Next(10);
 
             passwordEntry.PasswordHash = crypt(passwordEntry.OriginalPassword, passwordEntry.Salt);
 
@@ -558,7 +558,7 @@ namespace Hybrid.Examples
 
             int count = dictionary.Count;
             for (int i = count; i < sizeY; i++)
-                dictionary.Add(randomString(random.Next(5, 10)));
+                dictionary.Add(randomString(Random.Next(5, 10)));
 
             if(passwordEntries == null)
                 passwordEntries = new List<PasswordEntry>();

@@ -35,10 +35,10 @@ namespace Hybrid.Examples
             for (int y = 1; y < sizeY - 1; y++)
                 for (int x = 1; x < sizeX - 1; x++)
                 {
-                    state1[x, y] = (byte)random.Next(3);
+                    state1[x, y] = (byte)Random.Next(3);
 
                     if (state1[x, y] != 0)
-                        age[x, y] = random.Next(10);
+                        age[x, y] = Random.Next(10);
                 }
         }
 
@@ -74,7 +74,7 @@ namespace Hybrid.Examples
                         }
                         else
                         { // swim to neighbor field
-                            int randNeighbor = random.Next(4);
+                            int randNeighbor = Random.Next(4);
 
                             switch (randNeighbor)
                             {
@@ -122,7 +122,7 @@ namespace Hybrid.Examples
                             {
                                 starve[x, y]++; // We have nothing to eat-. So we starve (again).
 
-                                int randNeighbor = random.Next(4);
+                                int randNeighbor = Random.Next(4);
 
                                 switch (randNeighbor)
                                 {
@@ -193,7 +193,7 @@ namespace Hybrid.Examples
 
         private void breed(int x, int y, byte type)
         {
-            int breedPosition = random.Next(4);
+            int breedPosition = Random.Next(4);
 
             switch (breedPosition)
             {

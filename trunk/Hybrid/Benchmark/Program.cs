@@ -15,8 +15,6 @@ namespace Hybrid.Benchmark
 {
     public class Program
     {
-        static SystemCharacteristics systemCharacteristics = new SystemCharacteristics();
-
         int rounds;
         int warmup_rounds;
 
@@ -138,9 +136,9 @@ namespace Hybrid.Benchmark
             csv = evaluationLog();
             log = errorLog();
 
-            logWriteLine(systemCharacteristics.ToString());
+            logWriteLine(SystemCharacteristics.ToString());
 
-            for(int i=1; i<10; i ++)
+            for(int i=3; i<10; i ++)
                 benchmark(i);
 
             csv.Close();
@@ -155,7 +153,7 @@ namespace Hybrid.Benchmark
             print = false;
 
             foreach (ExampleBase example in examples())
-                runExample(example, systemCharacteristics.GetScale(example, minSequentialExecutionTime));
+                runExample(example, SystemCharacteristics.GetScale(example, minSequentialExecutionTime));
                 //runExampleGpuAndAutomaticOnly(example, minSequentialExecutionTime);
         }
 
@@ -198,7 +196,7 @@ namespace Hybrid.Benchmark
         private ExampleBase.RunResult executeGpu(ExampleBase example, double sizeFactor)
         {
             ExampleBase.RunResult runResultGPU = null;
-            if (!systemCharacteristics.Platform.ContainsAGpu)
+            if (!SystemCharacteristics.Platform.ContainsAGpu)
                 logWriteLine("[GPU]       No GPUs available!");
             else
             {

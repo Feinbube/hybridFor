@@ -39,10 +39,56 @@ namespace Hybrid.Examples
 
         public string Name { get { return this.GetType().Name; } }
 
+        public RunResult Run(double preferredExecutionTime, int rounds, int warmupRounds)
+        {
+            double size = FindAppropriateSize(preferredExecutionTime);
+            return Run(size, size, size, false, rounds, warmupRounds);
+        }
+
+        Dictionary<Execute, Dictionary<double, double>> FindAppropriateSize_Cache = new Dictionary<Execute, Dictionary<double, double>>();
+
+        public double FindAppropriateSize(double preferredExecutionTime)
+        {
+            if (!FindAppropriateSize_Cache.ContainsKey(ExecuteOn))
+                FindAppropriateSize_Cache.Add(ExecuteOn, new Dictionary<double, double>());
+
+            if (!FindAppropriateSize_Cache[ExecuteOn].ContainsKey(preferredExecutionTime))
+                FindAppropriateSize_Cache[ExecuteOn][preferredExecutionTime] = findApppropriateSize(preferredExecutionTime);
+
+            return FindAppropriateSize_Cache[ExecuteOn][preferredExecutionTime];
+        }
+
+        private double findApppropriateSize(double preferredExecutionTime)
+        {
+            double scale = 5;
+
+            double executionTime = Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
+            while (executionTime <= 0.001)
+            {
+                scale *= 2;
+                executionTime = Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
+            }
+
+            double executionTime2 = Run(scale * 2, scale * 2, scale * 2, false, 20, 5).ElapsedTotalSeconds;
+
+            double log = Math.Log(executionTime2 / executionTime, 2);
+            scale = Math.Pow(preferredExecutionTime / executionTime, 1 / log) * scale;
+
+            // executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
+
+            return scale;
+        }
+
         public RunResult Run(double size, bool print, int rounds)
         {
             return Run(size, size, size, print, rounds, 0);
         }
+
+        public RunResult Run(double size, bool print, int rounds, int warmupRounds)
+        {
+            return Run(size, size, size, print, rounds, warmupRounds);
+        }
+
 
         public RunResult Run(double sizeX, double sizeY, double sizeZ, bool print, int rounds, int warmupRounds)
         {

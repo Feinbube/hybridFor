@@ -27,11 +27,11 @@ namespace Hybrid.Examples.Upcrc2010
             }
             for (k = 0; k < 5 * sizeX; k++)
             {
-                i = random.Next(sizeX);
-                j = random.Next(sizeX);
+                i = Random.Next(sizeX);
+                j = Random.Next(sizeX);
                 if (i != j)
                 {
-                    W[i, j] = (float)(random.NextDouble() * 10.0);
+                    W[i, j] = (float)(Random.NextDouble() * 10.0);
                     W[j, i] = W[i, j];
                 }
             }

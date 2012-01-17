@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Hybrid.Benchmark
 {
-    public class SystemCharacteristics
+    public static class SystemCharacteristics
     {
         public class DoublePair
         {
@@ -39,22 +39,7 @@ namespace Hybrid.Benchmark
             private double findGoodSize(ExampleBase example, double minSequentialExecutionTime)
             {
                 example.ExecuteOn = Execute.OnSingleCpu;
-
-                double scale = 5;
-
-                double executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
-                while (executionTime <= 0.001)
-                {
-                    scale *= 2;
-                    executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
-                }
-
-                double executionTime2 = example.Run(scale * 2, scale * 2, scale * 2, false, 20, 5).ElapsedTotalSeconds;
-
-                double log = Math.Log(executionTime2/executionTime, 2);
-                scale = Math.Pow(minSequentialExecutionTime / executionTime, 1/log) * scale;
-
-                // executionTime = example.Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
+                double scale = example.FindAppropriateSize(minSequentialExecutionTime);
 
                 Console.WriteLine("Scale " + scale + " for " + example.GetType().Name + "."); // + " for " + executionTime + "s.");
 
@@ -62,12 +47,12 @@ namespace Hybrid.Benchmark
             }
         }
 
-        public List<Example> Examples;
+        public static List<Example> Examples;
         
-        public string MachineName { get; set; }
-        public Platform Platform { get; set; }
+        public static string MachineName { get; set; }
+        public static Platform Platform { get; set; }
 
-        public SystemCharacteristics()
+        static SystemCharacteristics()
         {
             Examples = new List<Example>();
             
@@ -75,7 +60,7 @@ namespace Hybrid.Benchmark
             Platform = Hybrid.Scheduler.Platform;
         }
 
-        private Example Get(string exampleName)
+        private static Example Get(string exampleName)
         {
             foreach (Example example in Examples)
                 if (example.Name == exampleName)
@@ -90,7 +75,7 @@ namespace Hybrid.Benchmark
             return result;
         }
 
-        public double GetScale(ExampleBase exampleBase, double minSequentialExecutionTime)
+        public static double GetScale(ExampleBase exampleBase, double minSequentialExecutionTime)
         {
             Example example = Get(exampleBase.GetType().ToString());
             DoublePair pair = example.Get(exampleBase, minSequentialExecutionTime);
@@ -98,7 +83,7 @@ namespace Hybrid.Benchmark
             return pair.Value;
         }
 
-        public override string ToString()
+        public static string ToString()
         {
             string result = "";
 

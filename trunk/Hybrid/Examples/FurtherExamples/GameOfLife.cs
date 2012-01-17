@@ -16,10 +16,10 @@ namespace Hybrid.Examples
 
             state1 = new byte[sizeX, sizeY];
             state2 = new byte[sizeX, sizeY];
-
+            
             for (int x = 1; x < sizeX-1; x++)
                 for (int y = 1; y < sizeY-1; y++)
-                    state1[x, y] = (byte)random.Next(2);
+                    state1[x, y] = (byte)Random.Next(2);
         }
 
         private void printField(byte[,] fields)
