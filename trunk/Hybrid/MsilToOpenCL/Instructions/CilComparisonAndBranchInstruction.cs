@@ -77,7 +77,7 @@ namespace Hybrid.MsilToOpenCL.Instructions
             }
             else if (Opcode == OpCodes.Bne_Un || Opcode == OpCodes.Bne_Un_S)
             {
-                Argument = new HighLevel.EqualsNode(Context.ReadStackLocationNode(Context.StackPointer - 1), Context.ReadStackLocationNode(Context.StackPointer));
+                Argument = new HighLevel.NotEqualsNode(Context.ReadStackLocationNode(Context.StackPointer - 1), Context.ReadStackLocationNode(Context.StackPointer));
             }
             else if (Opcode == OpCodes.Bge || Opcode == OpCodes.Bge_S || Opcode == OpCodes.Bge_Un || Opcode == OpCodes.Bge_Un_S)
             {
