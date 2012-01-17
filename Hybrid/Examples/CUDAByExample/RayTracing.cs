@@ -13,21 +13,6 @@ namespace Hybrid.Examples.CudaByExample
             public float radius;
             public float x, y, z;
 
-            public float hit(float ox, float oy, ref float n)
-            {
-                float dx = ox - x;
-                float dy = oy - y;
-
-                if (dx * dx + dy * dy < radius * radius)
-                {
-                    float dz = (float)Math.Sqrt(radius * radius - dx * dx - dy * dy);
-                    n = (float)(dz / Math.Sqrt(radius * radius));
-                    return dz + z;
-                }
-
-                return float.MinValue;
-            }
-
             public void print()
             {
                 //Console.Write("[(" + r + "," + g + "," + b + ")/" + radius + "/(" + x + "," + y + "," + z + ")]");
@@ -53,15 +38,15 @@ namespace Hybrid.Examples.CudaByExample
             {
                 sphere[i] = new Sphere();
 
-                sphere[i].r = (float)random.NextDouble();
-                sphere[i].g = (float)random.NextDouble();
-                sphere[i].b = (float)random.NextDouble();
+                sphere[i].r = (float)Random.NextDouble();
+                sphere[i].g = (float)Random.NextDouble();
+                sphere[i].b = (float)Random.NextDouble();
 
-                sphere[i].x = (float)(random.NextDouble() * 100.0f - 50.0f);
-                sphere[i].y = (float)(random.NextDouble() * 100.0f - 50.0f);
-                sphere[i].z = (float)(random.NextDouble() * 100.0f - 50.0f);
+                sphere[i].x = (float)(Random.NextDouble() * 100.0f - 50.0f);
+                sphere[i].y = (float)(Random.NextDouble() * 100.0f - 50.0f);
+                sphere[i].z = (float)(Random.NextDouble() * 100.0f - 50.0f);
 
-                sphere[i].radius = (float)(random.NextDouble() * 10.0f + 2.0f);
+                sphere[i].radius = (float)(Random.NextDouble() * 10.0f + 2.0f);
             }
         }
 
@@ -71,6 +56,21 @@ namespace Hybrid.Examples.CudaByExample
                 sphere[i].print();
 
             Console.WriteLine();
+        }
+
+        public float hit(float x, float y, float z, float radius, float ox, float oy, ref float n)
+        {
+            float dx = ox - x;
+            float dy = oy - y;
+
+            if (dx * dx + dy * dy < radius * radius)
+            {
+                float dz = (float)Math.Sqrt(radius * radius - dx * dx - dy * dy);
+                n = (float)(dz / Math.Sqrt(radius * radius));
+                return dz + z;
+            }
+
+            return (float)-3.40282347E+38; // float.MinValue;
         }
 
         protected override void algorithm()
@@ -89,7 +89,7 @@ namespace Hybrid.Examples.CudaByExample
                 for (int i = 0; i < sizeZ; i++)
                 {
                     float n = 0.0f;
-                    float t = sphere[i].hit(ox, oy, ref n);
+                    float t = hit(sphere[i].x, sphere[i].y, sphere[i].z, sphere[i].radius, ox, oy, ref n);
 
                     if (t > maxz)
                     {
@@ -126,7 +126,8 @@ namespace Hybrid.Examples.CudaByExample
                     for (int i = 0; i < sizeZ; i++)
                     {
                         float n = 0.0f;
-                        float t = sphere[i].hit(ox, oy, ref n);
+                        //float t = sphere[i].hit(ox, oy, ref n);
+                        float t = hit(sphere[i].x, sphere[i].y, sphere[i].z, sphere[i].radius, ox, oy, ref n);
 
                         if (t > maxz)
                         {

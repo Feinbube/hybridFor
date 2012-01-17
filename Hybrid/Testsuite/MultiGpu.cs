@@ -12,14 +12,14 @@ using Hybrid.Examples.Upcrc2010;
 
 namespace Hybrid.Testsuite
 {
-    [TestClass]
+    //[TestClass]
     public class MultiGpu : ExampleTestBase
     {
         override protected void testExample(ExampleBase example)
         {
             example.ExecuteOn = Execute.OnAllGpus;
 
-            if (!example.Run(0.1, 0.1, 0.1, false, 5, 2).Valid)
+            if (!example.Run(10.0, 10.0, 10.0, false, 5, 2).Valid)
                 throw new Exception("Invalid result for " + example.GetType());
 
             Parallel.ReInitialize();

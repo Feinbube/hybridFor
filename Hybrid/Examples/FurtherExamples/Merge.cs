@@ -18,8 +18,8 @@ namespace Hybrid.Examples
 
             for (int x = 0; x < sizeX; x++)
             {
-                input1[x] = random.Next();
-                input2[x] = random.Next();
+                input1[x] = Random.Next();
+                input2[x] = Random.Next();
             }
             Array.Sort(input1);
             Array.Sort(input2);

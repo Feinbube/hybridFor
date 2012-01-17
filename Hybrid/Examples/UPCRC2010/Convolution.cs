@@ -20,7 +20,7 @@ namespace Hybrid.Examples.Upcrc2010
             // create random, directed weight matrix
             for (int i = 0; i < sizeX; i++)
                 for (int j = 0; j < sizeY; j++)
-                    startImage[i, j] = random.NextDouble() * 10.0;
+                    startImage[i, j] = Random.NextDouble() * 10.0;
 
             //Set up edge values within border elements
             for (int k = 0; k < sizeX; k++)

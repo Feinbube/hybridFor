@@ -21,8 +21,8 @@ namespace Hybrid.Examples.Upcrc2010
 
             for (i = 0; i < sizeX; i++)
             {
-                x = random.Next(sizeX);
-                y = random.Next(sizeX);
+                x = Random.Next(sizeX);
+                y = Random.Next(sizeX);
 
                 t = A[y];
                 A[y] = A[x];

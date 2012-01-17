@@ -17,9 +17,9 @@ namespace Hybrid.Examples
             positions = new int[sizeX];
 
             for (int x = 0; x < sizeX; x++)
-                haystack[x] = (byte)random.Next(256);
+                haystack[x] = (byte)Random.Next(256);
 
-            needle = (byte)random.Next(256);
+            needle = (byte)Random.Next(256);
         }
 
         protected override void printInput()

@@ -18,11 +18,11 @@ namespace Hybrid.Examples.CudaByExample
           
             a = new float[sizeX];
             for (int i = 0; i < sizeX; i++)
-                a[i] = random.Next(0, 1000);
+                a[i] = Random.Next(0, 1000);
 
             b = new float[sizeX];
             for (int i = 0; i < sizeX; i++)
-                b[i] = random.Next(0, 1000);
+                b[i] = Random.Next(0, 1000);
 
             c = new float[sizeX];
         }

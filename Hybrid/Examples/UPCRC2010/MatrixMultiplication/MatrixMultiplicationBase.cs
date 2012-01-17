@@ -18,13 +18,13 @@ namespace Hybrid.Examples.Upcrc2010.MatrixMultiplication
             
             for (int i = 0; i < sizeX; i++)
                 for (int j = 0; j < sizeZ; j++)
-                    a[i, j] = random.NextDouble();
+                    a[i, j] = Random.NextDouble();
 
             b = new double[sizeZ, sizeY];
 
             for (int i = 0; i < sizeZ; i++)
                 for (int j = 0; j < sizeY; j++)
-                    b[i, j] = random.NextDouble();
+                    b[i, j] = Random.NextDouble();
 
             c = new double[sizeX, sizeY];
         }

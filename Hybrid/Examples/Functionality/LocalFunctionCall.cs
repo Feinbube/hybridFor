@@ -15,11 +15,11 @@ namespace Hybrid.Examples
         {
             a = new int[sizeX];
             for (int x = 0; x < sizeX; x++)
-                a[x] = random.Next(100);
+                a[x] = Random.Next(100);
 
             b = new int[sizeX];
             for (int x = 0; x < sizeX; x++)
-                b[x] = random.Next(100);
+                b[x] = Random.Next(100);
 
             c = new int[sizeX];
         }
