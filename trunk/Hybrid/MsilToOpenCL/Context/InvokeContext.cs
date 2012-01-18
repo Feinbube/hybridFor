@@ -16,6 +16,9 @@ namespace Hybrid.MsilToOpenCL
             }
         }
 
+        private Dictionary<Type, string> m_ValueTypeMap;
+        public Dictionary<Type, string> ValueTypeMap { get { return m_ValueTypeMap; } }
+
         public InvokeContext(HighLevel.HlGraph HLgraph)
             : this(HLgraph, GetRandomSeed())
         {
@@ -28,6 +31,7 @@ namespace Hybrid.MsilToOpenCL
 
         public InvokeContext(HighLevel.HlGraph HLgraph, int RandomSeed)
         {
+            m_ValueTypeMap = HLgraph.ValueTypeMap;
             m_Arguments = new List<InvokeArgument>(HLgraph.Arguments.Count);
             for (int i = 0; i < HLgraph.Arguments.Count; i++)
             {
@@ -82,20 +86,24 @@ namespace Hybrid.MsilToOpenCL
                 Type Type = Value.GetType();
                 if (Type.IsArray)
                 {
+                    bool ForRead = false, ForWrite = false;
+                    if ((Location.Flags & HighLevel.LocationFlags.IndirectRead) != 0) { ForRead = true; }
+                    if ((Location.Flags & HighLevel.LocationFlags.IndirectWrite) != 0) { ForWrite = true; }
+
+                    if (!ForRead && !ForWrite)
+                    {
+                        ForRead = ForWrite = true;
+                    }
+
                     Type ElementType = Type.GetElementType();
                     if (ElementType == typeof(byte) || ElementType == typeof(int) || ElementType == typeof(uint) || ElementType == typeof(long) || ElementType == typeof(ulong)
                         || ElementType == typeof(float) || ElementType == typeof(double))
                     {
-                        bool ForRead = false, ForWrite = false;
-                        if ((Location.Flags & HighLevel.LocationFlags.IndirectRead) != 0) { ForRead = true; }
-                        if ((Location.Flags & HighLevel.LocationFlags.IndirectWrite) != 0) { ForWrite = true; }
-
-                        if (!ForRead && !ForWrite)
-                        {
-                            ForRead = ForWrite = true;
-                        }
-
-                        Argument = new InvokeArgument.ArrayArg((System.Array)Value, ForRead, ForWrite);
+                        Argument = new InvokeArgument.PrimitiveArrayArg((System.Array)Value, ForRead, ForWrite);
+                    }
+                    else if (ValueTypeMap.ContainsKey(ElementType))
+                    {
+                        Argument = new InvokeArgument.MarshalledArrayArg((System.Array)Value,ForRead,ForWrite);
                     }
                 }
             }

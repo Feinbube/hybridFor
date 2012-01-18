@@ -294,6 +294,9 @@ namespace Hybrid.MsilToOpenCL
             Map.Add(OpCodes.Ldloc_3, CilLoadLocalInstruction.Create);
             Map.Add(OpCodes.Ldloc_S, CilLoadLocalInstruction.Create);
 
+            Map.Add(OpCodes.Ldloca, CilLoadLocalAddressInstruction.Create);
+            Map.Add(OpCodes.Ldloca_S, CilLoadLocalAddressInstruction.Create);
+
             Map.Add(OpCodes.Ldobj, CilLoadObjectInstruction.Create);
 
             Map.Add(OpCodes.Ldsfld, CilLoadFieldInstruction.Create);
@@ -319,6 +322,13 @@ namespace Hybrid.MsilToOpenCL
             Map.Add(OpCodes.Stelem_R4, CilStoreElementInstruction.Create_R4);
             Map.Add(OpCodes.Stelem_R8, CilStoreElementInstruction.Create_R8);
             Map.Add(OpCodes.Stelem_Ref, CilStoreElementInstruction.Create_Ref);
+
+            Map.Add(OpCodes.Stind_I1, CilStoreObjectInstruction.Create_I1);
+            Map.Add(OpCodes.Stind_I2, CilStoreObjectInstruction.Create_I2);
+            Map.Add(OpCodes.Stind_I4, CilStoreObjectInstruction.Create_I4);
+            Map.Add(OpCodes.Stind_I8, CilStoreObjectInstruction.Create_I8);
+            Map.Add(OpCodes.Stind_R4, CilStoreObjectInstruction.Create_R4);
+            Map.Add(OpCodes.Stind_R8, CilStoreObjectInstruction.Create_R8);
 
             Map.Add(OpCodes.Stloc, CilStoreLocalInstruction.Create);
             Map.Add(OpCodes.Stloc_0, CilStoreLocalInstruction.Create);

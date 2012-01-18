@@ -165,7 +165,7 @@ namespace Hybrid.MsilToOpenCL
                 result.AppendLine("#pragma OPENCL EXTENSION " + extension + " : enable");
         }
 
-        internal static void WriteOpenCL(Type StructType, TextWriter writer)
+        internal static void WriteOpenCL(HighLevel.HlGraph HLgraph, Type StructType, TextWriter writer)
         {
             if (StructType == null)
             {
@@ -178,20 +178,20 @@ namespace Hybrid.MsilToOpenCL
 
             writer.WriteLine();
             writer.WriteLine("// OpenCL structure definition for type '{0}'", StructType.FullName);
-            writer.WriteLine("struct {0} {{", StructType.Name);
+            writer.WriteLine("typedef {0} {{", GetOpenClType(HLgraph, StructType));
             FieldInfo[] Fields = StructType.GetFields();
             foreach (FieldInfo Field in Fields)
             {
-                writer.WriteLine("\t{0} {1};", GetOpenClType(Field.FieldType), Field.Name);
+                writer.WriteLine("\t{0} {1};", GetOpenClType(HLgraph, Field.FieldType), Field.Name);
             }
-            writer.WriteLine("}}");
+            writer.WriteLine("}} t_{0};", HLgraph.ValueTypeMap[StructType]);
         }
 
         internal static void WriteOpenCL(HighLevel.HlGraph HLgraph, TextWriter writer)
         {
             writer.WriteLine();
             writer.WriteLine("// OpenCL source for {2} method '{0}' of type '{1}'", HLgraph.MethodBase.ToString(), HLgraph.MethodBase.DeclaringType.ToString(), HLgraph.IsKernel ? "kernel" : "related");
-            writer.WriteLine("{2}{0} {1}(", GetOpenClType(((MethodInfo)HLgraph.MethodBase).ReturnType), HLgraph.MethodName, HLgraph.IsKernel ? "__kernel " : string.Empty);
+            writer.WriteLine("{2}{0} {1}(", GetOpenClType(HLgraph, ((MethodInfo)HLgraph.MethodBase).ReturnType), HLgraph.MethodName, HLgraph.IsKernel ? "__kernel " : string.Empty);
             for (int i = 0; i < HLgraph.Arguments.Count; i++)
             {
                 HighLevel.ArgumentLocation Argument = HLgraph.Arguments[i];
@@ -221,7 +221,7 @@ namespace Hybrid.MsilToOpenCL
                     AttributeString += "__global ";
                 }
 
-                writer.WriteLine("\t{0}{1} {2}{3}", AttributeString, GetOpenClType(Argument.DataType), Argument.Name, i + 1 < HLgraph.Arguments.Count ? "," : string.Empty);
+                writer.WriteLine("\t{0}{1} {2}{3}", AttributeString, GetOpenClType(HLgraph, Argument.DataType), Argument.Name, i + 1 < HLgraph.Arguments.Count ? "," : string.Empty);
             }
             writer.WriteLine(")");
             writer.WriteLine("/*");
@@ -258,7 +258,7 @@ namespace Hybrid.MsilToOpenCL
                     AttributeString += "__global ";
                 }
 
-                writer.WriteLine("\t{0}{1} {2};", AttributeString, GetOpenClType(LocalVariable.DataType), LocalVariable.Name);
+                writer.WriteLine("\t{0}{1} {2};", AttributeString, GetOpenClType(HLgraph, LocalVariable.DataType), LocalVariable.Name);
             }
 
             HighLevel.BasicBlock FallThroughTargetBlock = HLgraph.CanonicalStartBlock;
@@ -310,9 +310,9 @@ namespace Hybrid.MsilToOpenCL
             writer.WriteLine("}");
         }
 
-        public static string GetOpenClType(Type DataType)
+        public static string GetOpenClType(HighLevel.HlGraph HlGraph, Type DataType)
         {
-            return InnerGetOpenClType(DataType);
+            return InnerGetOpenClType(HlGraph, DataType);
         }
 
         public static readonly Type RandomStateDataType = ConstructRandomStateDataType();
@@ -326,7 +326,7 @@ namespace Hybrid.MsilToOpenCL
         {
         }
 
-        private static string InnerGetOpenClType(Type DataType)
+        private static string InnerGetOpenClType(HighLevel.HlGraph HlGraph, Type DataType)
         {
             if (DataType == typeof(void))
             {
@@ -374,15 +374,24 @@ namespace Hybrid.MsilToOpenCL
             }
             else if (DataType.IsByRef)
             {
-                return InnerGetOpenClType(DataType.GetElementType()) + "*";
+                return InnerGetOpenClType(HlGraph, DataType.GetElementType()) + "*";
             }
             else if (DataType.IsArray)
             {
-                return InnerGetOpenClType(DataType.GetElementType()) + "*";
+                return InnerGetOpenClType(HlGraph, DataType.GetElementType()) + "*";
             }
             else if (object.ReferenceEquals(DataType, RandomStateDataType))
             {
                 return "uint2";
+            }
+            else if (DataType.IsValueType && DataType.BaseType == typeof(System.ValueType) && HlGraph != null && HlGraph.ValueTypeMap != null)
+            {
+                string Name;
+                if (!HlGraph.ValueTypeMap.TryGetValue(DataType, out Name))
+                {
+                    HlGraph.ValueTypeMap[DataType] = Name = "genstruct_" + HlGraph.ValueTypeMap.Count;
+                }
+                return "struct " + Name;
             }
             else
             {

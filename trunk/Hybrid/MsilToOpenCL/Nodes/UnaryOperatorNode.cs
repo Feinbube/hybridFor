@@ -23,7 +23,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
             else if (SubNodes.Count == 1)
             {
-                return Symbol + SubNodes[0].ToString();
+                return "(" + Symbol + SubNodes[0].ToString() + ")";
             }
             else
             {
