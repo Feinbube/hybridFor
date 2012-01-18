@@ -18,10 +18,41 @@ namespace Hybrid.MsilToOpenCL.Instructions
             return new CilStoreObjectInstruction(Opcode, Offset, Type);
         }
 
+        public static CilInstruction Create_I1(OpCode Opcode, byte[] IL, int Offset, int NextOffset, MethodBase ParentMethodBase)
+        {
+            return new CilStoreObjectInstruction(Opcode, Offset, typeof(byte));
+        }
+
+        public static CilInstruction Create_I2(OpCode Opcode, byte[] IL, int Offset, int NextOffset, MethodBase ParentMethodBase)
+        {
+            return new CilStoreObjectInstruction(Opcode, Offset, typeof(short));
+        }
+
+        public static CilInstruction Create_I4(OpCode Opcode, byte[] IL, int Offset, int NextOffset, MethodBase ParentMethodBase)
+        {
+            return new CilStoreObjectInstruction(Opcode, Offset, typeof(int));
+        }
+
+        public static CilInstruction Create_I8(OpCode Opcode, byte[] IL, int Offset, int NextOffset, MethodBase ParentMethodBase)
+        {
+            return new CilStoreObjectInstruction(Opcode, Offset, typeof(long));
+        }
+
+        public static CilInstruction Create_R4(OpCode Opcode, byte[] IL, int Offset, int NextOffset, MethodBase ParentMethodBase)
+        {
+            return new CilStoreObjectInstruction(Opcode, Offset, typeof(float));
+        }
+
+        public static CilInstruction Create_R8(OpCode Opcode, byte[] IL, int Offset, int NextOffset, MethodBase ParentMethodBase)
+        {
+            return new CilStoreObjectInstruction(Opcode, Offset, typeof(double));
+        }
+
         private CilStoreObjectInstruction(OpCode Opcode, int Offset, Type Type)
             : base(Opcode, Offset)
         {
-            if (Opcode != OpCodes.Stobj)
+            if (Opcode != OpCodes.Stind_I1 && Opcode != OpCodes.Stind_I2 && Opcode != OpCodes.Stind_I4 && Opcode != OpCodes.Stind_I8 &&
+                Opcode != OpCodes.Stind_R4 && Opcode != OpCodes.Stind_R8 && Opcode != OpCodes.Stobj)
             {
                 throw new ArgumentException("Opcode");
             }

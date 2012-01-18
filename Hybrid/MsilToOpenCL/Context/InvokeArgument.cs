@@ -170,13 +170,99 @@ namespace Hybrid.MsilToOpenCL
             }
         }
 
-        public class ArrayArg : InvokeArgument
+        public class MarshalledArrayArg : ArrayArg
         {
-            private System.Array m_Value;
-            private OpenCLNet.Mem MemBuffer;
-            private bool m_ForRead;
-            private bool m_ForWrite;
-            private System.Runtime.InteropServices.GCHandle? m_GCHandle;
+            public MarshalledArrayArg(System.Array Value, bool ForRead, bool ForWrite)
+                : base(Value, ForRead, ForWrite)
+            {
+            }
+
+            protected override void EnqueueWrite(CallContext CallContext, int i, long ElementCount, OpenCLNet.MemFlags MemFlags)
+            {
+                Type RealElementType = Value.GetType().GetElementType();
+                int ElementSize = System.Runtime.InteropServices.Marshal.SizeOf(RealElementType);
+
+                m_GCHandle = System.Runtime.InteropServices.GCHandle.Alloc(Value, System.Runtime.InteropServices.GCHandleType.Pinned);
+
+                MemBuffer = CallContext.Context.CreateBuffer(MemFlags | OpenCLNet.MemFlags.USE_HOST_PTR, ElementCount * ElementSize, m_GCHandle.Value.AddrOfPinnedObject());
+                CallContext.Kernel.SetArg(i, MemBuffer);
+            }
+
+            protected override void EnqueueRead(CallContext CallContext, long ElementCount)
+            {
+                Type RealElementType = Value.GetType().GetElementType();
+                int ElementSize = System.Runtime.InteropServices.Marshal.SizeOf(RealElementType);
+
+                //
+                // Read buffer back into main memory
+                //
+
+                CallContext.CommandQueue.EnqueueReadBuffer(MemBuffer, true, IntPtr.Zero, new IntPtr(ElementCount * ElementSize), m_GCHandle.Value.AddrOfPinnedObject());
+            }
+        }
+
+        public class PrimitiveArrayArg : ArrayArg
+        {
+            public PrimitiveArrayArg(System.Array Value, bool ForRead, bool ForWrite)
+                : base(Value, ForRead, ForWrite)
+            {
+            }
+
+            protected override void EnqueueWrite(CallContext CallContext, int i, long ElementCount, OpenCLNet.MemFlags MemFlags)
+            {
+                Type RealElementType = Value.GetType().GetElementType();
+                int ElementSize = System.Runtime.InteropServices.Marshal.SizeOf(RealElementType);
+
+#if USE_HOST_POINTER
+                m_GCHandle = System.Runtime.InteropServices.GCHandle.Alloc(Value, System.Runtime.InteropServices.GCHandleType.Pinned);
+
+                MemBuffer = CallContext.Context.CreateBuffer(MemFlags | OpenCLNet.MemFlags.USE_HOST_PTR, ElementCount * ElementSize, m_GCHandle.Value.AddrOfPinnedObject());
+                CallContext.Kernel.SetArg(i, MemBuffer);
+#else
+                MemBuffer = CallContext.Context.CreateBuffer(MemFlags, ElementCount * ElementSize, IntPtr.Zero);
+                CallContext.Kernel.SetArg(i, MemBuffer);
+
+                //
+                // If the buffer is read by the device, transfer the data
+                //
+
+                if (m_ForRead)
+                {
+                    System.Runtime.InteropServices.GCHandle gch = System.Runtime.InteropServices.GCHandle.Alloc(Value, System.Runtime.InteropServices.GCHandleType.Pinned);
+
+                    try
+                    {
+                        IntPtr p = gch.Value.AddrOfPinnedObject();
+                        CallContext.CommandQueue.EnqueueWriteBuffer(MemBuffer, true, IntPtr.Zero, new IntPtr(ElementCount * ElementSize), p);
+                    }
+                    finally
+                    {
+                        gch.Free();
+                    }
+                }
+#endif
+            }
+
+            protected override void EnqueueRead(CallContext CallContext, long ElementCount)
+            {
+                Type RealElementType = Value.GetType().GetElementType();
+                int ElementSize = System.Runtime.InteropServices.Marshal.SizeOf(RealElementType);
+
+                //
+                // Read buffer back into main memory
+                //
+
+                CallContext.CommandQueue.EnqueueReadBuffer(MemBuffer, true, IntPtr.Zero, new IntPtr(ElementCount * ElementSize), m_GCHandle.Value.AddrOfPinnedObject());
+            }
+        }
+
+        public abstract class ArrayArg : InvokeArgument
+        {
+            protected System.Array m_Value;
+            protected OpenCLNet.Mem MemBuffer;
+            protected bool m_ForRead;
+            protected bool m_ForWrite;
+            protected System.Runtime.InteropServices.GCHandle? m_GCHandle;
 
             public ArrayArg(System.Array Value, bool ForRead, bool ForWrite)
             {
@@ -205,9 +291,6 @@ namespace Hybrid.MsilToOpenCL
                     ElementCount *= (m_Value.GetUpperBound(d) - m_Value.GetLowerBound(d) + 1);
                 }
 
-                Type RealElementType = Value.GetType().GetElementType();
-                int ElementSize = System.Runtime.InteropServices.Marshal.SizeOf(RealElementType);
-
                 //
                 // Allocate memory buffer on target hardware using the appropriate type
                 //
@@ -227,35 +310,10 @@ namespace Hybrid.MsilToOpenCL
                     MemFlags = OpenCLNet.MemFlags.READ_WRITE;
                 }
 
-#if USE_HOST_POINTER
-					m_GCHandle = System.Runtime.InteropServices.GCHandle.Alloc(Value, System.Runtime.InteropServices.GCHandleType.Pinned);
-
-					MemBuffer = CallContext.Context.CreateBuffer(MemFlags | OpenCLNet.MemFlags.USE_HOST_PTR, ElementCount * ElementSize, m_GCHandle.Value.AddrOfPinnedObject());
-					CallContext.Kernel.SetArg(i, MemBuffer);
-#else
-                MemBuffer = CallContext.Context.CreateBuffer(MemFlags, ElementCount * ElementSize, IntPtr.Zero);
-                CallContext.Kernel.SetArg(i, MemBuffer);
-
-                //
-                // If the buffer is read by the device, transfer the data
-                //
-
-                if (m_ForRead)
-                {
-                    System.Runtime.InteropServices.GCHandle gch = System.Runtime.InteropServices.GCHandle.Alloc(Value, System.Runtime.InteropServices.GCHandleType.Pinned);
-
-                    try
-                    {
-                        IntPtr p = gch.Value.AddrOfPinnedObject();
-                        CallContext.CommandQueue.EnqueueWriteBuffer(MemBuffer, true, IntPtr.Zero, new IntPtr(ElementCount * ElementSize), p);
-                    }
-                    finally
-                    {
-                        gch.Free();
-                    }
-                }
-#endif
+                EnqueueWrite(CallContext, i, ElementCount, MemFlags);
             }
+
+            protected abstract void EnqueueWrite(CallContext CallContext, int i, long ElementCount, OpenCLNet.MemFlags MemFlags);
 
             private static void ConvertDoubleToFloatArray(Array DoubleArray, Array FloatArray, int[] dims, int[] widx, int[] ridx, int p)
             {
@@ -302,15 +360,10 @@ namespace Hybrid.MsilToOpenCL
                     ElementCount *= (m_Value.GetUpperBound(d) - m_Value.GetLowerBound(d) + 1);
                 }
 
-                Type RealElementType = Value.GetType().GetElementType();
-                int ElementSize = System.Runtime.InteropServices.Marshal.SizeOf(RealElementType);
-
-                //
-                // Read buffer back into main memory
-                //
-
-                CallContext.CommandQueue.EnqueueReadBuffer(MemBuffer, true, IntPtr.Zero, new IntPtr(ElementCount * ElementSize), m_GCHandle.Value.AddrOfPinnedObject());
+                EnqueueRead(CallContext, ElementCount);
             }
+
+            protected abstract void EnqueueRead(CallContext CallContext, long ElementCount);
 
             #region IDisposable Members
 

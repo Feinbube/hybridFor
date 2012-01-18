@@ -43,6 +43,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         private Dictionary<System.Reflection.MethodInfo, HlGraphEntry> m_RelatedGraphs = new Dictionary<System.Reflection.MethodInfo, HlGraphEntry>();
         internal Dictionary<System.Reflection.MethodInfo, HlGraphEntry> RelatedGraphs { get { return m_RelatedGraphs; } }
 
+        private Dictionary<Type, string> m_ValueTypeMap = new Dictionary<Type, string>();
+        internal Dictionary<Type, string> ValueTypeMap { get { return m_ValueTypeMap; } set { m_ValueTypeMap = value; } }
+
         private int m_MaxStack;
 
         private bool m_IsKernel;
@@ -485,7 +488,10 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
             if (m_HasThisParameter && !m_KeepThis)
             {
-                System.Diagnostics.Debug.Assert(m_Arguments.Count > 0 && m_Arguments[0].FromIL && m_Arguments[0].Name == "this" && m_Arguments[0].DataType == m_MethodBase.DeclaringType);
+                System.Diagnostics.Debug.Assert(m_Arguments.Count > 0 && m_Arguments[0].FromIL && m_Arguments[0].Name == "this");
+                System.Diagnostics.Debug.Assert(
+                    (m_MethodBase.DeclaringType.IsValueType && m_Arguments[0].DataType.IsByRef && m_Arguments[0].DataType.GetElementType() == m_MethodBase.DeclaringType)
+                    || (!m_MethodBase.DeclaringType.IsValueType && m_Arguments[0].DataType == m_MethodBase.DeclaringType));
                 DestroyArgument(0);
                 m_HasThisParameter = false;
             }
@@ -757,6 +763,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
         {
             System.Reflection.FieldInfo FieldInfo = Node.FieldInfo;
 
+            if (m_KeepThis)
+                return null;
+
             if (Node.SubNodes[0].NodeType == NodeType.Location && object.Equals(((LocationNode)Node.SubNodes[0]).Location, Arguments[0]))
             {
                 AccessPathEntry NextPathEntry;
@@ -786,6 +795,9 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             else if (Node.SubNodes[0].NodeType == NodeType.InstanceField)
             {
                 PathEntry = TraverseFieldAccess((InstanceFieldNode)Node.SubNodes[0], false, PathEntry);
+
+                if (PathEntry == null)
+                    return null;
 
                 AccessPathEntry NextPathEntry;
                 if (PathEntry.SubEntries == null)
@@ -832,17 +844,44 @@ namespace Hybrid.MsilToOpenCL.HighLevel
 
                     bool UnsupportedFieldAccess = false;
 
-                    if ((MethodBase.CallingConvention & System.Reflection.CallingConventions.HasThis) == 0)
+                    if (m_KeepThis)
+                    {
+                        if (FieldInfo.DeclaringType.IsValueType)
+                        {
+                            Node SubNode = Node.SubNodes[0];
+                            if (ConvertForOpenCl(ref SubNode, false, RelatedGraphCache))
+                            {
+                                Node.SubNodes[0] = SubNode;
+                            }
+                            if (!((SubNode.DataType.IsByRef || SubNode.DataType.IsPointer) && SubNode.DataType.GetElementType() == FieldInfo.DeclaringType))
+                            {
+                                UnsupportedFieldAccess = true;
+                            }
+                        }
+                    }
+                    else if ((MethodBase.CallingConvention & System.Reflection.CallingConventions.HasThis) == 0)
                     {
                         UnsupportedFieldAccess = true;
                     }
                     else
                     {
+                        // Try to flatten field access occuring via the "this" parameter
                         AccessPathEntry PathEntry = TraverseFieldAccess((InstanceFieldNode)Node, true, RootPathEntry);
 
                         if (PathEntry == null)
                         {
-                            UnsupportedFieldAccess = true;
+                            if (FieldInfo.DeclaringType.IsValueType)
+                            {
+                                Node SubNode = Node.SubNodes[0];
+                                if (ConvertForOpenCl(ref SubNode, false, RelatedGraphCache))
+                                {
+                                    Node.SubNodes[0] = SubNode;
+                                }
+                                if (!((SubNode.DataType.IsByRef || SubNode.DataType.IsPointer) && SubNode.DataType.GetElementType() == FieldInfo.DeclaringType))
+                                {
+                                    UnsupportedFieldAccess = true;
+                                }
+                            }
                         }
                         else
                         {
@@ -884,13 +923,29 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 }
                 else
                 {
-                    // Check for function call on "this", and convert it to static form
-                    if (m_HasThisParameter && Node.NodeType == NodeType.Call && Node.SubNodes.Count > 0
-                        && ((((CallNode)Node).MethodInfo.CallingConvention & System.Reflection.CallingConventions.HasThis) != 0)
-                        && Node.SubNodes[0].NodeType == NodeType.Location && object.ReferenceEquals(((LocationNode)Node.SubNodes[0]).Location, Arguments[0]))
+                    // Check for specific function calls
+                    if (Node.NodeType == NodeType.Call && Node.SubNodes.Count > 0)
                     {
-                        Node.SubNodes.RemoveAt(0);
-                        ((CallNode)Node).IsStaticCall = true;
+                        CallNode CallNode = (CallNode)Node;
+
+                        // Function call on "this": convert to static form. Delete the "this" parameter itself, as
+                        // it screws up verification. We'll re-add necessary arguments later, once we have the
+                        // sub-graph and know what the callee needs
+                        if (m_HasThisParameter && ((CallNode.MethodInfo.CallingConvention & System.Reflection.CallingConventions.HasThis) != 0)
+                            && CallNode.SubNodes[0].NodeType == NodeType.Location && object.ReferenceEquals(((LocationNode)Node.SubNodes[0]).Location, Arguments[0]))
+                        {
+                            Node.SubNodes.RemoveAt(0);
+                            CallNode.IsStaticCall = true;
+                        }
+
+                        //
+                        // Calls on value types are supported directly, but they need to e in static form
+                        //
+
+                        else if (CallNode.MethodInfo.DeclaringType.IsValueType)
+                        {
+                            CallNode.IsStaticCall = true;
+                        }
                     }
 
                     for (int i = 0; i < Node.SubNodes.Count; i++)
@@ -985,6 +1040,23 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                             if (RelatedGraphEntry == null)
                             {
                                 throw new InvalidOperationException(string.Format("Sorry, no equivalent OpenCL function call available for '{0}'.", CallNode));
+                            }
+
+                            //
+                            // Do a very basic detection of whether pointer parameters lie in global/local memory
+                            //
+
+                            for (int i = 0; i < CallNode.SubNodes.Count; i++)
+                            {
+                                Node SubNode = Node.SubNodes[i];
+                                if (SubNode.NodeType == NodeType.AddressOf && SubNode.SubNodes[0].NodeType == HighLevel.NodeType.Location)
+                                {
+                                    Location Location = ((LocationNode)SubNode.SubNodes[0]).Location;
+                                    if (Location.LocationType == LocationType.LocalVariable)
+                                    {
+                                        RelatedGraphEntry.HlGraph.Arguments[i].Flags |= LocationFlags.PointerLocal;
+                                    }
+                                }
                             }
 
                             // Map additional parameters introduced as part of OpenCL conversion of the RelatedGraphEntry

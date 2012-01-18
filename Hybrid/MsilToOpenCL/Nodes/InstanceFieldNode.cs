@@ -26,7 +26,11 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
             else if (SubNodes.Count == 1)
             {
-                return SubNodes[0].ToString() + "." + ((FieldInfo == null) ? "???" : FieldInfo.Name);
+                string RefOp = ".";
+                if (FieldInfo != null && FieldInfo.DeclaringType.IsValueType)
+                    RefOp = "->";
+
+                return SubNodes[0].ToString() + RefOp + ((FieldInfo == null) ? "???" : FieldInfo.Name);
             }
             else
             {

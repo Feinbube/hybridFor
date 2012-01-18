@@ -163,11 +163,21 @@ namespace Hybrid.MsilToOpenCL
             return CacheEntry;
         }
 
+        private static Dictionary<Type, string> m_ValueTypeMap = new Dictionary<Type, string>();
+
 		private static HlGraphEntry ConstructHlGraphEntry(MethodInfo Method, int GidParamCount, bool IsKernel, string NameTemplate) {
             TextWriter writer = System.Console.Out;
             string MethodName = string.Format(NameTemplate, HlGraphSequenceNumber++);
             HighLevel.HlGraph HLgraph = new HighLevel.HlGraph(Method, MethodName);
             HLgraph.IsKernel = IsKernel;
+            HLgraph.ValueTypeMap = m_ValueTypeMap;
+
+            if (!IsKernel && Method.DeclaringType.IsValueType && ((Method.CallingConvention & CallingConventions.HasThis) != 0))
+            {
+                System.Diagnostics.Debug.Assert(HLgraph.Arguments.Count > 0);
+                System.Diagnostics.Debug.Assert(HLgraph.Arguments[0].DataType.IsByRef && HLgraph.Arguments[0].DataType.GetElementType() == Method.DeclaringType);
+                HLgraph.KeepThis = true;
+            }
 
             if (DumpCode > 3)
                 WriteCode(HLgraph, writer);
@@ -181,7 +191,7 @@ namespace Hybrid.MsilToOpenCL
 
             // Convert all expression trees into something OpenCL can understand
             HLgraph.ConvertForOpenCl(subGraphCache);
-            System.Diagnostics.Debug.Assert(!HLgraph.HasThisParameter);
+            System.Diagnostics.Debug.Assert(HLgraph.KeepThis || !HLgraph.HasThisParameter);
 
             // Change the real first arguments (the "int"s of the Action<> method) to local variables
             // which get their value from OpenCL's built-in get_global_id() routine.
@@ -407,6 +417,26 @@ namespace Hybrid.MsilToOpenCL
             CacheEntry.Source = getOpenCLSource(Result);
         }
 
+        private static void writeOpenClStructs(Hybrid.MsilToOpenCL.HighLevel.HlGraph HLgraph, StringWriter Srcwriter)
+        {
+            Dictionary<Type, int> TypeMarks = new Dictionary<Type, int>();
+            foreach (HighLevel.ArgumentLocation Argument in HLgraph.Arguments)
+            {
+                if (HLgraph.ValueTypeMap.ContainsKey(Argument.DataType))
+                {
+                    TypeMarks[Argument.DataType] = 1;
+                }
+                else if ((Argument.DataType.IsByRef || Argument.DataType.IsPointer) && HLgraph.ValueTypeMap.ContainsKey(Argument.DataType.GetElementType()))
+                {
+                    TypeMarks[Argument.DataType.GetElementType()] = 1;
+                }
+            }
+            foreach (KeyValuePair<Type, int> Entry in TypeMarks)
+            {
+                OpenCLInterop.WriteOpenCL(HLgraph, Entry.Key, Srcwriter);
+            }
+        }
+
         private static string getOpenCLSource(HighLevel.HlGraph HLgraph)
         {
             using (StringWriter Srcwriter = new StringWriter())
@@ -426,6 +456,9 @@ namespace Hybrid.MsilToOpenCL
             using (StringWriter Srcwriter = new StringWriter())
             {
                 foreach(HighLevel.HlGraph HLgraph in List)
+                    writeOpenClStructs(HLgraph, Srcwriter);
+
+                foreach (HighLevel.HlGraph HLgraph in List)
                     OpenCLInterop.WriteOpenCL(HLgraph, Srcwriter);
 
                 string OpenClSource = Srcwriter.ToString();
