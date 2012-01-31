@@ -66,9 +66,9 @@ namespace Hybrid.MsilToOpenCL
                     ctx.Arguments[i].WriteToKernel(CallContext, i);
                 }
 
-                OpenCLNet.Event StartEvent, EndEvent;
+                //OpenCLNet.Event StartEvent, EndEvent;
 
-                commandQueue.EnqueueMarker(out StartEvent);
+                //commandQueue.EnqueueMarker(out StartEvent);
 
                 IntPtr[] GlobalWorkSize = new IntPtr[WorkSize.Length];
                 for (int i = 0; i < WorkSize.Length; i++)
@@ -83,16 +83,16 @@ namespace Hybrid.MsilToOpenCL
                 }
 
                 commandQueue.Finish();
-                commandQueue.EnqueueMarker(out EndEvent);
-                commandQueue.Finish();
+                //commandQueue.EnqueueMarker(out EndEvent);
+                //commandQueue.Finish();
 
-                ulong StartTime, EndTime;
-                StartEvent.GetEventProfilingInfo(OpenCLNet.ProfilingInfo.QUEUED, out StartTime);
-                EndEvent.GetEventProfilingInfo(OpenCLNet.ProfilingInfo.END, out EndTime);
+                //ulong StartTime, EndTime;
+                //StartEvent.GetEventProfilingInfo(OpenCLNet.ProfilingInfo.QUEUED, out StartTime);
+                //EndEvent.GetEventProfilingInfo(OpenCLNet.ProfilingInfo.END, out EndTime);
             }
         }
 
-        internal static OpenCLNet.Device GetFirstGpu()
+        public static OpenCLNet.Device GetFirstGpu()
         {
             if (OpenCLNet.OpenCL.NumberOfPlatforms == 0)
                 return null;
