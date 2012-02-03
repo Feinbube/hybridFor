@@ -57,8 +57,14 @@ namespace Hybrid
 
                     executionInfo = executionInfos.Dequeue();
                 }
-
-                executionInfo.Execute(device as ComputeDevice);
+                try
+                {
+                    executionInfo.Execute(device as ComputeDevice);
+                }
+                catch(Exception exception)
+                {
+                    // Do Nothing ???
+                }
             }
         }
 

@@ -115,5 +115,191 @@ namespace Hybrid
         {
             Gpu.GpuComputeDevice.GpuReInitialize();
         }
+
+
+        public static void For(Execute mode, int fromInclusive, int toExclusive, System.Action<int, System.Threading.Tasks.ParallelLoopState> body)
+        {
+            System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, body);
+        }
+
+        public static void For(Execute mode, int fromInclusive, int toExclusive, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<int, System.Threading.Tasks.ParallelLoopState> body)
+        {
+            System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, parallelOptions, body);
+        }
+
+        public static void For(Execute mode, int fromInclusive, int toExclusive, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<int> body)
+        {
+            System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, parallelOptions, body);
+        }
+
+        public static void For(Execute mode, long fromInclusive, long toExclusive, System.Action<long, System.Threading.Tasks.ParallelLoopState> body)
+        {
+            System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, body);
+        }
+
+        public static void For(Execute mode, long fromInclusive, long toExclusive, System.Action<long> body)
+        {
+            System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, body);
+        }
+
+        public static void For(Execute mode, long fromInclusive, long toExclusive, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<long, System.Threading.Tasks.ParallelLoopState> body)
+        {
+            System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, parallelOptions, body);
+        }
+
+        public static void For(Execute mode, long fromInclusive, long toExclusive, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<long> body)
+        {
+            System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, parallelOptions, body);
+        }
+
+        public static void For<TLocal>(Execute mode, int fromInclusive, int toExclusive, System.Func<TLocal> localInit, System.Func<int, System.Threading.Tasks.ParallelLoopState, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.For<TLocal>(fromInclusive, toExclusive, localInit, body, localFinally);
+        }
+
+        public static void For<TLocal>(Execute mode, int fromInclusive, int toExclusive, System.Threading.Tasks.ParallelOptions parallelOptions, System.Func<TLocal> localInit, System.Func<int, System.Threading.Tasks.ParallelLoopState, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.For<TLocal>(fromInclusive, toExclusive, parallelOptions, localInit, body, localFinally);
+        }
+
+        public static void For<TLocal>(Execute mode, long fromInclusive, long toExclusive, System.Func<TLocal> localInit, System.Func<long, System.Threading.Tasks.ParallelLoopState, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.For<TLocal>(fromInclusive, toExclusive, localInit, body, localFinally);
+        }
+
+        public static void For<TLocal>(Execute mode, long fromInclusive, long toExclusive, System.Threading.Tasks.ParallelOptions parallelOptions, System.Func<TLocal> localInit, System.Func<long, System.Threading.Tasks.ParallelLoopState, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.For<TLocal>(fromInclusive, toExclusive, parallelOptions, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource, TLocal>(Execute mode, System.Collections.Concurrent.OrderablePartitioner<TSource> source, System.Func<TLocal> localInit, System.Func<TSource, System.Threading.Tasks.ParallelLoopState, long, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource, TLocal>(source, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource, TLocal>(Execute mode, System.Collections.Concurrent.OrderablePartitioner<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Func<TLocal> localInit, System.Func<TSource, System.Threading.Tasks.ParallelLoopState, long, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource, TLocal>(source, parallelOptions, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource, TLocal>(Execute mode, System.Collections.Concurrent.Partitioner<TSource> source, System.Func<TLocal> localInit, System.Func<TSource, System.Threading.Tasks.ParallelLoopState, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource, TLocal>(source, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource, TLocal>(Execute mode, System.Collections.Concurrent.Partitioner<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Func<TLocal> localInit, System.Func<TSource, System.Threading.Tasks.ParallelLoopState, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource, TLocal>(source, parallelOptions, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource, TLocal>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Func<TLocal> localInit, System.Func<TSource, System.Threading.Tasks.ParallelLoopState, long, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource, TLocal>(source, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource, TLocal>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Func<TLocal> localInit, System.Func<TSource, System.Threading.Tasks.ParallelLoopState, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource, TLocal>(source, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource, TLocal>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Func<TLocal> localInit, System.Func<TSource, System.Threading.Tasks.ParallelLoopState, long, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource, TLocal>(source, parallelOptions, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource, TLocal>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Func<TLocal> localInit, System.Func<TSource, System.Threading.Tasks.ParallelLoopState, TLocal, TLocal> body, System.Action<TLocal> localFinally)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource, TLocal>(source, parallelOptions, localInit, body, localFinally);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Concurrent.OrderablePartitioner<TSource> source, System.Action<TSource, System.Threading.Tasks.ParallelLoopState, long> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Concurrent.OrderablePartitioner<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<TSource, System.Threading.Tasks.ParallelLoopState, long> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, parallelOptions, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Concurrent.Partitioner<TSource> source, System.Action<TSource, System.Threading.Tasks.ParallelLoopState> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Concurrent.Partitioner<TSource> source, System.Action<TSource> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Concurrent.Partitioner<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<TSource, System.Threading.Tasks.ParallelLoopState> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, parallelOptions, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Concurrent.Partitioner<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<TSource> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, parallelOptions, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Action<TSource, System.Threading.Tasks.ParallelLoopState, long> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Action<TSource, System.Threading.Tasks.ParallelLoopState> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Action<TSource> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<TSource, System.Threading.Tasks.ParallelLoopState, long> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, parallelOptions, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<TSource, System.Threading.Tasks.ParallelLoopState> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, parallelOptions, body);
+        }
+
+        public static void ForEach<TSource>(Execute mode, System.Collections.Generic.IEnumerable<TSource> source, System.Threading.Tasks.ParallelOptions parallelOptions, System.Action<TSource> body)
+        {
+            System.Threading.Tasks.Parallel.ForEach<TSource>(source, parallelOptions, body);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
