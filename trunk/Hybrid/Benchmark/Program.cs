@@ -81,53 +81,87 @@ namespace Hybrid.Benchmark
         static List<ExampleBase> examples()
         {
             return new List<ExampleBase>(new ExampleBase[]{
-                
-                /* // function tests
-                new StaticFunctionCall(),
-                new LocalFunctionCall(),
-                new Lists(), */
-
-                /* // big examples
-                new Crypt3(),
-                new GameOfLife(),
-                new Wator(), */
-
-                new SudokuValidator(),
-                 //new SudokuValidatorInvalidColumn(),
-                 //new SudokuValidatorInvalidNumbers(),
-                 //new SudokuValidatorInvalidRow(),
-                 //new SudokuValidatorInvalidSubfield(),
-                new SudokuValidator2D(),
-
-                new MatrixMultiplication0(),
-                new MatrixMultiplication1(),
-                new MatrixMultiplication2(),
-                new MatrixMultiplication3(),
-                new MatrixMultiplication4(),
-                new MatrixMultiplication5(),
-
-                new MatrixVectorMultiplication(),
-
-                new Convolution(),
-                new MinimumSpanningTree(),
-                new PrefixScan(),
-
-                /* // not Gpu-enabled
-                new QuickSort(), */
-
-                new Average(),
-                new DotProduct(),
-                new HeatTransfer(),
-                new Histogram(),
                
-                /* // not reliable
-                new JuliaSet(),*/
+ 
+                //CUDAByExample
+                //-----------------------------------------
+                //new Average(),
+                //new DotProduct(),
+                //new HeatTransfer(),
+                //new Histogram(),
+                
+                // not reliable
+                //new JuliaSet(),
 
-                /* // no gpu-support (subcall)
-                new RayTracing(), */
+                // no gpu-support (subcall)
+                //new RayTracing(),
                    
-                new Ripple(),
-                new SummingVectors()
+                //new Ripple(),
+                //new SummingVectors(),
+
+                //-----------------------------------------
+
+                //Function Tests
+                //-----------------------------------------
+                
+                //new Lists(),
+                //new LocalFunctionCall(),
+                //new StaticFunctionCall(), 
+                //new Switch() 
+                
+                //-----------------------------------------
+
+                //FurtherExamples
+                //-----------------------------------------
+                
+                //Sudoku Validator
+                //new SudokuValidator(),
+                //new SudokuValidator2D(),
+                
+                //new SudokuValidatorInvalidColumn(),
+                //new SudokuValidatorInvalidNumbers(),
+                //new SudokuValidatorInvalidRow(),
+                //new SudokuValidatorInvalidSubfield(),
+                
+                
+                //new Sum(),
+                
+                // Big Examples
+                
+                new Crypt3(),
+                //new GameOfLife(),
+                //new Merge(),
+                //new ParGrep(),
+                //new Wator(),
+                
+                
+
+                //-----------------------------------------
+
+                //UPCRC2010
+                //-----------------------------------------
+                
+                //Matrix Multiplication
+                
+                //new MatrixMultiplication0(),
+                //new MatrixMultiplication1(),
+                //new MatrixMultiplication2(),
+                //new MatrixMultiplication3(),
+                //new MatrixMultiplication4(),
+                //new MatrixMultiplication5(),
+               
+
+                //Other Examples
+                
+                //new Convolution(),
+                //new MatrixVectorMultiplication(),
+                //new MinimumSpanningTree(),
+                //new PrefixScan(),
+                
+                // not Gpu-enabled
+                //new QuickSort(),
+
+                             
             });
         }
 
@@ -135,26 +169,56 @@ namespace Hybrid.Benchmark
         {
             csv = evaluationLog();
             log = errorLog();
+            try
+            {
+                logWriteLine(SystemCharacteristics.ToString());
 
-            logWriteLine(SystemCharacteristics.ToString());
-
-            for(int i=3; i<10; i ++)
-                benchmark(i);
-
+                //for (int i = 3; i < 10; i++)
+                    benchmark(5);
+                    benchmark(10);
+            }
+            catch (TypeInitializationException e)
+            {
+                Exception handledException = e;
+                while (handledException.InnerException != null)
+                {
+                    handledException = handledException.InnerException;
+                }
+                logWriteLine(handledException.GetType().ToString() + ":" + handledException.Message);
+ 
+            }
             csv.Close();
             log.Close();
         }
 
         private void benchmark(double minSequentialExecutionTime)
         {
-            rounds = 10;
-            warmup_rounds = 3;
+            rounds = 1;
+            warmup_rounds = 1;
 
             print = false;
 
+            
+
+
             foreach (ExampleBase example in examples())
-                runExample(example, SystemCharacteristics.GetScale(example, minSequentialExecutionTime));
+            {
+                double sizeFactor = 0.0;
+                try
+                {
+                    sizeFactor = SystemCharacteristics.GetScale(example, minSequentialExecutionTime);
+                }
+                catch (Exception exception)
+                {
+                    logWriteLine(exception.StackTrace);
+                    logWriteLine(example.Name + "is skipped due to a scale error.");
+                    continue;
+                }
+                runExample(example, sizeFactor);
                 //runExampleGpuAndAutomaticOnly(example, minSequentialExecutionTime);
+
+            }
+                
         }
 
         private void runExampleGpuAndAutomaticOnly(ExampleBase example, double sizeFactor)

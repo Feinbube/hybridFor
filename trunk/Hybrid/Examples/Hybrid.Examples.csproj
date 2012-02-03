@@ -57,6 +57,7 @@
     <Compile Include="ExampleBase.cs" />
     <Compile Include="Functionality\Lists.cs" />
     <Compile Include="Functionality\LocalFunctionCall.cs" />
+    <Compile Include="FurtherExamples\Sum.cs" />
     <Compile Include="FurtherExamples\SudokuValidator\SudokuValidatorInvalidSubfield.cs" />
     <Compile Include="FurtherExamples\SudokuValidator\SudokuValidatorInvalidColumn.cs" />
     <Compile Include="FurtherExamples\SudokuValidator\SudokuValidatorInvalidRow.cs" />

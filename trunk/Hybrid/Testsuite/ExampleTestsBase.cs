@@ -15,16 +15,12 @@ namespace Hybrid.Testsuite
     [TestClass]
     abstract public class ExampleTestBase
     {
+        //Functionality Tests
+
         [TestMethod]
         public void Lists()
         {
             testExample(new Lists());
-        }
-
-        [TestMethod]
-        public void StaticFunctionCall()
-        {
-            testExample(new StaticFunctionCall());
         }
 
         [TestMethod]
@@ -34,22 +30,25 @@ namespace Hybrid.Testsuite
         }
 
         [TestMethod]
-        public void MatrixMultiplicationTest()
+        public void StaticFunctionCall()
         {
-            testExample(new MatrixMultiplication0());
-            testExample(new MatrixMultiplication1());
-            testExample(new MatrixMultiplication2());
-            testExample(new MatrixMultiplication3());
-            testExample(new MatrixMultiplication4());
-            testExample(new MatrixMultiplication5());
+            testExample(new StaticFunctionCall());
         }
 
+        [TestMethod]
+        public void Switch()
+        {
+            testExample(new Switch());
+        }
+
+        //CUDA Book Examples
+        
         [TestMethod]
         public void AverageTest()
         {
             testExample(new Average());
         }
-
+        
         [TestMethod]
         public void DotProductTest()
         {
@@ -92,6 +91,20 @@ namespace Hybrid.Testsuite
             testExample(new SummingVectors());
         }
 
+
+        //UPCRC 2010
+
+        [TestMethod]
+        public void MatrixMultiplicationTest()
+        {
+            testExample(new MatrixMultiplication0());
+            testExample(new MatrixMultiplication1());
+            testExample(new MatrixMultiplication2());
+            testExample(new MatrixMultiplication3());
+            testExample(new MatrixMultiplication4());
+            testExample(new MatrixMultiplication5());
+        }
+
         [TestMethod]
         public void ConvolutionTest()
         {
@@ -117,27 +130,23 @@ namespace Hybrid.Testsuite
         }
 
         [TestMethod]
-        public void GameOfLifeTest()
-        {
-            testExample(new GameOfLife());
-        }
-
-        [TestMethod]
-        public void WatorTest()
-        {
-            testExample(new Wator());
-        }
-
-        [TestMethod]
         public void QuickSortTest()
         {
             testExample(new QuickSort());
         }
 
+        // Further Examples
+
         [TestMethod]
         public void SudokuValidatorTest()
         {
             testExample(new SudokuValidator());
+        }
+
+        [TestMethod]
+        public void SudokuValidator2DTest()
+        {
+            testExample(new SudokuValidator2D());
         }
 
         [TestMethod]
@@ -165,9 +174,33 @@ namespace Hybrid.Testsuite
         }
 
         [TestMethod]
-        public void SudokuValidator2DTest()
+        public void Crypt3Test()
         {
-            testExample(new SudokuValidator2D());
+            testExample(new Crypt3());
+        }
+        
+        [TestMethod]
+        public void GameOfLifeTest()
+        {
+            testExample(new GameOfLife());
+        }
+
+        [TestMethod]
+        public void MergeTest()
+        {
+            testExample(new Merge());
+        }
+
+        [TestMethod]
+        public void ParGrepTest()
+        {
+            testExample(new ParGrep());
+        }
+
+        [TestMethod]
+        public void WatorTest()
+        {
+            testExample(new Wator());
         }
 
         protected abstract void testExample(ExampleBase example);
