@@ -63,7 +63,8 @@ namespace Hybrid
                 }
                 catch(Exception exception)
                 {
-                    // Do Nothing ???
+                    // TODO 
+                    executionInfos.Enqueue(executionInfo);
                 }
             }
         }
