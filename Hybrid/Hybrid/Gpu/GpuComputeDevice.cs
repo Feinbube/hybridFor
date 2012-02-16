@@ -19,7 +19,23 @@ namespace Hybrid.Gpu
             OpenCLNet.Platform[] platforms = OpenCLNet.OpenCL.GetPlatforms();
             foreach (OpenCLNet.Platform platform in platforms)
             {
-                OpenCLNet.Device[] devices = platform.QueryDevices(OpenCLNet.DeviceType.GPU);
+                OpenCLNet.Device[] devices = {};
+                try
+                {
+                    devices = platform.QueryDevices(OpenCLNet.DeviceType.GPU);
+                }
+                catch (OpenCLNet.OpenCLException exception)
+                {
+                    //Some Intel OCL Versions throw an INVALID_VALUE exception, when they are asked for GPUs
+                    if (exception.ErrorCode == OpenCLNet.ErrorCode.INVALID_VALUE)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        throw exception;
+                    }
+                }
 
                 foreach (OpenCLNet.Device device in devices)
                     result.Add(new GpuComputeDevice(device));
