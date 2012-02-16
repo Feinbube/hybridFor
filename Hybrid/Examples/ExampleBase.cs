@@ -62,15 +62,20 @@ namespace Hybrid.Examples
         {
             double scale = 5;
 
-            double executionTime = Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
-            while (executionTime <= 0.001)
+            double executionTime = 0;
+            double executionTime2 = 0;
+
+            while(executionTime >= executionTime2)
             {
-                scale *= 2;
                 executionTime = Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
+                while (executionTime <= 0.001)
+                {
+                    scale *= 2;
+                    executionTime = Run(scale, scale, scale, false, 20, 5).ElapsedTotalSeconds;
+                }
+
+                executionTime2 = Run(scale * 2, scale * 2, scale * 2, false, 20, 5).ElapsedTotalSeconds;
             }
-
-            double executionTime2 = Run(scale * 2, scale * 2, scale * 2, false, 20, 5).ElapsedTotalSeconds;
-
             double log = Math.Log(executionTime2 / executionTime, 2);
             scale = Math.Pow(preferredExecutionTime / executionTime, 1 / log) * scale;
 
