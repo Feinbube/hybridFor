@@ -12,6 +12,7 @@ namespace Hybrid.Examples
 
         protected override void setup()
         {
+            if (sizeX > 500000) sizeX = 500000;
             input1 = new int[sizeX];
             input2 = new int[sizeX];
             output = new int[2 * sizeX];
@@ -46,7 +47,7 @@ namespace Hybrid.Examples
                 else // (input1[i] == input2[j])
                 {
                     output[k++] = input1[i++];
-                    j++;
+                    //j++;
                 }
             }
 
@@ -66,13 +67,14 @@ namespace Hybrid.Examples
         protected override bool isValid()
         {
             // output needs to contain all values of input{1,2}
-            for (int x=0; x<sizeX; x++)
+            // this validation takes forever, because it is in O(n^2)
+            for (int x = 0; x < sizeX; x++)
                 if (!output.Contains(input1[x]) || !output.Contains(input2[x]))
                     return false;
 
             // output needs to be sorted 
             for (int x = 0; x < 2 * sizeX - 1; x++)
-                if (output[x] >= output[x + 1])
+                if (output[x] > output[x + 1])
                     return false;
 
             return true;
