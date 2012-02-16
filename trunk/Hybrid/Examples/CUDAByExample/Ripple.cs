@@ -11,6 +11,12 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
+            int maximumSize = 67108864;
+            while (sizeX * sizeY > maximumSize)
+            {
+                sizeX = sizeX / 2;
+                sizeY = sizeY / 2;
+            }
             bitmap = new float[sizeX, sizeY];
         }
 
