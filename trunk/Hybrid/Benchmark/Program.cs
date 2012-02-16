@@ -8,6 +8,7 @@ using Hybrid.Examples;
 using Hybrid.Examples.CudaByExample;
 using Hybrid.Examples.Upcrc2010;
 using Hybrid.Examples.Upcrc2010.MatrixMultiplication;
+using Hybrid.Examples.Functionality;
 using System.Threading;
 using System.Globalization;
 
@@ -86,7 +87,7 @@ namespace Hybrid.Benchmark
                 //CUDAByExample
                 //-----------------------------------------
                 //new Average(),
-                //new DotProduct(),
+                new DotProduct(),
                 //new HeatTransfer(),
                 //new Histogram(),
                 
@@ -104,10 +105,12 @@ namespace Hybrid.Benchmark
                 //Function Tests
                 //-----------------------------------------
                 
+                //new AtomicExample(),
                 //new Lists(),
                 //new LocalFunctionCall(),
-                //new StaticFunctionCall(), 
-                //new Switch() 
+                //new StaticFunctionCall(),
+                //new RandomExample(),
+                //new Switch(), 
                 
                 //-----------------------------------------
 
@@ -128,7 +131,7 @@ namespace Hybrid.Benchmark
                 
                 // Big Examples
                 
-                new Crypt3(),
+                //new Crypt3(),
                 //new GameOfLife(),
                 //new Merge(),
                 //new ParGrep(),

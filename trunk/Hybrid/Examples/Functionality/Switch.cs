@@ -15,6 +15,9 @@ namespace Hybrid.Examples
 
         protected override void setup()
         {
+            if (sizeX > 16777216)
+                sizeX = 16777216;
+
             input = new int[sizeX];
             output = new int[sizeX];
 
