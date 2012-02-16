@@ -13,12 +13,12 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
-            if (sizeX * sizeY > 67108864)
+            int maximumSize = 33554432;
+            if (sizeX * sizeY > maximumSize)
             {
-                sizeX = 65536;
+                sizeX = maximumSize / 1024;
                 sizeY = 1024;
             }
-
             a = new float[sizeX * sizeY];
             b = new float[sizeX * sizeY];
 
