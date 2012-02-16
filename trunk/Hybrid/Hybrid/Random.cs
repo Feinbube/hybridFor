@@ -44,7 +44,19 @@ namespace Hybrid
         [OpenClAlias("MWC64X")]
         public static uint NextUInt()
         {
-            return (uint)staticRandom.NextDouble();
+            //uint result = (uint)staticRandom.Next();
+            return (uint) GetRandomNumber(Int32.MaxValue);
+        }
+
+        public static int GetRandomNumber(int maxNumber)
+        {
+            if (maxNumber < 1)
+                throw new System.Exception("The maxNumber value should be greater than 1");
+            byte[] b = new byte[4];
+            new System.Security.Cryptography.RNGCryptoServiceProvider().GetBytes(b);
+            int seed = (b[0] & 0x7f) << 24 | b[1] << 16 | b[2] << 8 | b[3];
+            System.Random r = new System.Random(seed);
+            return r.Next(1, maxNumber);
         }
     }
 }
