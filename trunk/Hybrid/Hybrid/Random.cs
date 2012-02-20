@@ -48,6 +48,10 @@ namespace Hybrid
             return (uint) GetRandomNumber(Int32.MaxValue);
         }
 
+
+        // The following method is adapted from 
+        // http://blog.codeeffects.com/Article/Generate-Random-Numbers-And-Strings-C-Sharp
+
         public static int GetRandomNumber(int maxNumber)
         {
             if (maxNumber < 1)
