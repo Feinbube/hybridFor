@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\UPCRC2010">
+      <UniqueIdentifier>{af7a86de-c168-4999-95f6-dc865f7d39cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UPCRC2010\MatrixMultiplications">
+      <UniqueIdentifier>{6f48953a-0b92-4650-8240-4ac109d30b43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UPCRC2010">
+      <UniqueIdentifier>{5a154bc8-e9f6-49d6-b069-9b28154e2674}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UPCRC2010\MatrixMultiplications">
+      <UniqueIdentifier>{308bd3c0-d8d6-4250-b1c3-82adf2f80c4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CUDAByExample">
+      <UniqueIdentifier>{397a6fe7-bbf3-41c0-b052-0d1abfa84f64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CUDAByExample">
+      <UniqueIdentifier>{851f1f0e-5c80-473e-9280-bfbc188aa7a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Program.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ExampleBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixMultiplicationBase.cpp">
+      <Filter>Source Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixMultiplication0.cpp">
+      <Filter>Source Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixMultiplication1.cpp">
+      <Filter>Source Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixMultiplication2.cpp">
+      <Filter>Source Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixMultiplication3.cpp">
+      <Filter>Source Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixMultiplication4.cpp">
+      <Filter>Source Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixMultiplication5.cpp">
+      <Filter>Source Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Convolution.cpp">
+      <Filter>Source Files\UPCRC2010</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MatrixVectorMultiplication.cpp">
+      <Filter>Source Files\UPCRC2010</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MinimumSpanningTree.cpp">
+      <Filter>Source Files\UPCRC2010</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PrefixScan.cpp">
+      <Filter>Source Files\UPCRC2010</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QuickSort.cpp">
+      <Filter>Source Files\UPCRC2010</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Average.cpp">
+      <Filter>Source Files\CUDAByExample</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SummingVectors.cpp">
+      <Filter>Source Files\CUDAByExample</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ripple.cpp">
+      <Filter>Source Files\CUDAByExample</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JuliaSet.cpp">
+      <Filter>Source Files\CUDAByExample</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DotProduct.cpp">
+      <Filter>Source Files\CUDAByExample</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HeatTransfer.cpp">
+      <Filter>Source Files\CUDAByExample</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Histogram.cpp">
+      <Filter>Source Files\CUDAByExample</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RayTracing.cpp">
+      <Filter>Source Files\CUDAByExample</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dummy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Program.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ExampleBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MatrixMultiplicationBase.h">
+      <Filter>Header Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MatrixMultiplication0.h">
+      <Filter>Header Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MatrixMultiplication1.h">
+      <Filter>Header Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MatrixMultiplication2.h">
+      <Filter>Header Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MatrixMultiplication3.h">
+      <Filter>Header Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MatrixMultiplication4.h">
+      <Filter>Header Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MatrixMultiplication5.h">
+      <Filter>Header Files\UPCRC2010\MatrixMultiplications</Filter>
+    </ClInclude>
+    <ClInclude Include="include\examples.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Convolution.h">
+      <Filter>Header Files\UPCRC2010</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MatrixVectorMultiplication.h">
+      <Filter>Header Files\UPCRC2010</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MinimumSpanningTree.h">
+      <Filter>Header Files\UPCRC2010</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PrefixScan.h">
+      <Filter>Header Files\UPCRC2010</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QuickSort.h">
+      <Filter>Header Files\UPCRC2010</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Average.h">
+      <Filter>Header Files\CUDAByExample</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SummingVectors.h">
+      <Filter>Header Files\CUDAByExample</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ripple.h">
+      <Filter>Header Files\CUDAByExample</Filter>
+    </ClInclude>
+    <ClInclude Include="include\JuliaSet.h">
+      <Filter>Header Files\CUDAByExample</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DotProduct.h">
+      <Filter>Header Files\CUDAByExample</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HeatTransfer.h">
+      <Filter>Header Files\CUDAByExample</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Histogram.h">
+      <Filter>Header Files\CUDAByExample</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RayTracing.h">
+      <Filter>Header Files\CUDAByExample</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Dummy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\hpidocumentsjaeckel%40svn\FutureSOC\src\HybridParallelLibraryOpenCL\HybridParallelLibraryOpenCL\simpleMultiGPU.cl">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
