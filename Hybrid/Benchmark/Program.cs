@@ -87,7 +87,7 @@ namespace Hybrid.Benchmark
                 //CUDAByExample
                 //-----------------------------------------
                 //new Average(),
-                new DotProduct(),
+                //new DotProduct(),
                 //new HeatTransfer(),
                 //new Histogram(),
                 
@@ -160,7 +160,8 @@ namespace Hybrid.Benchmark
                 //new MatrixVectorMultiplication(),
                 //new MinimumSpanningTree(),
                 //new PrefixScan(),
-                
+                //new ConvolutionNPP(),
+
                 // not Gpu-enabled
                 //new QuickSort(),
 
@@ -177,7 +178,7 @@ namespace Hybrid.Benchmark
                 logWriteLine(SystemCharacteristics.ToString());
 
                 //for (int i = 3; i < 10; i++)
-                    benchmark(5);
+                //    benchmark(4);
                     benchmark(10);
             }
             catch (TypeInitializationException e)
@@ -196,8 +197,8 @@ namespace Hybrid.Benchmark
 
         private void benchmark(double minSequentialExecutionTime)
         {
-            rounds = 1;
-            warmup_rounds = 1;
+            rounds = 5;
+            warmup_rounds = 5;
 
             print = false;
 
@@ -246,7 +247,8 @@ namespace Hybrid.Benchmark
 
             logWriteLine();
 
-            writeOutputs(example, runResultSerial, runResultParallel, runResultGPU, runResultAutomatic);
+            //writeOutputs(example, runResultSerial, runResultParallel, runResultGPU, runResultAutomatic);
+            writeOutputs(example, runResultGPU, runResultGPU, runResultGPU, runResultGPU);
         }
 
         private ExampleBase.RunResult executeAutomatic(ExampleBase example, double sizeFactor)
