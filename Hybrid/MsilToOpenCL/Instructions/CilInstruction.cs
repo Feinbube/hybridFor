@@ -242,6 +242,9 @@ namespace Hybrid.MsilToOpenCL
             Map.Add(OpCodes.Conv_R4, CilConvertInstruction.Create_R4);
             Map.Add(OpCodes.Conv_R8, CilConvertInstruction.Create_R8);
             Map.Add(OpCodes.Conv_U, CilConvertInstruction.Create_U);
+            Map.Add(OpCodes.Conv_U1, CilConvertInstruction.Create_U1);
+            Map.Add(OpCodes.Conv_U2, CilConvertInstruction.Create_U2);
+            Map.Add(OpCodes.Conv_U4, CilConvertInstruction.Create_U4);
 
             Map.Add(OpCodes.Div, CilBinaryNumericInstruction.Create);
             Map.Add(OpCodes.Dup, CilDupInstruction.Create);

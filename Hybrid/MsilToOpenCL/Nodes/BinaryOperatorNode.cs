@@ -44,8 +44,20 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
 
             Type LeftType = Left.DataType, RightType = Right.DataType;
+            if (LeftType == typeof(byte))
+            {
+                if (RightType == typeof(int) || RightType == typeof(uint) || RightType == typeof(long) || RightType == typeof(ulong) ||
+                    RightType == typeof(IntPtr) || RightType == typeof(UIntPtr))
+                {
+                    return RightType;
+                }
+                else if (RightType == typeof(byte)  || RightType==typeof(ushort))
+                {
+                    return typeof(uint);
+                }
 
-            if (LeftType == typeof(int))
+            }
+            else if (LeftType == typeof(int))
             {
                 if (RightType == typeof(int) || RightType == typeof(IntPtr) || RightType == typeof(uint))
                 {
@@ -58,7 +70,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             }
             else if (LeftType == typeof(uint))
             {
-                if (RightType == typeof(int) || RightType == typeof(uint))
+                if (RightType == typeof(byte) || RightType == typeof(short) || RightType == typeof(ushort) || RightType == typeof(int) || RightType == typeof(uint))
                 {
                     return LeftType;
                 }
@@ -68,6 +80,13 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 }
             }
             else if (LeftType == typeof(long))
+            {
+                if (RightType == LeftType)
+                {
+                    return RightType;
+                }
+            }
+            else if (LeftType == typeof(ulong))
             {
                 if (RightType == LeftType)
                 {
@@ -89,6 +108,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                 }
             }
 
+            System.Diagnostics.Debug.Assert(false, string.Format("Sorry, data type combination Left={0}, Right={1} not supported yet.", LeftType, RightType));
             // TODO
             return null;
         }
