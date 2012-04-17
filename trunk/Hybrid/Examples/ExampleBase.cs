@@ -211,6 +211,21 @@ namespace Hybrid.Examples
             }
         }
 
+        protected void printField(byte[,] field, int sizeX, int sizeY)
+        {
+            for (int i = -1; i <= sizeX; i++)
+            {
+                for (int j = -1; j <= sizeY; j++)
+                {
+                    if (j == -1 || j == sizeY || i == -1 || i == sizeX)
+                        Console.Write("**** ");
+                    else
+                        Console.Write(""+ field[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+
         protected void printField(byte[,] fields, int sizeX, int sizeY, Action<int, int> printAction)
         {
             for (int y = 0; y < sizeY; y++)

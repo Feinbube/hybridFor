@@ -13,7 +13,8 @@ namespace Hybrid.Examples.CudaByExample
 
         protected override void setup()
         {
-            int maximumSize = 33554432;
+             
+            int maximumSize = 134217728;
             if (sizeX * sizeY > maximumSize)
             {
                 sizeX = maximumSize / 1024;
