@@ -8,7 +8,8 @@ namespace Hybrid
 {
     public class Random
     {
-        static System.Random staticRandom = new System.Random();
+        [ThreadStatic]
+        static System.Random staticRandom = null;
 
         public static void Seed(int seed)
         {
@@ -49,8 +50,23 @@ namespace Hybrid
         [OpenClAlias("MWC64X")]
         public static uint NextUInt()
         {
-            //uint result = (uint)staticRandom.Next();
-            return (uint) GetRandomNumber(Int32.MaxValue);
+            return (uint)GetStaticRandom().Next();
+        }
+
+        private static System.Random GetStaticRandom()
+        {
+            System.Random rnd = staticRandom;
+            if (object.ReferenceEquals(rnd, null))
+            {
+                // This is adapted from
+                // http://blog.codeeffects.com/Article/Generate-Random-Numbers-And-Strings-C-Sharp
+
+                byte[] b = new byte[4];
+                new System.Security.Cryptography.RNGCryptoServiceProvider().GetBytes(b);
+                int seed = (b[0] & 0x7f) << 24 | b[1] << 16 | b[2] << 8 | b[3];
+                rnd = staticRandom = new System.Random(seed);
+            }
+            return rnd;
         }
 
 
