@@ -22,7 +22,8 @@ namespace Hybrid
 
         private void findOpenCLDevices()
         {
-            ComputeDevices.AddRange(Gpu.GpuComputeDevice.GpuComputeDevices());
+			foreach(Hybrid.Gpu.GpuComputeDevice d in Gpu.GpuComputeDevice.GpuComputeDevices())
+				ComputeDevices.Add(d);
         }
 
         private bool deviceOfTypeInDeviceList(ComputeDevice.DeviceTypes type)
@@ -36,7 +37,9 @@ namespace Hybrid
 
         private void findProcessors()
         {
-            ComputeDevices.AddRange(Cpu.CpuComputeDevice.CpuComputeDevices());
+			foreach (Hybrid.Cpu.CpuComputeDevice d in Cpu.CpuComputeDevice.CpuComputeDevices()) {
+				ComputeDevices.Add(d);
+			}
         }
 
         public double PredictPerformance(AlgorithmCharacteristics algorithmCharacteristics)

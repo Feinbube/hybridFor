@@ -117,6 +117,7 @@ namespace Hybrid
         }
 
 
+#if !NET20
         public static void For(Execute mode, int fromInclusive, int toExclusive, System.Action<int, System.Threading.Tasks.ParallelLoopState> body)
         {
             System.Threading.Tasks.Parallel.For(fromInclusive, toExclusive, body);
@@ -271,7 +272,7 @@ namespace Hybrid
         {
             System.Threading.Tasks.Parallel.ForEach<TSource>(source, parallelOptions, body);
         }
-
+#endif
 
 
 
@@ -303,3 +304,27 @@ namespace Hybrid
 
     }
 }
+
+
+#if NET20
+namespace System.Threading.Tasks {
+	internal class Parallel {
+		public static void For(int fromInclusive, int toExclusive, Action<int> action) {
+			for (int i = fromInclusive; i < toExclusive; i++) {
+				action(i);
+			}
+		}
+
+		public static void Invoke(Action[] actions) {
+			foreach (Action action in actions) {
+				action();
+			}
+		}
+
+		public static void ForEach<T>(IEnumerable<T> l, Action<T> action) {
+			foreach (T t in l)
+				action(t);
+		}
+	}
+}
+#endif

@@ -15,6 +15,11 @@ namespace Hybrid
             staticRandom = new System.Random(seed);
         }
 
+        public int InstanceNext()
+        {
+            return Next();
+        }
+
         public static int Next()
         {
             return (int)NextUInt();

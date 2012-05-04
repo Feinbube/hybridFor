@@ -21,14 +21,8 @@ namespace Hybrid.Cpu
 
             SharedMemory = null;
 
-            Caches = new List<MemoryInfo>{ // what about L1Cache?
-                new MemoryInfo() // where does L2Cache really reside: on-core or on-die?
-                {
-                    MemoryType = MemoryInfo.Type.Cache,
-                    MemoryAccess = MemoryInfo.Access.ReadWrite,
-                    Size = uint.Parse(processorInfo["L2CacheSize"].ToString())
-                }
-            };
+            Caches = new List<MemoryInfo>();
+			Caches.Add(new MemoryInfo(MemoryInfo.Type.Cache, MemoryInfo.Access.ReadWrite, uint.Parse(processorInfo["L2CacheSize"].ToString())));
         }
     }
 }

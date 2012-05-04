@@ -59,11 +59,7 @@ namespace Hybrid.Gpu
             for (int i = 0; i < device.MaxComputeUnits; i++)
                 ComputeUnits.Add(new GpuComputeUnit(device));
 
-            GlobalMemory = new MemoryInfo()
-            {
-                MemoryType = MemoryInfo.Type.Global,
-                Size = device.GlobalMemSize
-            };
+            GlobalMemory = new MemoryInfo(MemoryInfo.Type.Global,device.GlobalMemSize);
 
             // TODO L2Cache
         }

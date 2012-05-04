@@ -150,16 +150,15 @@ namespace Hybrid.Examples
 
             Console.WriteLine("Done in " + watch.Elapsed.TotalSeconds + "s. " + (valid ? "SUCCESS" : "<!!! FAILED !!!>"));
 
-            return new RunResult()
-            {
-                Name = this.GetType().Name,
-                ExecutedOn = ExecuteOn,
-                SizeX = this.sizeX,
-                SizeY = this.sizeY,
-                SizeZ = this.sizeZ,
-                ElapsedTotalSeconds = watch.Elapsed.TotalSeconds,
-                Valid = valid
-            };
+            RunResult result = new RunResult();
+			result.Name = this.GetType().Name;
+			result.ExecutedOn = ExecuteOn;
+			result.SizeX = this.sizeX;
+            result.SizeY = this.sizeY;
+            result.SizeZ = this.sizeZ;
+            result.ElapsedTotalSeconds = watch.Elapsed.TotalSeconds;
+            result.Valid = valid;
+			return result;
         }
 
         protected abstract void setup();

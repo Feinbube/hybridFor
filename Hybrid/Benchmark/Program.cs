@@ -227,11 +227,22 @@ namespace Hybrid.Benchmark
 
         private void runExampleGpuAndAutomaticOnly(ExampleBase example, double sizeFactor)
         {
-            ExampleBase.RunResult runResultSerial = new ExampleBase.RunResult() { 
-                Valid = true, ElapsedTotalSeconds = 1, SizeX = sizeFactor, SizeY = sizeFactor, SizeZ = sizeFactor, Name = example.Name }; //executeSerial(example, sizeFactor);
+            ExampleBase.RunResult runResultSerial = new ExampleBase.RunResult();
+            {
+                runResultSerial.Valid = true;
+                runResultSerial.ElapsedTotalSeconds = 1;
+                runResultSerial.SizeX = sizeFactor;
+                runResultSerial.SizeY = sizeFactor;
+                runResultSerial.SizeZ = sizeFactor;
+                runResultSerial.Name = example.Name;
+            }; //executeSerial(example, sizeFactor);
             ExampleBase.RunResult runResultParallel = executeParallel(example, sizeFactor);
             ExampleBase.RunResult runResultGPU = executeGpu(example, sizeFactor);
-            ExampleBase.RunResult runResultAutomatic = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 }; //executeAutomatic(example, sizeFactor);
+            ExampleBase.RunResult runResultAutomatic = new ExampleBase.RunResult();
+            {
+                runResultAutomatic.Valid = false;
+                runResultAutomatic.ElapsedTotalSeconds = -1;
+            }; //executeAutomatic(example, sizeFactor);
 
             logWriteLine();
 
@@ -258,7 +269,13 @@ namespace Hybrid.Benchmark
             Parallel.ReInitialize();
 
             if (runResultAutomatic == null)
-                runResultAutomatic = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            {
+                runResultAutomatic = new ExampleBase.RunResult();
+                {
+                    runResultAutomatic.Valid = false;
+                    runResultAutomatic.ElapsedTotalSeconds = -1;
+                };
+            }
             return runResultAutomatic;
         }
 
@@ -275,7 +292,13 @@ namespace Hybrid.Benchmark
             }
 
             if (runResultGPU == null)
-                runResultGPU = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            {
+                runResultGPU = new ExampleBase.RunResult();
+                {
+                    runResultGPU.Valid = false;
+                    runResultGPU.ElapsedTotalSeconds = -1;
+                };
+            }
             return runResultGPU;
         }
 
@@ -284,8 +307,13 @@ namespace Hybrid.Benchmark
             logWrite("[Parallel]  ");
             ExampleBase.RunResult runResultParallel = runExample(example, Execute.OnAllCpus, sizeFactor);
 
-            if (runResultParallel == null)
-                runResultParallel = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            if (runResultParallel == null) {
+                runResultParallel = new ExampleBase.RunResult();
+                {
+                    runResultParallel.Valid = false;
+                    runResultParallel.ElapsedTotalSeconds = -1;
+                };
+            }
             return runResultParallel;
         }
 
@@ -294,8 +322,13 @@ namespace Hybrid.Benchmark
             logWrite("[Serial]    ");
             ExampleBase.RunResult runResultSerial = runExample(example, Execute.OnSingleCpu, sizeFactor);
 
-            if (runResultSerial == null)
-                runResultSerial = new ExampleBase.RunResult() { Valid = false, ElapsedTotalSeconds = -1 };
+            if (runResultSerial == null) {
+                runResultSerial = new ExampleBase.RunResult();
+                {
+                    runResultSerial.Valid = false;
+                    runResultSerial.ElapsedTotalSeconds = -1;
+                };
+            }
             return runResultSerial;
         }
 

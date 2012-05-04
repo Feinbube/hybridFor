@@ -33,19 +33,12 @@ namespace Hybrid.Cpu
             for (int i = 0; i < numberOfCores; i++)
                 ComputeUnits.Add(new CpuComputeUnit(processorInfo));
 
-            GlobalMemory = new MemoryInfo()
-            {
-                MemoryType = MemoryInfo.Type.Global,
-                Size = getGlobalMemorySizeForProcessor(processorInfo)
-            };
+            GlobalMemory = new MemoryInfo(MemoryInfo.Type.Global, getGlobalMemorySizeForProcessor(processorInfo));
 
-            Caches = new List<MemoryInfo>{ // where does L2Cache really reside: on-core or on-die?
-                new MemoryInfo()
-                {
-                    MemoryType = MemoryInfo.Type.Cache,
-                    Size = uint.Parse(processorInfo["L3CacheSize"].ToString())
-                }
-            };
+            Caches = new List<MemoryInfo>();
+			Caches.Add( // where does L2Cache really reside: on-core or on-die?
+                new MemoryInfo(MemoryInfo.Type.Cache, uint.Parse(processorInfo["L2CacheSize"].ToString()))
+                );
         }
 
         private ulong getGlobalMemorySizeForProcessor(ManagementObject processorInfo)

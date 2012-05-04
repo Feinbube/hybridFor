@@ -69,7 +69,7 @@ namespace Hybrid.Examples
             // output needs to contain all values of input{1,2}
             // this validation takes forever, because it is in O(n^2)
             for (int x = 0; x < sizeX; x++)
-                if (!output.Contains(input1[x]) || !output.Contains(input2[x]))
+                if (System.Array.IndexOf(output, input1[x])<0 || System.Array.IndexOf(output,input2[x])<0)
                     return false;
 
             // output needs to be sorted 

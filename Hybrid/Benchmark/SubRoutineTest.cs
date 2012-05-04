@@ -28,11 +28,11 @@ namespace Hybrid.Benchmark
         {
             a = new int[sizeX];
             for (int i = 0; i < sizeX; i++)
-                a[i] = random.Next();
+                a[i] = random.InstanceNext();
 
             b = new int[sizeX];
             for (int i = 0; i < sizeX; i++)
-                b[i] = random.Next();
+                b[i] = random.InstanceNext();
 
             c = new int[sizeX];
             r = new uint[sizeX];
