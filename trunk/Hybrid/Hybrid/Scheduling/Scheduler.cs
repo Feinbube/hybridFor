@@ -97,7 +97,7 @@ namespace Hybrid
                 executeInfos.Add(new ExecuteInfo(from, to, action, Platform.ComputeDevices[i]));
             }
             
-            System.Threading.Tasks.Parallel.ForEach(executeInfos, executeInfo => { executeInfo.Execute(); });
+            System.Threading.Tasks.Parallel.ForEach(executeInfos, delegate(ExecuteInfo executeInfo) { executeInfo.Execute(); });
         }
 
         public static void AutomaticFor(int fromInclusiveX, int toExclusiveX, int fromInclusiveY, int toExclusiveY, Action<int, int> action)

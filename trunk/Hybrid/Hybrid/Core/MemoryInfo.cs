@@ -17,5 +17,18 @@ namespace Hybrid
 
         public ulong Size;
         public ulong LineSize = 0;
+
+		public MemoryInfo() { }
+
+		public MemoryInfo(Type MemoryType, ulong Size) {
+			this.MemoryType = MemoryType;
+			this.Size = Size;
+		}
+
+		public MemoryInfo(Type MemoryType, Access MemoryAccess, ulong Size) {
+			this.MemoryType = MemoryType;
+			this.MemoryAccess = MemoryAccess;
+			this.Size = Size;
+		}
     }
 }

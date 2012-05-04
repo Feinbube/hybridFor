@@ -48,9 +48,12 @@ namespace Hybrid.Benchmark
         }
 
         public static List<Example> Examples;
-        
-        public static string MachineName { get; set; }
-        public static Platform Platform { get; set; }
+
+        private static string m_MachineName;
+        public static string MachineName { get { return m_MachineName; } set { m_MachineName = value; } }
+
+        private static Platform m_Platform;
+        public static Platform Platform { get { return m_Platform; } set { m_Platform = value; } }
 
         static SystemCharacteristics()
         {
@@ -83,7 +86,7 @@ namespace Hybrid.Benchmark
             return pair.Value;
         }
 
-        public static string ToString()
+        public new static string ToString()
         {
             string result = "";
 

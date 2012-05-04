@@ -21,7 +21,10 @@ namespace Hybrid
             this.action = action;
         }
 
-        public bool UsesDoublePrecisionFloatingPoint { get; set; }
-        public bool UsesAtomics { get; set; }
+		private bool usesDoublePrecisionFloatingPoint;
+		public bool UsesDoublePrecisionFloatingPoint { get { return usesDoublePrecisionFloatingPoint; } set { usesDoublePrecisionFloatingPoint = value; } }
+
+		private bool usesAtomics;
+		public bool UsesAtomics { get { return usesAtomics; } set { usesAtomics = value; } }
     }
 }

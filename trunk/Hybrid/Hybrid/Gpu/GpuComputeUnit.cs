@@ -28,21 +28,11 @@ namespace Hybrid.Gpu
 
             if (device.GlobalMemCacheSize > 0)
                 result.Add(
-                    new MemoryInfo()
-                    {
-                        MemoryAccess = mapCacheAccess(device.GlobalMemCacheType),
-                        MemoryType = MemoryInfo.Type.Cache,
-                        Size = device.GlobalMemCacheSize
-                    }
+                    new MemoryInfo(MemoryInfo.Type.Cache, mapCacheAccess(device.GlobalMemCacheType), device.GlobalMemCacheSize)
                 );
 
             result.Add(
-                new MemoryInfo() // Constant Memory
-                {
-                    MemoryType = MemoryInfo.Type.Cache,
-                    MemoryAccess = MemoryInfo.Access.ReadOnly,
-                    Size = device.MaxConstantBufferSize
-                }
+                new MemoryInfo(MemoryInfo.Type.Cache, MemoryInfo.Access.ReadOnly, device.MaxConstantBufferSize)
             );
 
             return result;
@@ -55,11 +45,7 @@ namespace Hybrid.Gpu
                 case OpenCLNet.DeviceLocalMemType.GLOBAL:
                     return null;
                 case OpenCLNet.DeviceLocalMemType.LOCAL:
-                    return new MemoryInfo()
-                    {
-                        MemoryType = MemoryInfo.Type.Shared,
-                        Size = device.LocalMemSize
-                    };
+                    return new MemoryInfo(MemoryInfo.Type.Shared,device.LocalMemSize);
                 default:
                     throw new Exception("LocalMemType " + device.LocalMemType.ToString() + " is unknown.");
             }
