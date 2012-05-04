@@ -13,7 +13,17 @@ namespace Hybrid.MsilToOpenCL
         {
             // We can invoke the kernel using the arguments from ctx now :)
             if (device == null)
+            {
                 device = GetFirstGpu();
+                if (device == null)
+                {
+                    device = GetFirstCpu();
+                }
+                if (device == null)
+                {
+                    throw new ArgumentNullException("device");
+                }
+            }
 
             OpenCLNet.Platform Platform = device.Platform;
 
