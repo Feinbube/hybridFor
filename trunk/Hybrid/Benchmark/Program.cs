@@ -281,8 +281,10 @@ namespace Hybrid.Benchmark
 
         private ExampleBase.RunResult executeGpu(ExampleBase example, double sizeFactor)
         {
+            const bool CpuViaOpenCL = true;
+
             ExampleBase.RunResult runResultGPU = null;
-            if (!SystemCharacteristics.Platform.ContainsAGpu)
+            if (!SystemCharacteristics.Platform.ContainsAGpu && !CpuViaOpenCL)
                 logWriteLine("[GPU]       No GPUs available!");
             else
             {
