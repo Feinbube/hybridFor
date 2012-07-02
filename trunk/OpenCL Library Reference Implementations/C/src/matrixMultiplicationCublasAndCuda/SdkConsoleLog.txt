@@ -1,0 +1,23 @@
+C:\Users\Ralf\Desktop\NVIDIA GPU Computing SDK 4.0\C\src\matrixMultiplicationCublasAndCuda\../../bin/win32/Release/matrixMul.exe Starting (CUDA and CUBLAS tests)...
+
+
+Using Matrix Sizes: A(640 x 960), B(640 x 640), C(640 x 960)
+
+Runing Kernels...
+
+The elapsed time for round 1 is: 14.762709 ms.
+The elapsed time for round 2 is: 14.887625 ms.
+The elapsed time for round 3 is: 14.737232 ms.
+The elapsed time for round 1 is: 49.342712 ms.
+The elapsed time for round 2 is: 49.363255 ms.
+The elapsed time for round 3 is: 49.316822 ms.
+The average elapsed time is: 49.340927 ms.
+
+NumDevsUsed = 1, Workgroup = 1024
+
+Comparing GPU results with Host computation...
+
+CUBLAS compares OK
+
+CUDA matrixMul compares OK
+
