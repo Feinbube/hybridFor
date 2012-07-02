@@ -1292,6 +1292,7 @@ namespace Hybrid.MsilToOpenCL.HighLevel
             if (MethodInfo.DeclaringType == typeof(System.Math))
             {
                 switch (MethodInfo.Name)
+
                 {
                     case "Acos":
                     case "Asin":
@@ -1300,19 +1301,40 @@ namespace Hybrid.MsilToOpenCL.HighLevel
                     case "Cos":
                     case "Cosh":
                     case "Exp":
+                    case "Floor":
                     case "Log10":
                     case "Max":
                     case "Min":
+                    case "Pow":
+                    case "Round": //Behaves different in C# and OpenCL
                     case "Sin":
                     case "Sinh":
                     case "Sqrt":
                     case "Tan":
                     case "Tanh":
                         return MethodInfo.Name.ToLower();
-
+                    case "Abs":
+                        System.Reflection.ParameterInfo[] parameterInfo = MethodInfo.GetParameters();
+                        if (parameterInfo.Length == 1)
+                        {
+                            if (parameterInfo[0].ParameterType == typeof(double) || parameterInfo[0].ParameterType == typeof(float))
+                            {
+                                return "fabs";
+                            }
+                            else
+                            {
+                                return "abs";
+                            }
+                        }
+                        break;
+                    case "Ceiling":
+                        return "ceil";
+                    case "IEEERemainder":
+                        return "remainder";
                     case "Log":
                         if (MethodInfo.GetParameters().Length == 1)
                         {
+                            // produces different results than C# implementation
                             return MethodInfo.Name.ToLower();
                         }
                         break;	// Logarithm to arbitrary base is not a built-in in OpenCL
