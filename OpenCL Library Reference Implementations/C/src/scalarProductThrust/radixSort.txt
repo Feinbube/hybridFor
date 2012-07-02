@@ -1,0 +1,13 @@
+C:\Users\Ralf\Desktop\NVIDIA GPU Computing SDK 4.0\C\src\scalarProductThrust\../../bin/win64/Debug/ScalarProductThrust.exe Starting...
+
+The number of elements is set to: 2097152
+The number of warm-up rounds is set to: 2
+The number of warm-up rounds is set to: 4
+The number of warm-up rounds is set to: 1
+The elapsed time for round 1 is: 117.575134 ms.
+The elapsed time for round 2 is: 117.419807 ms.
+The elapsed time for round 3 is: 117.543037 ms.
+The elapsed time for round 4 is: 117.559807 ms.
+The result is: 2863661056.
+The average elapsed time is: 117.524445 ms.
+
