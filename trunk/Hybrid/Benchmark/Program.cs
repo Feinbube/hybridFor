@@ -110,7 +110,9 @@ namespace Hybrid.Benchmark
                 //new LocalFunctionCall(),
                 //new StaticFunctionCall(),
                 //new RandomExample(),
-                //new Switch(), 
+                //new Switch(),
+                //new ForLoop(),
+                new MathematicalFunctions(),
                 
                 //-----------------------------------------
 
@@ -251,10 +253,10 @@ namespace Hybrid.Benchmark
 
         private void runExample(ExampleBase example, double sizeFactor)
         {
-            ExampleBase.RunResult runResultSerial = executeSerial(example, sizeFactor);
-            ExampleBase.RunResult runResultParallel = executeParallel(example, sizeFactor);
+           // ExampleBase.RunResult runResultSerial = executeSerial(example, sizeFactor);
+           // ExampleBase.RunResult runResultParallel = executeParallel(example, sizeFactor);
             ExampleBase.RunResult runResultGPU = executeGpu(example, sizeFactor);
-            ExampleBase.RunResult runResultAutomatic = executeAutomatic(example, sizeFactor);
+           // ExampleBase.RunResult runResultAutomatic = executeAutomatic(example, sizeFactor);
 
             logWriteLine();
 
