@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Hybrid.Examples
+namespace Hybrid.Examples.Functionality
 {
     // Simple test for switch statement
     // Just fill an input array with random values,

@@ -9,13 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid.Benchmark", "Benchma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid.Testsuite", "Testsuite\Hybrid.Testsuite.csproj", "{EFD8F0F7-0F68-4D49-A697-7372B30E17F9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F415357E-177E-4DD4-9FF4-5CB20C903E38}"
-	ProjectSection(SolutionItems) = preProject
-		Hybrid.vsmdi = Hybrid.vsmdi
-		Local.testsettings = Local.testsettings
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid", "Hybrid\Hybrid.csproj", "{5EAE1B62-A9FD-496D-8903-6464474FD652}"
 EndProject
 Global

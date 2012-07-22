@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Hybrid.Examples
+namespace Hybrid.Examples.Functionality
 {
     public class StaticFunctionCall: ExampleBase
     {

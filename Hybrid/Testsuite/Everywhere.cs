@@ -12,7 +12,7 @@ using Hybrid.Examples.Upcrc2010;
 
 namespace Hybrid.Testsuite
 {
-    [TestClass]
+    //[TestClass]
     public class Everywhere : ExampleTestBase
     {
         override protected void testExample(ExampleBase example)
