@@ -11,6 +11,9 @@ textPath = "D:\\Test\\header.txt"
 path = "D:\\Test\\tests2"
 fileExtension = "cs"
 
+def preheader(fileName):
+    return "/*    \n*    " + fileName + "\n*\n";
+
 def writeHeaderToAllFilesInDir():
     headerHandle = open(textPath, "r")
     header = headerHandle.read()
@@ -28,6 +31,7 @@ def writeHeaderToEveryFileInDir(header, path):
                 fileHandle.close()
                 
                 fileHandle = open(root + "\\" + str(fileName), "w")
+                fileHandle.write(preheader(fileName))
                 fileHandle.write(header);
                 fileHandle.write(tempFile)
                 fileHandle.close()

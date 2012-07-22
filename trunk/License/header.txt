@@ -1,6 +1,4 @@
-/*
-*	 <one line to give the program's name and a brief idea of what it does.>
-*    Copyright (C) 2012  <name of author>
+*    Copyright (C) 2012  Frank Feinbube, Jan-Arne Sobania, Ralf Diestelkämper
 *
 *    This library is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU Lesser General Public License as published by
@@ -14,6 +12,9 @@
 *
 *    You should have received a copy of the GNU Lesser General Public License
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*    Frank [at] Feinbube [dot] de
+*
+*    ralf [dot] diestelkaemper [at] hotmail [dot] com
+*
 */
-
-Also add information on how to contact you by electronic and paper mail.
