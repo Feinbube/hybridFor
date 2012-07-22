@@ -31,6 +31,7 @@ namespace Hybrid.Examples.FurtherExamples
 
         protected override void algorithm() 
         {
+            //TODO: Find parallel implementation
             for (int i = 0; i < a.Length; i++)
             {
                 result += a[i];

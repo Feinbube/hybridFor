@@ -9,6 +9,7 @@ using Hybrid.Examples;
 using Hybrid.Examples.Upcrc2010.MatrixMultiplication;
 using Hybrid.Examples.CudaByExample;
 using Hybrid.Examples.Upcrc2010;
+using Hybrid.Examples.Functionality;
 
 namespace Hybrid.Testsuite
 {
@@ -203,6 +204,25 @@ namespace Hybrid.Testsuite
             testExample(new Wator());
         }
 
+        [TestMethod]
+        public void MathematicalFunctionsTest()
+        {
+            testExample(new MathematicalFunctions());
+        }
+
+        [TestMethod]
+        public void ForLoopTest()
+        {
+            testExample(new ForLoop());
+        }
+
+        [TestMethod]
+        public void ConvolutionNPPTest()
+        {
+            testExample(new ConvolutionNPP());
+        }
         protected abstract void testExample(ExampleBase example);
+
+        
     }
 }
