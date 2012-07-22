@@ -55,8 +55,10 @@
     <Compile Include="CUDAByExample\SummingVectors.cs" />
     <Compile Include="ExampleBase.cs" />
     <Compile Include="Functionality\AtomicExample.cs" />
+    <Compile Include="Functionality\ForLoop.cs" />
     <Compile Include="Functionality\Lists.cs" />
     <Compile Include="Functionality\LocalFunctionCall.cs" />
+    <Compile Include="Functionality\MathematicalFunctions.cs" />
     <Compile Include="Functionality\RandomExample.cs" />
     <Compile Include="FurtherExamples\ConvolutionNPP.cs" />
     <Compile Include="FurtherExamples\Sum.cs" />
