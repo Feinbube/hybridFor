@@ -14,7 +14,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *    Frank [at] Feinbube [dot] de
-*
+*    jan-arne [dot] sobania [at] gmx [dot] net
 *    ralf [dot] diestelkaemper [at] hotmail [dot] com
 *
 */
