@@ -7,8 +7,8 @@ which have the the matching fileExtension
 
 import os
 
-textPath = "D:\\Test\\header.txt"
-path = "D:\\Test\\tests2"
+textPath = "D:\\Studium\\Arbeit\\ParProg\\Hybrid\\trunk\\License\\headerJanArne.txt"
+path = "D:\\Studium\\Arbeit\\ParProg\\Hybrid\\trunk\\Hybrid\\MSilToOpenCL"
 fileExtension = "cs"
 
 def preheader(fileName):

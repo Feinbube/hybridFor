@@ -1,4 +1,4 @@
-*    Copyright (C) 2012  Frank Feinbube, Jan-Arne Sobania, Ralf Diestelk�mper
+﻿*    Copyright (C) 2012  Frank Feinbube, Jan-Arne Sobania, Ralf Diestelkämper
 *
 *    This library is free software: you can redistribute it and/or modify
 *    it under the terms of the GNU Lesser General Public License as published by
@@ -18,3 +18,5 @@
 *    ralf [dot] diestelkaemper [at] hotmail [dot] com
 *
 */
+
+
