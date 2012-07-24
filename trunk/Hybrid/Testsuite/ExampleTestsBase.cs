@@ -18,7 +18,7 @@ namespace Hybrid.Testsuite
     {
         //Functionality Tests
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void Lists()
         {
             testExample(new Lists());
@@ -174,13 +174,13 @@ namespace Hybrid.Testsuite
             testExample(new SudokuValidatorInvalidSubfield());
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void Crypt3Test()
         {
             testExample(new Crypt3());
         }
         
-        [TestMethod]
+        [TestMethod, Ignore]
         public void GameOfLifeTest()
         {
             testExample(new GameOfLife());
@@ -192,13 +192,13 @@ namespace Hybrid.Testsuite
             testExample(new Merge());
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void ParGrepTest()
         {
             testExample(new ParGrep());
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void WatorTest()
         {
             testExample(new Wator());
