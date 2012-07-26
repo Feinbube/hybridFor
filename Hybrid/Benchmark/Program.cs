@@ -173,7 +173,7 @@ namespace Hybrid.Benchmark
                 
                 //Matrix Multiplication
                 
-                //new MatrixMultiplication0(),
+                new MatrixMultiplication0(),
                 //new MatrixMultiplication1(),
                 //new MatrixMultiplication2(),
                 //new MatrixMultiplication3(),
