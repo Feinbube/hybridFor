@@ -1,0 +1,1 @@
+scalarProdCublas.exe -n=6471936 -w=5 -m=5 -c=5 

@@ -1,0 +1,1 @@
+vectorAverageThrust.exe -n=8852940 -w=5 -m=5 -c=5 

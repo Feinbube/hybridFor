@@ -1,0 +1,1 @@
+boxFilterNPP.exe -x=1200 -y=1200 -w=5 -m=5 -c=5 

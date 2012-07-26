@@ -1,0 +1,1 @@
+histogramThrust.exe -n=113993 -w=5 -m=5 -c=5 
