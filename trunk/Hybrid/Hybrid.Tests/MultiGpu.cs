@@ -35,7 +35,7 @@ using Hybrid.Examples.Upcrc2010.MatrixMultiplication;
 using Hybrid.Examples.CudaByExample;
 using Hybrid.Examples.Upcrc2010;
 
-namespace Hybrid.Testsuite
+namespace Hybrid.Tests
 {
     //[TestClass]
     public class MultiGpu : ExampleTestBase
