@@ -36,7 +36,7 @@ using Hybrid.Examples.CudaByExample;
 using Hybrid.Examples.Upcrc2010;
 using Hybrid.Examples.Functionality;
 
-namespace Hybrid.Testsuite
+namespace Hybrid.Tests
 {
     [TestClass]
     abstract public class ExampleTestBase
